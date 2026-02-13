@@ -517,6 +517,8 @@ def smart_triage_with_llm(story_groups):
         sources = ", ".join(set(a.source_name for a in group))
         story_summaries.append(f"{i}. [{sources}] {lead.title}")
 
+    newline = "\n"
+    stories_list = newline.join(story_summaries)
     prompt = f"""You are a news editor. From these candidate stories, pick the 15-20 most important
 and interesting ones for a reader interested in: world politics, Canadian politics, US politics,
 economics/business, AI/technology, Canadian insurance, data privacy/AI governance, and uplifting culture stories.
@@ -526,7 +528,7 @@ Pick stories that are: genuinely significant, have real-world impact, represent 
 and include at least 1-2 uplifting/cultural stories.
 
 Stories:
-{chr(10).join(story_summaries)}"""
+{stories_list}"""
 
     print("\n🧠 Smart triage with Gemini Flash...")
     result = call_llm("google", "gemini-2.0-flash", "You are a concise news editor.", prompt, api_key, max_tokens=200)
@@ -608,6 +610,7 @@ def synthesize_briefing(top_stories, all_analyses):
         return "No LLM API keys configured - cannot generate synthesis."
 
     # Build synthesis prompt
+    newline = "\n"
     story_summaries = []
     for i, (group, analyses) in enumerate(zip(top_stories, all_analyses)):
         lead = group[0]
@@ -626,7 +629,7 @@ Based on these stories and multi-LLM analyses, write a compelling 3-4 paragraph 
 Be sharp, concise, and insightful. Write as if briefing a senior executive.
 
 TODAY'S STORIES:
-{chr(10).join(story_summaries[:10])}"""
+{newline.join(story_summaries[:10])}"""
 
     print("\n📝 Generating synthesis...")
     return call_llm(provider, model, "You are an expert intelligence briefing writer.", prompt, api_key, max_tokens=1000)
@@ -688,6 +691,14 @@ def generate_html(top_stories, all_analyses, synthesis, run_time):
 
     # Escape synthesis
     synthesis_escaped = (synthesis or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    # Pre-build filter buttons (avoid backslash in f-string)
+    filter_buttons = "".join(
+        '<button class="filter-btn" onclick="filterStories(\'{tid}\')">{icon} {name}</button>'.format(
+            tid=tid, icon=t["icon"], name=t["name"]
+        )
+        for tid, t in TOPICS.items()
+    )
 
     html = f'''<!DOCTYPE html>
 <html lang="en">
@@ -991,7 +1002,7 @@ def generate_html(top_stories, all_analyses, synthesis, run_time):
 
         <div class="filter-bar">
             <button class="filter-btn active" onclick="filterStories('all')">All</button>
-            {"".join(f'<button class="filter-btn" onclick="filterStories(\\'{tid}\\')">{t["icon"]} {t["name"]}</button>' for tid, t in TOPICS.items())}
+            {filter_buttons}
         </div>
 
         <div class="synthesis">
