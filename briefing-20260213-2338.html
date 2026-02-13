@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Briefing — February 13, 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0c;
+            --bg-card: #111116;
+            --bg-card-hover: #16161d;
+            --bg-analysis: #0d0d12;
+            --text-primary: #e8e6e1;
+            --text-secondary: #8a8a95;
+            --text-dim: #55555f;
+            --accent-gold: #c9a84c;
+            --accent-blue: #4a7cc9;
+            --accent-green: #4caa7c;
+            --accent-red: #c94a5a;
+            --accent-purple: #8a5cc9;
+            --border: #1e1e28;
+            --border-subtle: #15151d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* HEADER */
+        header {
+            padding: 40px 0 30px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .masthead {
+            font-family: 'Newsreader', serif;
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .masthead .accent { color: var(--accent-gold); }
+
+        .run-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .run-info strong { color: var(--text-primary); font-weight: 500; }
+
+        /* FILTER TABS */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            background: rgba(201, 168, 76, 0.08);
+        }
+
+        /* SYNTHESIS */
+        .synthesis {
+            background: linear-gradient(135deg, #111118, #0f0f1a);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .synthesis h2 {
+            font-family: 'Newsreader', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--accent-gold);
+            margin-bottom: 14px;
+        }
+
+        .synthesis p {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        /* STORY CARDS */
+        .story-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 22px;
+            margin-bottom: 16px;
+            transition: background 0.2s;
+        }
+
+        .story-card:hover { background: var(--bg-card-hover); }
+
+        .topic-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .topic-tag {
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: rgba(201, 168, 76, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid rgba(201, 168, 76, 0.15);
+        }
+
+        .story-title {
+            font-family: 'Newsreader', serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .story-title a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .story-title a:hover { color: var(--accent-gold); }
+
+        .story-meta {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 12px;
+        }
+
+        .story-summary {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+
+        /* MULTI-SOURCE */
+        .multi-source {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 10px 0;
+            padding: 8px 12px;
+            background: rgba(74, 124, 201, 0.06);
+            border-radius: 6px;
+            border: 1px solid rgba(74, 124, 201, 0.1);
+        }
+
+        .perspective-badge {
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .bias-label {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+        }
+
+        /* ANALYSES ACCORDION */
+        .analyses-container { margin-top: 12px; }
+
+        .toggle-analyses {
+            width: 100%;
+            background: var(--bg-analysis);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-analyses:hover { border-color: var(--accent-purple); color: var(--text-primary); }
+
+        .analyses-content {
+            display: none;
+            margin-top: 8px;
+        }
+
+        .analyses-container.open .analyses-content { display: block; }
+        .analyses-container.open .arrow { transform: rotate(180deg); }
+
+        .llm-analysis {
+            background: var(--bg-analysis);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 8px;
+        }
+
+        .llm-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--accent-purple);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .llm-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .masthead { font-size: 1.6rem; }
+            .story-card { padding: 16px; }
+            .story-title { font-size: 1.05rem; }
+            header { padding: 24px 0 20px; }
+        }
+
+        /* TOPIC-SPECIFIC COLORS */
+        [data-topic="world_politics"] { background: rgba(74, 124, 201, 0.1); border-color: rgba(74, 124, 201, 0.2); color: #6a9cd9; }
+        [data-topic="canada_politics"] { background: rgba(201, 76, 76, 0.1); border-color: rgba(201, 76, 76, 0.2); color: #d97a7a; }
+        [data-topic="us_politics"] { background: rgba(76, 100, 201, 0.1); border-color: rgba(76, 100, 201, 0.2); color: #7a8ed9; }
+        [data-topic="economics_business"] { background: rgba(76, 170, 124, 0.1); border-color: rgba(76, 170, 124, 0.2); color: #6ac9a0; }
+        [data-topic="tech_ai"] { background: rgba(138, 92, 201, 0.1); border-color: rgba(138, 92, 201, 0.2); color: #a87ed9; }
+        [data-topic="insurance_canada"] { background: rgba(201, 168, 76, 0.1); border-color: rgba(201, 168, 76, 0.2); color: #d9c06a; }
+        [data-topic="data_privacy_governance"] { background: rgba(76, 180, 201, 0.1); border-color: rgba(76, 180, 201, 0.2); color: #6ad0d9; }
+        [data-topic="culture_good_news"] { background: rgba(201, 140, 76, 0.1); border-color: rgba(201, 140, 76, 0.2); color: #d9b06a; }
+
+        /* Loading shimmer for future use */
+        .loading { opacity: 0.5; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.8; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="masthead">Global <span class="accent">Briefing</span></div>
+            <div class="run-info">
+                <strong>Friday, February 13, 2026 • 11:38 PM UTC</strong><br>
+                20 stories from 4 sources •
+                Analyzed by 0 AI models
+            </div>
+        </header>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterStories('all')">All</button>
+            <button class="filter-btn" onclick="filterStories('world_politics')">🌍 World Politics & Geopolitics</button><button class="filter-btn" onclick="filterStories('canada_politics')">🍁 Canadian Politics & Policy</button><button class="filter-btn" onclick="filterStories('us_politics')">🇺🇸 US Politics</button><button class="filter-btn" onclick="filterStories('economics_business')">📊 Economics & Business</button><button class="filter-btn" onclick="filterStories('tech_ai')">🤖 Technology & AI</button><button class="filter-btn" onclick="filterStories('insurance_canada')">🛡️ Canadian Insurance Industry</button><button class="filter-btn" onclick="filterStories('data_privacy_governance')">🔐 Data, Privacy & AI Governance</button><button class="filter-btn" onclick="filterStories('culture_good_news')">🌈 Culture, Joy & Good News</button>
+        </div>
+
+        <div class="synthesis">
+            <h2>📋 Today's Synthesis</h2>
+            <p></p>
+        </div>
+
+        <div id="stories">
+            
+        <article class="story-card" data-topics="canada_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="canada_politics">🍁 Canadian Politics & Policy</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://nationalpost.com/sports/olympics/19-seconds-of-canada-power-play-magic" target="_blank" rel="noopener">For these 19 seconds of Team Canada power-play magic, it was (almost) worth the wait</a></h2>
+                <div class="story-meta">
+                    <span class="source">National Post</span>
+                    <span class="region">Canada</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Interestingly, the Canadians are probably just finding their sea legs with the man advantage.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="canada_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="canada_politics">🍁 Canadian Politics & Policy</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://nationalpost.com/sports/olympics/connor-mcdavid-nathan-mackinnon-2026-olympics-team-canada-swiss" target="_blank" rel="noopener">Canada, led again by McDavid and MacKinnon, passes Swiss test in second Olympic contest</a></h2>
+                <div class="story-meta">
+                    <span class="source">National Post</span>
+                    <span class="region">Canada</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Really, it was the best second test for a Canadian men's hockey squad that wanted to rev up its engine a little more from a high-quality first game</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai culture_good_news">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span> <span class="topic-tag" data-topic="culture_good_news">🌈 Culture, Joy & Good News</span></div>
+                <h2 class="story-title"><a href="https://nationalpost.com/news/canada/b-c-mass-shooting-shakes-newfoundland-community-killers-mother-once-called-home" target="_blank" rel="noopener">B.C. mass shooting shakes Newfoundland community killer’s mother once called home</a></h2>
+                <div class="story-meta">
+                    <span class="source">National Post</span>
+                    <span class="region">Canada</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">'She was just a regular, happy-go-lucky little child,' the owner of the general store in Lawn, N.L. said of Jennifer Strang</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics canada_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="canada_politics">🍁 Canadian Politics & Policy</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://nationalpost.com/sports/team-canada-men-hockey-josh-morrissey-injured" target="_blank" rel="noopener">Canada’s Josh Morrissey won’t play against Switzerland due to suspected injury</a></h2>
+                <div class="story-meta">
+                    <span class="source">National Post</span>
+                    <span class="region">Canada</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Morrissey left Thursday's 5-0 win over Czechia in the second period with an undisclosed injury. His status moving forward, is unknown</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics canada_politics culture_good_news">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="canada_politics">🍁 Canadian Politics & Policy</span> <span class="topic-tag" data-topic="culture_good_news">🌈 Culture, Joy & Good News</span></div>
+                <h2 class="story-title"><a href="https://nationalpost.com/news/csis-officials-say-china-is-more-of-a-concern-in-canadas-arctic-than-russia" target="_blank" rel="noopener">CSIS officials say China is more of a concern in Canada’s Arctic than Russia</a></h2>
+                <div class="story-meta">
+                    <span class="source">National Post</span>
+                    <span class="region">Canada</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Lynd’s warning comes just a month after Prime Minister Mark Carney signed a new 'strategic partnership' with China</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="canada_politics world_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="canada_politics">🍁 Canadian Politics & Policy</span> <span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://nationalpost.com/news/canada/energy-minister-says-ottawa-needs-more-prairie-pragmatism-on-energy" target="_blank" rel="noopener">Energy minister says Ottawa needs more ‘Prairie pragmatism’ on energy</a></h2>
+                <div class="story-meta">
+                    <span class="source">National Post</span>
+                    <span class="region">Canada</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">His remarks drew a clear connection between Ottawa-Alberta energy cooperation and keeping the country together</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai culture_good_news">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span> <span class="topic-tag" data-topic="culture_good_news">🌈 Culture, Joy & Good News</span></div>
+                <h2 class="story-title"><a href="https://www.bbc.com/news/articles/cq8gv2327y7o?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">Two jailed over plot to attack Jewish community</a></h2>
+                <div class="story-meta">
+                    <span class="source">BBC News</span>
+                    <span class="region">UK</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Walid Saadaoui and Amar Hussein planned to carry out an "Isis-inspired plot", a court hears.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai insurance_canada">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span> <span class="topic-tag" data-topic="insurance_canada">🛡️ Canadian Insurance Industry</span></div>
+                <h2 class="story-title"><a href="https://www.bbc.com/news/videos/c20jepq911zo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">Watch: How Andrew's BBC interview compares to what Epstein emails tell us now</a></h2>
+                <div class="story-meta">
+                    <span class="source">BBC News</span>
+                    <span class="region">UK</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Following the latest release of the Epstein files, claims made by the then Prince Andrew in 2019 are under fresh scrutiny.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://www.bbc.com/news/articles/cnv63q1vpv1o?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">Boxers, dancers and weightlifters - the war dead pictured on banned Ukrainian slider's helmet</a></h2>
+                <div class="story-meta">
+                    <span class="source">BBC News</span>
+                    <span class="region">UK</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Vladyslav Heraskevych's helmet depicts fellow athletes who have been killed since Russia's full-scale invasion of his country.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai culture_good_news">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span> <span class="topic-tag" data-topic="culture_good_news">🌈 Culture, Joy & Good News</span></div>
+                <h2 class="story-title"><a href="https://www.bbc.com/news/articles/cp8rn6z1dg2o?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">British couple held by Taliban describe 'culture shock' returning to UK</a></h2>
+                <div class="story-meta">
+                    <span class="source">BBC News</span>
+                    <span class="region">UK</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Peter and Barbie Reynolds were released by the Taliban in September after being detained for seven-and-a-half months.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="economics_business tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="economics_business">📊 Economics & Business</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://www.bbc.com/news/articles/cddn6yyr66yo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">Andrew facing claim he shared Treasury document with banking contact</a></h2>
+                <div class="story-meta">
+                    <span class="source">BBC News</span>
+                    <span class="region">UK</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Reports suggest the former prince shared a Treasury document when he was serving as trade envoy.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai culture_good_news">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span> <span class="topic-tag" data-topic="culture_good_news">🌈 Culture, Joy & Good News</span></div>
+                <h2 class="story-title"><a href="https://www.bbc.com/sport/articles/cwy8dgzzpkqo?at_medium=RSS&at_campaign=rss" target="_blank" rel="noopener">Vomiting Musgrave battles heat & Norwegians to set new best</a></h2>
+                <div class="story-meta">
+                    <span class="source">BBC News</span>
+                    <span class="region">UK</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">The 35-year-old Scot finished sixth in the 10km interval start freestyle to post Britain's best finish in a Winter Olympic cross-country skiing event.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics us_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="us_politics">🇺🇸 US Politics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://www.nytimes.com/2026/02/13/world/middleeast/board-peace-pledges-gaza.html" target="_blank" rel="noopener">Trump’s ‘Board of Peace’ Said to Raise Billions in First Pledges for Gaza</a></h2>
+                <div class="story-meta">
+                    <span class="source">New York Times</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">The United Arab Emirates and the United States have each committed more than $1 billion to President Trump’s new international initiative, officials said.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="us_politics world_politics">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="us_politics">🇺🇸 US Politics</span> <span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span></div>
+                <h2 class="story-title"><a href="https://www.nytimes.com/2026/02/13/us/politics/congress-jets-off-shutdown.html" target="_blank" rel="noopener">Congress Leaves DC as DHS Shuts Down</a></h2>
+                <div class="story-meta">
+                    <span class="source">New York Times</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Despite a deadlock over funding for the agency, lawmakers left town and left Democratic and White House negotiators to try to work out a deal in their absence.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="us_politics economics_business">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="us_politics">🇺🇸 US Politics</span> <span class="topic-tag" data-topic="economics_business">📊 Economics & Business</span></div>
+                <h2 class="story-title"><a href="https://www.nytimes.com/2026/02/13/business/economy-inflation-jobs-trump.html" target="_blank" rel="noopener">White House Sees Win After 2 Strong Economic Reports</a></h2>
+                <div class="story-meta">
+                    <span class="source">New York Times</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Solid jobs data and a soft inflation reading for January are welcome news for President Trump. But the bigger economic picture is less encouraging.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="economics_business world_politics">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="economics_business">📊 Economics & Business</span> <span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span></div>
+                <h2 class="story-title"><a href="https://www.nytimes.com/2026/02/13/business/markets-crisis-trump.html" target="_blank" rel="noopener">Crises Everywhere, but the Markets Don’t Seem to Mind</a></h2>
+                <div class="story-meta">
+                    <span class="source">New York Times</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Stocks have prospered while the world has plunged into disorder, an economist says. “Keep calm and carry on” may be the best investors can do.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics us_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="us_politics">🇺🇸 US Politics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://www.nytimes.com/2026/02/13/world/europe/germany-merz-trump-munich.html" target="_blank" rel="noopener">German Officials Needle Trump at Munich Security Conference</a></h2>
+                <div class="story-meta">
+                    <span class="source">New York Times</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Friedrich Merz, the chancellor of Germany, said that under President Trump, the United States’ claim to global leadership “has been challenged, and possibly squandered.”</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://www.wsj.com/articles/suspected-sabotage-of-deep-sea-cable-triggers-first-nato-led-response-337119ba" target="_blank" rel="noopener">Suspected Sabotage of Deep-Sea Cable Triggers First NATO-Led Response</a></h2>
+                <div class="story-meta">
+                    <span class="source">Wall Street Journal</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">The alliance mounted its first coordinated response to a suspected sabotage campaign against critical infrastructure after another cable was severed in the Baltic Sea.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics tech_ai">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="tech_ai">🤖 Technology & AI</span></div>
+                <h2 class="story-title"><a href="https://www.wsj.com/articles/cocaine-funded-gangs-shake-colombia-years-after-peace-pact-a45a28da" target="_blank" rel="noopener">Cocaine-Funded Gangs Shake Colombia Years After Peace Pact</a></h2>
+                <div class="story-meta">
+                    <span class="source">Wall Street Journal</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">Attacks by powerful militias against civilians reflect the state’s inaction eight years after a peace accord removed a powerful rebel group from the field.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        <article class="story-card" data-topics="world_politics us_politics economics_business culture_good_news">
+            <div class="story-header">
+                <div class="topic-tags"><span class="topic-tag" data-topic="world_politics">🌍 World Politics & Geopolitics</span> <span class="topic-tag" data-topic="us_politics">🇺🇸 US Politics</span> <span class="topic-tag" data-topic="economics_business">📊 Economics & Business</span></div>
+                <h2 class="story-title"><a href="https://www.wsj.com/articles/trump-says-colombia-will-face-25-tariffs-amid-fight-over-deportation-flights-e32dc497" target="_blank" rel="noopener">Trump Says Colombia Will Accept Deportees, Ending Tariff Standoff</a></h2>
+                <div class="story-meta">
+                    <span class="source">Wall Street Journal</span>
+                    <span class="region">USA</span>
+                </div>
+            </div>
+            
+            <p class="story-summary">The president has made immigration an early priority to start second term, with ICE making more than 900 arrests Sunday.</p>
+            <div class="analyses-container">
+                <button class="toggle-analyses" onclick="this.parentElement.classList.toggle('open')">
+                    🤖 AI Analysis (0 perspectives) <span class="arrow">▾</span>
+                </button>
+                <div class="analyses-content">
+                    
+                </div>
+            </div>
+        </article>
+        </div>
+
+        <footer>
+            Global Briefing • AI-powered intelligence system<br>
+            Sources: 66 feeds across 18 regions
+        </footer>
+    </div>
+
+    <script>
+        function filterStories(topic) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.story-card').forEach(card => {
+                if (topic === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    const topics = card.getAttribute('data-topics').split(' ');
+                    card.style.display = topics.includes(topic) ? 'block' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
