@@ -1,3 +1,6 @@
+
+Copy
+
 #!/usr/bin/env python3
 """
 Global Briefing System
@@ -15,6 +18,7 @@ import os
 import sys
 import hashlib
 import re
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -372,7 +376,7 @@ def group_by_story(articles):
     return groups
 
 
-def select_top_stories(groups, max_stories=20):
+def select_top_stories(groups, max_stories=12):
     """Select the top stories to send to LLMs for deep analysis."""
     # Score groups by: number of sources covering it × importance
     scored = []
@@ -394,94 +398,113 @@ def select_top_stories(groups, max_stories=20):
 
 def call_llm(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500):
     """
-    Unified LLM caller. Supports: openai (ChatGPT), anthropic (Claude),
-    google (Gemini), xai (Grok).
+    Unified LLM caller with retry logic for rate limits.
+    Supports: openai (ChatGPT), anthropic (Claude), google (Gemini), xai (Grok).
     """
-    try:
-        if provider == "google":
-            # Gemini API
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
-            payload = {
-                "contents": [{"parts": [{"text": f"{system_prompt}\n\n{user_prompt}"}]}],
-                "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.7}
-            }
-            resp = requests.post(url, json=payload, timeout=60)
-            resp.raise_for_status()
-            data = resp.json()
-            return data["candidates"][0]["content"]["parts"][0]["text"]
+    max_retries = 3
 
-        elif provider == "openai":
-            url = "https://api.openai.com/v1/chat/completions"
-            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-            payload = {
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                "max_tokens": max_tokens,
-                "temperature": 0.7
-            }
-            resp = requests.post(url, headers=headers, json=payload, timeout=60)
-            resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
+    for attempt in range(max_retries):
+        try:
+            resp = _call_llm_once(provider, model, system_prompt, user_prompt, api_key, max_tokens)
+            return resp
+        except requests.exceptions.HTTPError as e:
+            if e.response is not None and e.response.status_code == 429:
+                wait_time = (attempt + 1) * 15  # 15s, 30s, 45s
+                print(f"    ⏳ Rate limited, waiting {wait_time}s (attempt {attempt+1}/{max_retries})...")
+                time.sleep(wait_time)
+            else:
+                print(f"  ❌ {provider}/{model}: HTTP {e.response.status_code if e.response else 'unknown'}")
+                return None
+        except Exception as e:
+            print(f"  ❌ {provider}/{model}: {str(e)[:100]}")
+            return None
 
-        elif provider == "anthropic":
-            url = "https://api.anthropic.com/v1/messages"
-            headers = {
-                "x-api-key": api_key,
-                "content-type": "application/json",
-                "anthropic-version": "2023-06-01"
-            }
-            payload = {
-                "model": model,
-                "max_tokens": max_tokens,
-                "system": system_prompt,
-                "messages": [{"role": "user", "content": user_prompt}]
-            }
-            resp = requests.post(url, headers=headers, json=payload, timeout=60)
-            resp.raise_for_status()
-            return resp.json()["content"][0]["text"]
+    print(f"  ❌ {provider}/{model}: Failed after {max_retries} retries (rate limited)")
+    return None
 
-        elif provider == "xai":
-            # Grok uses OpenAI-compatible API
-            url = "https://api.x.ai/v1/chat/completions"
-            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-            payload = {
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                "max_tokens": max_tokens,
-                "temperature": 0.7
-            }
-            resp = requests.post(url, headers=headers, json=payload, timeout=60)
-            resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
 
-    except Exception as e:
-        print(f"  ❌ {provider}/{model}: {str(e)[:100]}")
-        return None
+def _call_llm_once(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500):
+    """Single LLM API call. Raises HTTPError on failure."""
+    if provider == "google":
+        # Gemini API
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        payload = {
+            "contents": [{"parts": [{"text": f"{system_prompt}\n\n{user_prompt}"}]}],
+            "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.7}
+        }
+        resp = requests.post(url, json=payload, timeout=60)
+        resp.raise_for_status()
+        data = resp.json()
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+
+    elif provider == "openai":
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.7
+        }
+        resp = requests.post(url, headers=headers, json=payload, timeout=60)
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
+
+    elif provider == "anthropic":
+        url = "https://api.anthropic.com/v1/messages"
+        headers = {
+            "x-api-key": api_key,
+            "content-type": "application/json",
+            "anthropic-version": "2023-06-01"
+        }
+        payload = {
+            "model": model,
+            "max_tokens": max_tokens,
+            "system": system_prompt,
+            "messages": [{"role": "user", "content": user_prompt}]
+        }
+        resp = requests.post(url, headers=headers, json=payload, timeout=60)
+        resp.raise_for_status()
+        return resp.json()["content"][0]["text"]
+
+    elif provider == "xai":
+        # Grok uses OpenAI-compatible API
+        url = "https://api.x.ai/v1/chat/completions"
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.7
+        }
+        resp = requests.post(url, headers=headers, json=payload, timeout=60)
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
 
 
 # LLM configurations - uses env vars for API keys
 LLM_CONFIGS = {
     "gemini_triage": {
         "provider": "google",
-        "model": "gemini-2.0-flash",
+        "model": "gemini-3-flash-preview",
         "env_key": "GOOGLE_API_KEY",
         "label": "Gemini Flash (Triage)",
     },
     "gemini": {
         "provider": "google",
-        "model": "gemini-2.0-flash",
+        "model": "gemini-3-flash-preview",
         "env_key": "GOOGLE_API_KEY",
         "label": "Google Gemini",
     },
     "chatgpt": {
         "provider": "openai",
-        "model": "gpt-4o-mini",
+        "model": "gpt-5.2",
         "env_key": "OPENAI_API_KEY",
         "label": "ChatGPT",
     },
@@ -493,7 +516,7 @@ LLM_CONFIGS = {
     },
     "grok": {
         "provider": "xai",
-        "model": "grok-3-mini-fast",
+        "model": "grok-4",
         "env_key": "XAI_API_KEY",
         "label": "Grok",
     },
@@ -531,7 +554,7 @@ Stories:
 {stories_list}"""
 
     print("\n🧠 Smart triage with Gemini Flash...")
-    result = call_llm("google", "gemini-2.0-flash", "You are a concise news editor.", prompt, api_key, max_tokens=200)
+    result = call_llm("google", "gemini-3-flash-preview", "You are a concise news editor.", prompt, api_key, max_tokens=200)
 
     if result:
         try:
@@ -586,6 +609,9 @@ Analyze this story concisely."""
         result = call_llm(config["provider"], config["model"], system_prompt, user_prompt, api_key)
         if result:
             analyses[config["label"]] = result
+
+        # Rate limit: wait between calls (especially important for Gemini free tier)
+        time.sleep(5)
 
     return analyses
 
@@ -1067,7 +1093,7 @@ def main():
     # 4. Smart triage with LLM (if available)
     top_stories = smart_triage_with_llm(story_groups)
     if len(top_stories) > 20:
-        top_stories = top_stories[:20]
+        top_stories = top_stories[:12]
 
     print(f"\n⭐ Top stories selected: {len(top_stories)}")
     for i, group in enumerate(top_stories):
