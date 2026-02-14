@@ -1,6 +1,3 @@
-
-Copy
-
 #!/usr/bin/env python3
 """
 Global Briefing System
