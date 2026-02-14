@@ -18,7 +18,7 @@ from pathlib import Path
 
 from config import get_active_sources, get_active_topics, load_query_pack, LLM_CONFIGS
 import llm as llm_caller
-from pipeline import fetch, triage, cluster, select, perspectives, extract, compare, investigate, write, synthesize, publish
+from pipeline import fetch, triage, cluster, select, perspectives, extract, compare, investigate, write, synthesize, quickscan, publish
 
 
 def process_story(story_group, story_num, total):
@@ -140,9 +140,13 @@ def main():
     synth, synth_report = synthesize.run(topic_cards)
     all_reports.append(synth_report)
 
+    # Step 10b: Quickscan
+    qscan, qscan_report = quickscan.run(topic_cards)
+    all_reports.append(qscan_report)
+
     # Step 11: Publish
     run_time = int(time.time() - start_time)
-    html = publish.run(topic_cards, synth, all_reports, run_time)
+    html = publish.run(topic_cards, synth, qscan, all_reports, run_time)
 
     output_dir = Path("output")
     output_dir.mkdir(exist_ok=True)

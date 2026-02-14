@@ -15,12 +15,13 @@ import llm as llm_caller
 from config import TOPICS, LLM_CONFIGS
 
 
-def run(topic_cards, synthesis, reports, run_time):
+def run(topic_cards, synthesis, quickscan_data, reports, run_time):
     """Generate HTML. Returns html string."""
     stories_html = ""
-    for card in topic_cards:
-        stories_html += _render_card(card)
+    for i, card in enumerate(topic_cards):
+        stories_html += _render_card(card, i)
 
+    quickscan_html = _render_quickscan(quickscan_data)
     synthesis_html = _render_synthesis(synthesis)
     filter_buttons = _render_filters()
     run_report_html = _render_run_report(reports, run_time)
@@ -31,6 +32,7 @@ def run(topic_cards, synthesis, reports, run_time):
         date=now,
         num_stories=len(topic_cards),
         llms=llms_used,
+        quickscan=quickscan_html,
         synthesis=synthesis_html,
         filters=filter_buttons,
         stories=stories_html,
@@ -55,7 +57,7 @@ def _lines_to_items(text):
     return items
 
 
-def _render_card(card):
+def _render_card(card, card_index=0):
     # Topic tags
     topic_tags = ""
     for t in card.get("topics", [])[:3]:
@@ -153,7 +155,7 @@ def _render_card(card):
         writer_html = '<div class="written-by">Card written by {}</div>'.format(written_by)
 
     return """
-    <article class="story-card" data-topics="{topic_ids}">
+    <article class="story-card" id="topic-card-{card_idx}" data-topics="{topic_ids}">
         <div class="topic-tags">{tags}</div>
         <h2 class="story-title">{title}</h2>
         <div class="story-meta">
@@ -176,6 +178,7 @@ def _render_card(card):
         </details>
     </article>""".format(
         topic_ids=" ".join(card.get("topics", [])[:3]),
+        card_idx=card_index,
         tags=topic_tags,
         title=card.get("title", ""),
         src_count=card.get("source_count", 0),
@@ -228,6 +231,65 @@ def _extract_source_framing(source_name, framing_text):
             # Clean up the line - remove the source name prefix if present
             return line.strip()[:200]
     return ""
+
+
+def _render_quickscan(data):
+    """Render the Today in 60 Seconds section."""
+    if not data:
+        return ""
+
+    stories_items = ""
+    for story in data.get("top_stories", [])[:10]:
+        consensus = story.get("consensus", "split")
+        if consensus == "consensus":
+            icon = '<span class="consensus-dot dot-green" title="Sources agree"></span>'
+        elif consensus == "contested":
+            icon = '<span class="consensus-dot dot-red" title="Highly contested"></span>'
+        else:
+            icon = '<span class="consensus-dot dot-yellow" title="Sources split"></span>'
+
+        card_idx = story.get("card_index", 0)
+        sources = story.get("key_sources", "")
+        stories_items += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{headline}</span><span class="qs-summary">{summary}</span><span class="qs-sources">{sources}</span></div></a>'.format(
+            idx=card_idx, icon=icon,
+            headline=_esc(story.get("headline", "")),
+            summary=_esc(story.get("summary_line", "")),
+            sources=_esc(sources))
+
+    tensions_items = ""
+    for t in data.get("key_tensions", [])[:4]:
+        tensions_items += '<div class="qs-tension">{}</div>'.format(_esc(t.get("tension", "")))
+
+    watch_items = ""
+    for w in data.get("watch_list", [])[:4]:
+        horizon = w.get("time_horizon", "developing")
+        if horizon == "imminent":
+            badge = '<span class="horizon-badge badge-imminent">IMMINENT</span>'
+        elif horizon == "this_week":
+            badge = '<span class="horizon-badge badge-week">THIS WEEK</span>'
+        else:
+            badge = '<span class="horizon-badge badge-developing">DEVELOPING</span>'
+        watch_items += '<div class="qs-watch">{badge} {item}</div>'.format(
+            badge=badge, item=_esc(w.get("item", "")))
+
+    tensions_section = ""
+    if tensions_items:
+        tensions_section = '<div class="qs-box qs-tensions"><div class="qs-box-title">Key Tensions</div>{}</div>'.format(tensions_items)
+
+    watch_section = ""
+    if watch_items:
+        watch_section = '<div class="qs-box qs-watchlist"><div class="qs-box-title">Watch List</div>{}</div>'.format(watch_items)
+
+    return """<div class="quickscan">
+        <div class="qs-header">Today in 60 Seconds</div>
+        <div class="qs-legend">
+            <span><span class="consensus-dot dot-green"></span> Consensus</span>
+            <span><span class="consensus-dot dot-yellow"></span> Split</span>
+            <span><span class="consensus-dot dot-red"></span> Contested</span>
+        </div>
+        <div class="qs-stories">{stories}</div>
+        <div class="qs-bottom-row">{tensions}{watch}</div>
+    </div>""".format(stories=stories_items, tensions=tensions_section, watch=watch_section)
 
 
 def _render_synthesis(synthesis):
@@ -313,8 +375,41 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .masthead h1 {{ font-family: 'Newsreader', serif; font-size: 2rem; color: var(--accent); }}
 .masthead .meta {{ font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }}
 
+/* Quickscan */
+.quickscan {{ background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid var(--accent); border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem; }}
+.qs-header {{ font-family: 'Newsreader', serif; font-size: 1.4rem; color: var(--accent); margin-bottom: 0.5rem; }}
+.qs-legend {{ display: flex; gap: 1rem; font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; align-items: center; }}
+.consensus-dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }}
+.dot-green {{ background: var(--green); }}
+.dot-yellow {{ background: var(--accent); }}
+.dot-red {{ background: var(--red); }}
+.qs-stories {{ display: flex; flex-direction: column; gap: 0.4rem; }}
+.qs-story {{ display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.5rem 0.6rem; background: rgba(255,255,255,0.03); border-radius: 6px; text-decoration: none; color: var(--text); transition: background 0.15s; cursor: pointer; }}
+.qs-story:hover {{ background: rgba(255,255,255,0.07); }}
+.qs-story .consensus-dot {{ margin-top: 0.45rem; flex-shrink: 0; }}
+.qs-story-content {{ flex: 1; }}
+.qs-headline {{ font-weight: 600; font-size: 0.9rem; display: block; }}
+.qs-summary {{ font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }}
+.qs-sources {{ font-size: 0.72rem; color: var(--purple); display: block; margin-top: 0.15rem; }}
+.qs-bottom-row {{ display: flex; gap: 1rem; margin-top: 1rem; }}
+.qs-box {{ flex: 1; padding: 0.8rem; background: rgba(255,255,255,0.03); border-radius: 6px; }}
+.qs-box-title {{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 600; }}
+.qs-tensions .qs-box-title {{ color: var(--red); }}
+.qs-watchlist .qs-box-title {{ color: var(--blue); }}
+.qs-tension {{ font-size: 0.82rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }}
+.qs-tension:last-child {{ border-bottom: none; }}
+.qs-watch {{ font-size: 0.82rem; padding: 0.3rem 0; display: flex; align-items: flex-start; gap: 0.4rem; }}
+.horizon-badge {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 600; flex-shrink: 0; }}
+.badge-imminent {{ background: var(--red); color: #fff; }}
+.badge-week {{ background: var(--accent); color: #000; }}
+.badge-developing {{ background: var(--slate); color: #fff; }}
+@media (max-width: 600px) {{ .qs-bottom-row {{ flex-direction: column; }} }}
+
 /* Synthesis */
-.synthesis-box {{ background: var(--card-bg); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }}
+.synthesis-expand {{ margin-bottom: 1.5rem; }}
+.synthesis-toggle {{ font-size: 0.9rem; color: var(--muted); cursor: pointer; padding: 0.5rem 0; font-weight: 500; }}
+.synthesis-toggle:hover {{ color: var(--text); }}
+.synthesis-box {{ background: var(--card-bg); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem; margin-top: 0.5rem; }}
 .synthesis-box h2 {{ font-family: 'Newsreader', serif; color: var(--accent); font-size: 1.3rem; margin-bottom: 1rem; }}
 .synth-section {{ margin-bottom: 1rem; padding: 0.8rem; background: var(--section-bg); border-radius: 6px; }}
 .synth-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.4rem; font-weight: 600; }}
@@ -410,10 +505,15 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
     <div class="meta">{date} | {num_stories} stories | Models: {llms}</div>
 </div>
 
+{quickscan}
+
+<details class="synthesis-expand">
+<summary class="synthesis-toggle">Executive Synthesis (full analysis)</summary>
 <div class="synthesis-box">
     <h2>Executive Synthesis</h2>
     {synthesis}
 </div>
+</details>
 
 <div class="filter-bar">{filters}</div>
 
