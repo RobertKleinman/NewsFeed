@@ -522,14 +522,10 @@ LLM_CONFIGS = {
 
 def smart_triage_with_llm(story_groups):
     """
-    Use Gemini Flash (very cheap) to do a smarter triage pass on the top candidates.
-    This refines the local keyword triage with actual understanding.
+    Use multiple LLMs to vote on the most important stories.
+    Each available LLM picks its top stories, and stories selected by
+    multiple models get boosted. This avoids single-model selection bias.
     """
-    api_key = os.environ.get("GOOGLE_API_KEY")
-    if not api_key:
-        print("  ⚠️  No Google API key - skipping LLM triage, using keyword triage only")
-        return story_groups
-
     # Build a compact summary of candidate stories
     story_summaries = []
     for i, group in enumerate(story_groups[:50]):  # Top 50 candidates
@@ -550,22 +546,58 @@ and include at least 1-2 uplifting/cultural stories.
 Stories:
 {stories_list}"""
 
-    print("\n🧠 Smart triage with Gemini Flash...")
-    result = call_llm("google", "gemini-3-flash-preview", "You are a concise news editor.", prompt, api_key, max_tokens=200)
+    # Collect votes from all available LLMs
+    vote_counts = {}  # story_index -> number of votes
+    voters = 0
 
-    if result:
-        try:
-            # Parse the JSON array from the response
-            match = re.search(r'\[[\d,\s]+\]', result)
-            if match:
-                indices = json.loads(match.group())
-                selected = [story_groups[i] for i in indices if i < len(story_groups)]
-                print(f"  LLM selected {len(selected)} stories")
-                return selected
-        except Exception as e:
-            print(f"  ⚠️  Could not parse LLM triage response: {e}")
+    triage_models = [
+        ("google", "gemini-3-flash-preview", "GOOGLE_API_KEY", "Gemini"),
+        ("openai", "gpt-4.1", "OPENAI_API_KEY", "ChatGPT"),
+        ("xai", "grok-3-fast", "XAI_API_KEY", "Grok"),
+    ]
 
-    return story_groups[:20]
+    print("\n🧠 Multi-model story selection...")
+    for provider, model, env_key, label in triage_models:
+        api_key = os.environ.get(env_key)
+        if not api_key:
+            continue
+
+        print(f"  🗳️  {label} voting...")
+        result = call_llm(provider, model, "You are a concise news editor. Return only a JSON array.", prompt, api_key, max_tokens=200)
+        time.sleep(3)
+
+        if result:
+            try:
+                match = re.search(r'\[[\d,\s]+\]', result)
+                if match:
+                    indices = json.loads(match.group())
+                    voters += 1
+                    for idx in indices:
+                        if idx < len(story_groups):
+                            vote_counts[idx] = vote_counts.get(idx, 0) + 1
+                    print(f"    ✅ {label} picked {len(indices)} stories")
+                else:
+                    print(f"    ⚠️  {label}: Could not parse response")
+            except Exception as e:
+                print(f"    ⚠️  {label}: Parse error - {e}")
+
+    if not vote_counts:
+        print("  ⚠️  No LLM votes received, using keyword triage only")
+        return story_groups[:12]
+
+    # Sort stories by vote count (most votes first), then by original order
+    sorted_stories = sorted(vote_counts.items(), key=lambda x: (-x[1], x[0]))
+
+    selected = []
+    for idx, votes in sorted_stories:
+        selected.append(story_groups[idx])
+        vote_label = f"({votes}/{voters} models)" if voters > 1 else ""
+        print(f"  📰 Story {idx}: {story_groups[idx][0].title[:60]}... {vote_label}")
+        if len(selected) >= 12:
+            break
+
+    print(f"\n  Total: {len(selected)} stories selected by {voters} model(s)")
+    return selected
 
 
 def analyze_story_with_llms(story_group):
@@ -582,7 +614,8 @@ def analyze_story_with_llms(story_group):
     system_prompt = """You are a sharp, insightful news analyst. Provide a brief but substantive analysis
 of this story in 2-3 paragraphs. Cover: what happened, why it matters, and what to watch for next.
 If multiple source perspectives are provided, note any interesting differences in framing or emphasis.
-Be direct, avoid filler. Write for a smart reader who wants signal, not noise."""
+Be direct, avoid filler. Write for a smart reader who wants signal, not noise.
+Write in plain text only. Do NOT use markdown formatting like **bold**, ## headers, or bullet points."""
 
     user_prompt = f"""STORY: {lead.title}
 SOURCE: {lead.source_name} ({lead.source_region})
@@ -647,19 +680,20 @@ def synthesize_briefing(top_stories, all_analyses):
         story_summaries.append(f"Story {i+1}: {lead.title}\nTopic: {', '.join(lead.topics[:2])}\n{analysis_text}")
 
     prompt = f"""You are writing the executive synthesis for a daily intelligence briefing.
-Based on these stories and multi-LLM analyses, write a compelling 3-4 paragraph overview that:
+Based on these stories and multi-LLM analyses, write a compelling 4-5 paragraph overview that:
 1. Identifies the 2-3 biggest themes of the day
 2. Notes where different analysts/sources agreed or disagreed
 3. Calls out any connecting threads between stories
 4. Ends with a "watch for" note about developing situations
 
-Be sharp, concise, and insightful. Write as if briefing a senior executive.
+IMPORTANT: Write in plain text only. Do NOT use markdown formatting like **bold**, ## headers, or bullet points.
+Use regular sentences and paragraphs. Be sharp, concise, and insightful. Write as if briefing a senior executive.
 
 TODAY'S STORIES:
-{newline.join(story_summaries[:10])}"""
+{newline.join(story_summaries[:12])}"""
 
     print("\n📝 Generating synthesis...")
-    return call_llm(provider, model, "You are an expert intelligence briefing writer.", prompt, api_key, max_tokens=1000)
+    return call_llm(provider, model, "You are an expert intelligence briefing writer. Write in plain text only, no markdown formatting.", prompt, api_key, max_tokens=2000)
 
 
 # =============================================================================
