@@ -501,7 +501,7 @@ LLM_CONFIGS = {
     },
     "chatgpt": {
         "provider": "openai",
-        "model": "gpt-5.2",
+        "model": "gpt-4.1",
         "env_key": "OPENAI_API_KEY",
         "label": "ChatGPT",
     },
@@ -513,7 +513,7 @@ LLM_CONFIGS = {
     },
     "grok": {
         "provider": "xai",
-        "model": "grok-4",
+        "model": "grok-3-fast",
         "env_key": "XAI_API_KEY",
         "label": "Grok",
     },
@@ -600,12 +600,16 @@ Analyze this story concisely."""
         config = LLM_CONFIGS[llm_id]
         api_key = os.environ.get(config["env_key"])
         if not api_key:
+            print(f"    ⏭️  {config['label']}: No API key, skipping")
             continue
 
         print(f"    🤖 {config['label']}...")
         result = call_llm(config["provider"], config["model"], system_prompt, user_prompt, api_key)
         if result:
+            print(f"    ✅ {config['label']}: Got {len(result)} chars")
             analyses[config["label"]] = result
+        else:
+            print(f"    ⚠️  {config['label']}: Empty or failed response")
 
         # Rate limit: wait between calls (especially important for Gemini free tier)
         time.sleep(5)
