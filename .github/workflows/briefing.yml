@@ -2,10 +2,9 @@ name: Global Briefing
 
 on:
   schedule:
-    # Runs at 6:00 AM and 5:00 PM Eastern (11:00 UTC and 22:00 UTC)
-    - cron: '0 11 * * *'
-    - cron: '0 22 * * *'
-  workflow_dispatch:  # Allows manual trigger from GitHub UI
+    - cron: '0 11 * * *'   # 6 AM Eastern
+    - cron: '0 22 * * *'   # 5 PM Eastern
+  workflow_dispatch:         # Manual trigger
 
 permissions:
   contents: read
@@ -19,10 +18,8 @@ concurrency:
 jobs:
   build-briefing:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,28 +29,25 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run briefing
+      - name: Run briefing pipeline
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-        run: python briefing.py
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+        run: python runner.py
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './output'
+          path: output
 
   deploy:
+    needs: build-briefing
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build-briefing
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
