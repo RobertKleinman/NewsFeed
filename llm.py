@@ -69,7 +69,8 @@ def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens)
     if provider == "google":
         url = "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}".format(model, api_key)
         payload = {
-            "contents": [{"parts": [{"text": system_prompt + "\n\n" + user_prompt}]}],
+            "systemInstruction": {"parts": [{"text": system_prompt}]},
+            "contents": [{"parts": [{"text": user_prompt}]}],
             "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.3}
         }
         resp = requests.post(url, json=payload, timeout=90)
