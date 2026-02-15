@@ -62,21 +62,37 @@ Stories:
         time.sleep(1)
         if result:
             try:
+                # Try multiple parsing strategies
+                parsed = None
+                # Strategy 1: exact array match
                 match = re.search(r'\[[\d,\s]+\]', result)
                 if match:
-                    indices = json.loads(match.group())
+                    parsed = json.loads(match.group())
+                # Strategy 2: strip markdown and try again
+                if not parsed:
+                    cleaned = result.replace('```json', '').replace('```', '').strip()
+                    match = re.search(r'\[[\d,\s]+\]', cleaned)
+                    if match:
+                        parsed = json.loads(match.group())
+                # Strategy 3: extract all numbers if response looks like a list
+                if not parsed:
+                    nums = re.findall(r'\b(\d{1,2})\b', result)
+                    if len(nums) >= 5:
+                        parsed = [int(n) for n in nums]
+
+                if parsed:
                     voters += 1
                     report.llm_successes += 1
-                    for idx in indices:
+                    for idx in parsed:
                         if idx < len(story_groups):
                             vote_counts[idx] = vote_counts.get(idx, 0) + 1
-                    print("      {} picked {} stories".format(config["label"], len(indices)))
+                    print("      {} picked {} stories".format(config["label"], len(parsed)))
                 else:
                     report.llm_failures += 1
-                    print("      {} response not parseable".format(config["label"]))
-            except Exception:
+                    print("      {} not parseable: {}".format(config["label"], result[:80]))
+            except Exception as e:
                 report.llm_failures += 1
-                print("      {} parse error".format(config["label"]))
+                print("      {} parse error: {}".format(config["label"], str(e)[:60]))
         else:
             report.llm_failures += 1
             print("      {} returned nothing".format(config["label"]))
