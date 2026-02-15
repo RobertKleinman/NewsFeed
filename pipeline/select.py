@@ -58,7 +58,7 @@ Stories:
         report.llm_calls += 1
         print("    {} voting...".format(config["label"]))
         result = llm_caller.call_by_id(llm_id,
-            "You are a concise news editor. Return only a JSON array.", prompt, 200)
+            "You are a concise news editor. Return only a JSON array.", prompt, 400)
         time.sleep(1)
         if result:
             try:
