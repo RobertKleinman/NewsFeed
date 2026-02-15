@@ -52,7 +52,7 @@ def call(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500, 
             return result
         except requests.exceptions.HTTPError as e:
             if e.response is not None and e.response.status_code == 429:
-                wait = (attempt + 1) * 15
+                wait = (attempt + 1) * 8
                 print("    ... rate limited, waiting {}s (attempt {}/3)".format(wait, attempt + 1))
                 time.sleep(wait)
             else:

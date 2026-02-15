@@ -90,7 +90,7 @@ complete sentences, not fragments. No markdown anywhere.
     result = llm_caller.call_by_id(writer_id,
         "You write structured intelligence briefing cards. Return valid JSON only. No markdown. No extra text outside the JSON.",
         prompt, 2000)
-    time.sleep(3)
+    time.sleep(1)
 
     if not result:
         report.llm_failures += 1

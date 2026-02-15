@@ -14,26 +14,33 @@ from models import StepReport
 
 
 def run(story_groups, topics, max_stories=12):
-    """Multi-model voting with topic minimums. Returns (selected, report)."""
     print("\n>>> SELECT: voting on {} candidates...".format(min(len(story_groups), 50)))
     report = StepReport("select", items_in=len(story_groups))
 
     summaries = []
     for i, group in enumerate(story_groups[:50]):
         lead = group[0]
-        sources = ", ".join(set(a.source_name for a in group))
+        source_details = []
+        for a in group[:5]:
+            source_details.append("{} ({})".format(a.source_name, a.source_region))
+        sources = ", ".join(source_details)
         topic_str = ", ".join(lead.topics[:2])
-        summaries.append("{}. [{}] [{}] {} ({} sources)".format(
-            i, topic_str, sources, lead.title, len(group)))
+        summaries.append("{}. [{}] {} ({} sources: {})".format(
+            i, topic_str, lead.title, len(group), sources))
 
     stories_list = "\n".join(summaries)
-    prompt = """You are a news editor selecting stories for an intelligence briefing.
-Pick 15-20 of the most important stories for a reader interested in: world politics,
+    prompt = """You are a news editor selecting stories for a global intelligence briefing.
+Pick 15-20 of the most important stories. The reader cares about: world politics,
 Canadian politics, US politics, economics/business, AI/technology, Canadian insurance,
 data privacy/AI governance, and culture/good news.
 
-Prioritize: genuine significance, diverse topics, multiple perspectives available,
-and at least 1-2 uplifting/cultural stories.
+Selection criteria IN ORDER OF PRIORITY:
+1. IMPORTANCE: Genuine significance and real-world impact comes first. A major story
+   covered by only 2 sources beats a minor story covered by 10.
+2. TOPIC DIVERSITY: Ensure coverage across different topic areas, not just politics.
+3. SOURCE DIVERSITY: When two stories are equally important, prefer the one with
+   coverage from more diverse regions/perspectives.
+4. Include at least 1-2 uplifting/cultural stories.
 
 Return ONLY a JSON array of story numbers, e.g. [0, 3, 5, 12, ...]
 
@@ -43,13 +50,16 @@ Stories:
     vote_counts = {}
     voters = 0
 
-    for llm_id in llm_caller.get_available_llms()[:3]:
+    available_voters = llm_caller.get_available_llms()[:3]
+    print("    Voters: {}".format(", ".join(LLM_CONFIGS[k]["label"] for k in available_voters)))
+
+    for llm_id in available_voters:
         config = LLM_CONFIGS[llm_id]
         report.llm_calls += 1
         print("    {} voting...".format(config["label"]))
         result = llm_caller.call_by_id(llm_id,
             "You are a concise news editor. Return only a JSON array.", prompt, 200)
-        time.sleep(3)
+        time.sleep(1)
         if result:
             try:
                 match = re.search(r'\[[\d,\s]+\]', result)
@@ -60,11 +70,16 @@ Stories:
                     for idx in indices:
                         if idx < len(story_groups):
                             vote_counts[idx] = vote_counts.get(idx, 0) + 1
-                    print("      picked {} stories".format(len(indices)))
+                    print("      {} picked {} stories".format(config["label"], len(indices)))
+                else:
+                    report.llm_failures += 1
+                    print("      {} response not parseable".format(config["label"]))
             except Exception:
                 report.llm_failures += 1
+                print("      {} parse error".format(config["label"]))
         else:
             report.llm_failures += 1
+            print("      {} returned nothing".format(config["label"]))
 
     if not vote_counts:
         print("    No votes received, using keyword ranking")

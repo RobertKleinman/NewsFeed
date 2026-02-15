@@ -66,7 +66,7 @@ want to know.""".format(title=lead_title, claims=claims_text)
         result = llm_caller.call_by_id(llm_id,
             "You are a precise, evidence-based news auditor. Only reference the provided extractions. Never invent facts. Plain text only.",
             prompt, 1500)
-        time.sleep(5)
+        time.sleep(2)
         if result:
             comparisons[config["label"]] = result
             report.llm_successes += 1

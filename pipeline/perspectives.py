@@ -54,7 +54,7 @@ Return ONLY a JSON array like:
         result = llm_caller.call_by_id(llm_id,
             "You are a media analyst who understands editorial perspectives globally. Return only JSON.",
             prompt, 600)
-        time.sleep(3)
+        time.sleep(1)
         if result:
             try:
                 json_match = re.search(r'\[.*\]', result, re.DOTALL)

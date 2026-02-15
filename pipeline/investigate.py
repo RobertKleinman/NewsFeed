@@ -88,7 +88,7 @@ PREDICTIONS:
     result = llm_caller.call_by_id(investigator_id,
         "You are a senior intelligence analyst. Clearly distinguish established facts from inference. Plain text only.",
         prompt, 1500)
-    time.sleep(3)
+    time.sleep(1)
 
     if result:
         report.llm_successes += 1

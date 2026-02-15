@@ -54,7 +54,7 @@ End with EMPHASIS and FRAMING lines.""".format(
         result = llm_caller.call_by_id(extractor_id,
             "You extract structured claims from news. Be precise. Only extract what is stated. Never invent facts.",
             prompt, 800)
-        time.sleep(3)
+        time.sleep(1)
 
         if result:
             report.llm_successes += 1
