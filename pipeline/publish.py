@@ -65,46 +65,92 @@ def _render_card(card, card_index=0):
             topic_tags += '<span class="topic-tag" data-topic="{}">{} {}</span>'.format(
                 t, TOPICS[t]["icon"], TOPICS[t]["name"])
 
-    # Source pills with perspective labels
+    # Coverage spectrum bar (computed from data, no LLM)
+    type_counts = card.get("source_type_counts", {})
+    spectrum_html = ""
+    if type_counts:
+        parts = []
+        for stype in ["wire", "mainstream", "regional", "niche", "think_tank", "opinion", "advocacy"]:
+            count = type_counts.get(stype, 0)
+            if count > 0:
+                parts.append('<span class="spectrum-item"><span class="spectrum-label">{}</span> {}</span>'.format(
+                    stype.replace("_", " ").title(), count))
+        if parts:
+            spectrum_html = '<div class="coverage-spectrum">Coverage: {}</div>'.format(" ".join(parts))
+
+    # Source pills with perspective + type
     source_pills = ""
     for s in card.get("sources", []):
-        source_pills += '<span class="source-pill"><strong>{name}</strong> <span class="perspective-label">{persp}</span> <span class="bias-label">{bias}</span></span>'.format(
-            name=s["name"], persp=s["perspective"], bias=s["bias"])
+        stype = s.get("source_type", "mainstream")
+        source_pills += '<span class="source-pill"><strong>{name}</strong> <span class="perspective-label">{persp}</span> <span class="source-type-tag type-{stype}">{stype}</span></span>'.format(
+            name=s["name"], persp=s["perspective"], stype=stype)
 
-    # === QUICK SCAN LAYER ===
-    # What happened (always visible)
+    # === SCANNABLE LAYER (always visible) ===
+
+    # What happened (tight, no prose)
     what_happened = '<div class="what-happened"><p>{}</p></div>'.format(
         _esc(card.get("what_happened", "")))
 
-    # Perspective comparison grid
+    # Agreed facts as tight bullets with source tags
+    facts_html = ""
+    agreed = card.get("agreed_facts", [])
+    if isinstance(agreed, list) and agreed:
+        items = ""
+        for fact in agreed[:5]:
+            if isinstance(fact, str) and fact.strip():
+                items += '<li class="scan-item">{}</li>'.format(_esc(fact))
+        if items:
+            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Confirmed Facts</div><ul class="scan-list">{}</ul></div>'.format(items)
+    elif isinstance(agreed, str) and agreed:
+        items = _lines_to_items(agreed)
+        if items:
+            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Confirmed Facts</div><ul class="scan-list">{}</ul></div>'.format(items)
+
+    # Disputes as paired side-by-side comparisons
+    disputes_html = ""
+    disputes = card.get("disputes", [])
+    if isinstance(disputes, list) and disputes:
+        dispute_blocks = ""
+        for d in disputes[:4]:
+            if isinstance(d, dict):
+                dtype = d.get("type", "framing").upper()
+                side_a = _esc(d.get("side_a", ""))
+                side_b = _esc(d.get("side_b", ""))
+                if side_a or side_b:
+                    dispute_blocks += """<div class="dispute-pair">
+                        <span class="dispute-type-tag">{dtype}</span>
+                        <div class="dispute-sides">
+                            <div class="dispute-side side-a">{side_a}</div>
+                            <div class="dispute-vs">vs</div>
+                            <div class="dispute-side side-b">{side_b}</div>
+                        </div>
+                    </div>""".format(dtype=dtype, side_a=side_a, side_b=side_b)
+        if dispute_blocks:
+            disputes_html = '<div class="scan-section section-disagree"><div class="scan-label">What\'s Disputed</div>{}</div>'.format(dispute_blocks)
+
+    # Framing as quoted blocks
+    framing_html = ""
+    framing = card.get("framing", [])
+    if isinstance(framing, list) and framing:
+        framing_blocks = ""
+        for f in framing[:5]:
+            if isinstance(f, dict):
+                source = _esc(f.get("source", ""))
+                quote = _esc(f.get("quote", ""))
+                frame = _esc(f.get("frame", ""))
+                if quote or frame:
+                    framing_blocks += '<div class="framing-quote"><span class="framing-source">{src}</span>{q}{f}</div>'.format(
+                        src=source,
+                        q=' <span class="framing-quoted">&ldquo;{}&rdquo;</span>'.format(quote) if quote else "",
+                        f=' <span class="framing-desc">{}</span>'.format(frame) if frame else "")
+        if framing_blocks:
+            framing_html = '<div class="scan-section section-framing"><div class="scan-label">How Sources Frame It</div>{}</div>'.format(framing_blocks)
+
+    # Perspective grid (promoted — key visual element)
     grid_html = _render_perspective_grid(card)
 
-    # Key facts as scannable items
-    facts_html = ""
-    facts_items = _lines_to_items(card.get("agreed_facts", ""))
-    if facts_items:
-        facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Agreed Facts</div><ul class="scan-list">{}</ul></div>'.format(facts_items)
-
-    # Disagreements as scannable items
-    disagree_html = ""
-    disagree_items = _lines_to_items(card.get("disagreements", ""))
-    if disagree_items and "no substantive" not in card.get("disagreements", "").lower():
-        disagree_html = '<div class="scan-section section-disagree"><div class="scan-label">Points of Disagreement</div><ul class="scan-list">{}</ul></div>'.format(disagree_items)
-
-    # What to watch
-    watch_html = ""
-    watch_items = _lines_to_items(card.get("what_to_watch", ""))
-    if watch_items:
-        watch_html = '<div class="scan-section section-watch"><div class="scan-label">What to Watch</div><ul class="scan-list">{}</ul></div>'.format(watch_items)
-
-    # === EXPANDABLE DETAIL LAYER ===
+    # === COLLAPSED DETAIL LAYER ===
     detail_sections = ""
-
-    # Framing differences (detail)
-    framing = card.get("framing_differences", "")
-    if framing:
-        detail_sections += '<div class="detail-section section-framing"><div class="detail-label">Framing & Perspective Detail</div><div class="detail-text">{}</div></div>'.format(
-            _esc(framing).replace("\n", "<br>"))
 
     # Implications
     implications = card.get("implications", "")
@@ -112,32 +158,68 @@ def _render_card(card, card_index=0):
         detail_sections += '<div class="detail-section section-implications"><div class="detail-label">Implications</div><div class="detail-text">{}</div></div>'.format(
             _esc(implications).replace("\n", "<br>"))
 
-    # Predictions
-    predictions = card.get("predictions", "")
-    if predictions:
-        pred_items = _lines_to_items(predictions)
-        if pred_items:
-            detail_sections += '<div class="detail-section section-predictions"><div class="detail-label">Predictions</div><ul class="scan-list">{}</ul></div>'.format(pred_items)
+    # Watch items (structured)
+    watch_items = card.get("watch_items", [])
+    if isinstance(watch_items, list) and watch_items:
+        items_html = ""
+        for w in watch_items[:4]:
+            if isinstance(w, dict):
+                event = _esc(w.get("event", ""))
+                horizon = w.get("time_horizon", "")
+                driver = _esc(w.get("driver", ""))
+                badge = ""
+                if horizon:
+                    badge = '<span class="horizon-badge badge-developing">{}</span> '.format(_esc(horizon))
+                items_html += '<li class="scan-item">{}{}{}</li>'.format(
+                    badge, event,
+                    ' <span class="watch-driver">If: {}</span>'.format(driver) if driver else "")
+            elif isinstance(w, str):
+                items_html += '<li class="scan-item">{}</li>'.format(_esc(w))
+        if items_html:
+            detail_sections += '<div class="detail-section section-watch"><div class="detail-label">What to Watch</div><ul class="scan-list">{}</ul></div>'.format(items_html)
+
+    # Predictions (structured)
+    predictions = card.get("predictions", [])
+    if isinstance(predictions, list) and predictions:
+        pred_html = ""
+        for p in predictions[:3]:
+            if isinstance(p, dict):
+                scenario = _esc(p.get("scenario", ""))
+                likelihood = p.get("likelihood", "")
+                condition = _esc(p.get("condition", ""))
+                lclass = "pred-" + likelihood if likelihood in ("likely", "possible", "unlikely") else ""
+                pred_html += '<div class="prediction {lc}"><span class="pred-likelihood">{like}</span> {scen}{cond}</div>'.format(
+                    lc=lclass, like=likelihood.upper() if likelihood else "",
+                    scen=scenario,
+                    cond=' <span class="pred-condition">Condition: {}</span>'.format(condition) if condition else "")
+            elif isinstance(p, str):
+                pred_html += '<div class="prediction">{}</div>'.format(_esc(p))
+        if pred_html:
+            detail_sections += '<div class="detail-section section-predictions"><div class="detail-label">Predictions</div>{}</div>'.format(pred_html)
 
     # Key unknowns
-    unknowns = card.get("key_unknowns", "")
-    if unknowns:
+    unknowns = card.get("key_unknowns", [])
+    if isinstance(unknowns, list) and unknowns:
+        items = "".join('<li class="scan-item">{}</li>'.format(_esc(u)) for u in unknowns if isinstance(u, str) and u.strip())
+        if items:
+            detail_sections += '<div class="detail-section section-unknowns"><div class="detail-label">Key Unknowns</div><ul class="scan-list">{}</ul></div>'.format(items)
+    elif isinstance(unknowns, str) and unknowns:
         detail_sections += '<div class="detail-section section-unknowns"><div class="detail-label">Key Unknowns</div><div class="detail-text">{}</div></div>'.format(
             _esc(unknowns).replace("\n", "<br>"))
 
     # Missing viewpoints
     missing = card.get("missing_viewpoints", "")
-    if missing and "all identified" not in missing.lower() and "none" not in missing.lower():
+    if missing and "all identified" not in missing.lower() and not missing.strip() == "":
         detail_sections += '<div class="detail-section section-missing"><div class="detail-label">Missing Viewpoints</div><div class="detail-text">{}</div></div>'.format(
             _esc(missing).replace("\n", "<br>"))
 
-    # Investigation (background + context)
+    # Investigation
     investigation = card.get("investigation", "")
     if investigation:
         detail_sections += '<div class="detail-section section-investigation"><div class="detail-label">Background & Context (AI Analysis)</div><div class="detail-text">{}</div></div>'.format(
             _esc(investigation).replace("\n", "<br>"))
 
-    # Raw comparisons (always collapsed)
+    # Raw comparisons
     comp_html = ""
     comparisons = card.get("comparisons", {})
     if comparisons:
@@ -148,7 +230,6 @@ def _render_card(card, card_index=0):
         comp_html = '<details class="raw-comp"><summary>Raw Model Comparisons ({} models)</summary>{}</details>'.format(
             len(comparisons), comp_blocks)
 
-    # Written by
     written_by = card.get("written_by", "")
     writer_html = ""
     if written_by:
@@ -156,22 +237,25 @@ def _render_card(card, card_index=0):
 
     return """
     <article class="story-card" id="topic-card-{card_idx}" data-topics="{topic_ids}">
-        <div class="topic-tags">{tags}</div>
-        <h2 class="story-title">{title}</h2>
-        <div class="story-meta">
-            <span>{src_count} sources</span>
-            <span>{persp_count} perspectives</span>
+        <div class="card-header">
+            <div class="topic-tags">{tags}</div>
+            <h2 class="story-title">{title}</h2>
+            <div class="story-meta">
+                <span>{src_count} sources</span>
+                <span>{persp_count} perspectives</span>
+            </div>
+            {spectrum}
         </div>
         <div class="sources-row">{pills}</div>
 
         {what_happened}
-        {grid}
         {facts}
-        {disagree}
-        {watch}
+        {disputes}
+        {framing}
+        {grid}
 
         <details class="detail-expand">
-            <summary>Full Analysis</summary>
+            <summary>Deep Analysis</summary>
             {detail_sections}
             {comp}
             {writer}
@@ -183,12 +267,13 @@ def _render_card(card, card_index=0):
         title=card.get("title", ""),
         src_count=card.get("source_count", 0),
         persp_count=card.get("perspectives_used", 0),
+        spectrum=spectrum_html,
         pills=source_pills,
         what_happened=what_happened,
-        grid=grid_html,
         facts=facts_html,
-        disagree=disagree_html,
-        watch=watch_html,
+        disputes=disputes_html,
+        framing=framing_html,
+        grid=grid_html,
         detail_sections=detail_sections,
         comp=comp_html,
         writer=writer_html)
@@ -228,38 +313,60 @@ def _extract_source_framing(source_name, framing_text):
         return ""
     for line in framing_text.split("\n"):
         if source_name.lower() in line.lower():
-            # Clean up the line - remove the source name prefix if present
-            return line.strip()[:200]
+            return line.strip()
     return ""
 
 
 def _render_quickscan(data):
-    """Render the Today in 60 Seconds section."""
+    """Render Today in 60 Seconds grouped by topic."""
     if not data:
         return ""
 
-    stories_items = ""
-    for story in data.get("top_stories", [])[:10]:
-        consensus = story.get("consensus", "split")
-        if consensus == "consensus":
-            icon = '<span class="consensus-dot dot-green" title="Sources agree"></span>'
-        elif consensus == "contested":
-            icon = '<span class="consensus-dot dot-red" title="Highly contested"></span>'
-        else:
-            icon = '<span class="consensus-dot dot-yellow" title="Sources split"></span>'
+    # Group stories by topic
+    topic_groups = {}
+    for story in data.get("top_stories", [])[:12]:
+        topic_id = story.get("topic", "general")
+        if topic_id not in topic_groups:
+            topic_groups[topic_id] = []
+        topic_groups[topic_id].append(story)
 
-        card_idx = story.get("card_index", 0)
-        sources = story.get("key_sources", "")
-        stories_items += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{headline}</span><span class="qs-summary">{summary}</span><span class="qs-sources">{sources}</span></div></a>'.format(
-            idx=card_idx, icon=icon,
-            headline=_esc(story.get("headline", "")),
-            summary=_esc(story.get("summary_line", "")),
-            sources=_esc(sources))
+    # Render grouped stories
+    stories_html = ""
+    for topic_id, stories in topic_groups.items():
+        topic_info = TOPICS.get(topic_id, {"icon": "", "name": topic_id})
+        stories_html += '<div class="qs-topic-group"><div class="qs-topic-label">{icon} {name}</div>'.format(
+            icon=topic_info.get("icon", ""), name=topic_info.get("name", topic_id))
 
+        for story in stories:
+            consensus = story.get("consensus", "split")
+            if consensus == "consensus":
+                icon = '<span class="consensus-dot dot-green" title="Sources agree"></span>'
+            elif consensus == "contested":
+                icon = '<span class="consensus-dot dot-red" title="Highly contested"></span>'
+            else:
+                icon = '<span class="consensus-dot dot-yellow" title="Sources split"></span>'
+
+            card_idx = story.get("card_index", 0)
+            sources = story.get("key_sources", "")
+            fault = story.get("fault_line", "")
+            stories_html += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{headline}</span><span class="qs-fault">{fault}</span><span class="qs-sources">{sources}</span></div></a>'.format(
+                idx=card_idx, icon=icon,
+                headline=_esc(story.get("headline", "")),
+                fault=_esc(fault),
+                sources=_esc(sources))
+        stories_html += '</div>'
+
+    # Key tensions with type tags
     tensions_items = ""
     for t in data.get("key_tensions", [])[:4]:
-        tensions_items += '<div class="qs-tension">{}</div>'.format(_esc(t.get("tension", "")))
+        ttype = t.get("type", "")
+        type_tag = ""
+        if ttype:
+            type_tag = '<span class="tension-type">{}</span> '.format(_esc(ttype.upper()))
+        tensions_items += '<div class="qs-tension">{tag}{text}</div>'.format(
+            tag=type_tag, text=_esc(t.get("tension", "")))
 
+    # Watch list
     watch_items = ""
     for w in data.get("watch_list", [])[:4]:
         horizon = w.get("time_horizon", "developing")
@@ -289,7 +396,7 @@ def _render_quickscan(data):
         </div>
         <div class="qs-stories">{stories}</div>
         <div class="qs-bottom-row">{tensions}{watch}</div>
-    </div>""".format(stories=stories_items, tensions=tensions_section, watch=watch_section)
+    </div>""".format(stories=stories_html, tensions=tensions_section, watch=watch_section)
 
 
 def _render_synthesis(synthesis):
@@ -369,6 +476,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     --purple: #a78bfa; --slate: #64748b; --section-bg: #0f172a;
 }}
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+html {{ scroll-behavior: smooth; }}
 body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 0 1rem; max-width: 900px; margin: 0 auto; }}
 
 .masthead {{ text-align: center; padding: 2rem 0 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }}
@@ -383,13 +491,15 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .dot-green {{ background: var(--green); }}
 .dot-yellow {{ background: var(--accent); }}
 .dot-red {{ background: var(--red); }}
-.qs-stories {{ display: flex; flex-direction: column; gap: 0.4rem; }}
+.qs-stories {{ display: flex; flex-direction: column; gap: 0.2rem; }}
+.qs-topic-group {{ margin-bottom: 0.5rem; }}
+.qs-topic-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 0.2rem; }}
 .qs-story {{ display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.5rem 0.6rem; background: rgba(255,255,255,0.03); border-radius: 6px; text-decoration: none; color: var(--text); transition: background 0.15s; cursor: pointer; }}
 .qs-story:hover {{ background: rgba(255,255,255,0.07); }}
 .qs-story .consensus-dot {{ margin-top: 0.45rem; flex-shrink: 0; }}
 .qs-story-content {{ flex: 1; }}
 .qs-headline {{ font-weight: 600; font-size: 0.9rem; display: block; }}
-.qs-summary {{ font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }}
+.qs-fault {{ font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; font-style: italic; }}
 .qs-sources {{ font-size: 0.72rem; color: var(--purple); display: block; margin-top: 0.15rem; }}
 .qs-bottom-row {{ display: flex; gap: 1rem; margin-top: 1rem; }}
 .qs-box {{ flex: 1; padding: 0.8rem; background: rgba(255,255,255,0.03); border-radius: 6px; }}
@@ -398,6 +508,7 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .qs-watchlist .qs-box-title {{ color: var(--blue); }}
 .qs-tension {{ font-size: 0.82rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }}
 .qs-tension:last-child {{ border-bottom: none; }}
+.tension-type {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 3px; background: var(--red); color: #fff; margin-right: 0.3rem; vertical-align: middle; }}
 .qs-watch {{ font-size: 0.82rem; padding: 0.3rem 0; display: flex; align-items: flex-start; gap: 0.4rem; }}
 .horizon-badge {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 600; flex-shrink: 0; }}
 .badge-imminent {{ background: var(--red); color: #fff; }}
@@ -424,10 +535,16 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 
 /* Story cards */
 .story-card {{ background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; }}
+.card-header {{ margin-bottom: 0.5rem; }}
 .topic-tags {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }}
 .topic-tag {{ font-size: 0.73rem; padding: 0.15rem 0.5rem; border-radius: 12px; border: 1px solid var(--border); color: var(--muted); }}
 .story-title {{ font-family: 'Newsreader', serif; font-size: 1.25rem; line-height: 1.4; margin-bottom: 0.4rem; }}
-.story-meta {{ font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; display: flex; gap: 1rem; }}
+.story-meta {{ font-size: 0.8rem; color: var(--muted); margin-bottom: 0.3rem; display: flex; gap: 1rem; }}
+
+/* Coverage spectrum */
+.coverage-spectrum {{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--muted); padding: 0.3rem 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }}
+.spectrum-item {{ padding: 0.1rem 0.4rem; background: var(--section-bg); border-radius: 3px; }}
+.spectrum-label {{ color: var(--purple); }}
 
 /* Source pills */
 .sources-row {{ display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1rem; }}
@@ -435,11 +552,44 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .source-pill strong {{ color: var(--text); }}
 .perspective-label {{ color: var(--purple); font-style: italic; }}
 .perspective-label::before {{ content: "— "; }}
-.bias-label {{ color: var(--muted); font-size: 0.68rem; }}
+.source-type-tag {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.05rem 0.25rem; border-radius: 2px; margin-left: 0.2rem; }}
+.type-mainstream {{ background: var(--blue); color: #fff; }}
+.type-wire {{ background: var(--green); color: #fff; }}
+.type-niche {{ background: var(--purple); color: #fff; }}
+.type-opinion {{ background: var(--accent); color: #000; }}
+.type-think_tank {{ background: var(--slate); color: #fff; }}
+.type-advocacy {{ background: var(--red); color: #fff; }}
+.type-regional {{ background: #4a9eff; color: #fff; }}
 
 /* What happened */
 .what-happened {{ margin-bottom: 1rem; padding: 0.8rem; background: var(--section-bg); border-left: 3px solid var(--blue); border-radius: 0 6px 6px 0; }}
 .what-happened p {{ font-size: 0.95rem; }}
+
+/* Disputes - paired side-by-side */
+.dispute-pair {{ margin-bottom: 0.6rem; padding: 0.6rem; background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.15); border-radius: 6px; }}
+.dispute-type-tag {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.1rem 0.3rem; background: var(--red); color: #fff; border-radius: 3px; display: inline-block; margin-bottom: 0.4rem; }}
+.dispute-sides {{ display: flex; gap: 0.5rem; align-items: flex-start; }}
+.dispute-side {{ flex: 1; font-size: 0.85rem; padding: 0.4rem; background: var(--section-bg); border-radius: 4px; }}
+.side-a {{ border-left: 2px solid var(--accent); }}
+.side-b {{ border-left: 2px solid var(--blue); }}
+.dispute-vs {{ font-size: 0.7rem; color: var(--red); font-weight: 600; padding-top: 0.4rem; flex-shrink: 0; }}
+
+/* Framing quotes */
+.framing-quote {{ padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; }}
+.framing-quote:last-child {{ border-bottom: none; }}
+.framing-source {{ font-weight: 600; color: var(--purple); }}
+.framing-quoted {{ font-style: italic; color: var(--text); }}
+.framing-desc {{ color: var(--muted); font-size: 0.8rem; }}
+
+/* Predictions */
+.prediction {{ padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.03); }}
+.prediction:last-child {{ border-bottom: none; }}
+.pred-likelihood {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 3px; margin-right: 0.3rem; }}
+.pred-likely .pred-likelihood {{ background: var(--green); color: #fff; }}
+.pred-possible .pred-likelihood {{ background: var(--accent); color: #000; }}
+.pred-unlikely .pred-likelihood {{ background: var(--slate); color: #fff; }}
+.pred-condition {{ font-size: 0.78rem; color: var(--muted); font-style: italic; display: block; margin-top: 0.15rem; }}
+.watch-driver {{ font-size: 0.78rem; color: var(--muted); font-style: italic; }}
 
 /* Perspective grid */
 .perspective-grid {{ margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }}
@@ -496,6 +646,8 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
     .masthead h1 {{ font-size: 1.5rem; }}
     .grid-source {{ width: 40%; }}
     .grid-position {{ width: 60%; }}
+    .dispute-sides {{ flex-direction: column; }}
+    .dispute-vs {{ padding: 0; text-align: center; }}
 }}
 </style>
 </head>

@@ -1,18 +1,18 @@
 """
-Quickscan: Generate the "Today in 60 Seconds" quick-scan layer.
-Input: list of topic card dicts (from write.py)
-Output: quickscan dict with top_stories, tensions, watch_list; StepReport
+Quickscan: "Today in 60 Seconds" + Key Tensions + Watch List.
+Grouped by topic. Each story includes a fault line (axis of disagreement).
+Card indices map to the ORIGINAL topic_cards order for anchor links.
 """
 
 import json
 import re
 
 import llm as llm_caller
+from config import TOPICS
 from models import StepReport
 
 
 def calculate_heat_scores(topic_cards):
-    scored = []
     for card in topic_cards:
         src = card.get("source_count", 1)
         persp = card.get("perspectives_used", 1)
@@ -22,9 +22,6 @@ def calculate_heat_scores(topic_cards):
         if dt and "no substantive" not in dt.lower():
             has_disagree = 1
         card["_heat_score"] = (src * 2) + (persp * 3) + (topics * 2) + (has_disagree * 5)
-        scored.append(card)
-    scored.sort(key=lambda c: c["_heat_score"], reverse=True)
-    return scored
 
 
 def determine_consensus(card):
@@ -46,19 +43,28 @@ def determine_consensus(card):
 def run(topic_cards):
     print("\n>>> QUICKSCAN...")
     report = StepReport("quickscan", items_in=len(topic_cards))
-    scored = calculate_heat_scores(topic_cards)
-    for card in scored:
+
+    # Score and tag each card (preserving original indices)
+    calculate_heat_scores(topic_cards)
+    for i, card in enumerate(topic_cards):
         card["_consensus"] = determine_consensus(card)
+        card["_original_index"] = i  # This maps to topic-card-{i} in HTML
+
+    # Sort by heat for ranking, but keep original index for anchors
+    ranked = sorted(topic_cards, key=lambda c: c["_heat_score"], reverse=True)
 
     briefs = []
-    for i, card in enumerate(scored[:10]):
+    for i, card in enumerate(ranked[:10]):
         sources = ", ".join(s["name"] for s in card.get("sources", [])[:3])
-        briefs.append("{i}. [{con}] {t}\n   Src: {s}\n   What: {w}\n   Disagree: {d}".format(
-            i=i+1, con=card["_consensus"], t=card["title"][:100],
-            s=sources, w=card.get("what_happened", "")[:120],
+        primary_topic = card.get("topics", ["general"])[0]
+        topic_label = TOPICS.get(primary_topic, {}).get("name", primary_topic)
+        briefs.append("{i}. [{con}] [{topic}] {t}\n   Src: {s}\n   What: {w}\n   Disagree: {d}".format(
+            i=i+1, con=card["_consensus"], topic=topic_label,
+            t=card["title"][:100], s=sources,
+            w=card.get("what_happened", "")[:120],
             d=card.get("disagreements", "")[:80]))
 
-    prompt = """Write a quick-scan briefing. Return ONLY valid JSON, no other text.
+    prompt = """Write a quick-scan briefing. Return ONLY valid JSON.
 
 STORIES:
 {b}
@@ -66,7 +72,7 @@ STORIES:
 JSON structure:
 {{
   "key_tensions": [
-    {{"tension": "Who disagrees with whom about what. Name specific sources and positions."}}
+    {{"tension": "Who disagrees with whom about what. Name sources and positions.", "type": "data OR causality OR attribution OR framing"}}
   ],
   "watch_list": [
     {{"item": "What to watch and why.", "time_horizon": "imminent OR this_week OR developing"}}
@@ -74,8 +80,8 @@ JSON structure:
   "top_stories": [
     {{
       "rank": 1,
-      "headline": "Full headline 6-10 words",
-      "summary_line": "Full sentence: what happened, why it matters, who disagrees. Name sources.",
+      "headline": "Full headline 6-10 words, NEVER truncated",
+      "fault_line": "The core disagreement: X says A while Y says B. If consensus, say so.",
       "consensus": "consensus OR split OR contested",
       "key_sources": "2-3 source names on different sides"
     }}
@@ -83,15 +89,16 @@ JSON structure:
 }}
 
 RULES:
-- key_tensions: 3-4 items, sharpest disagreements across all stories
-- watch_list: 3-4 items, most important next developments
-- top_stories: up to 10, in order given
-- NEVER truncate mid-word. All headlines and summaries must be COMPLETE.
+- key_tensions: 3-4 items with type tag
+- watch_list: 3-4 items
+- top_stories: all stories given, in order
+- EVERY story MUST have a fault_line showing the axis of disagreement
+- COMPLETE sentences only. NEVER truncate mid-word.
 - Use consensus value from brackets.""".format(b="\n\n".join(briefs))
 
     available = llm_caller.get_available_llms()
     if not available:
-        return _fallback(scored), report
+        return _fallback(ranked), report
 
     report.llm_calls += 1
     result = llm_caller.call_by_id(available[0],
@@ -99,18 +106,25 @@ RULES:
 
     if not result:
         report.llm_failures += 1
-        return _fallback(scored), report
+        return _fallback(ranked), report
 
-    qs = _parse(result, scored)
+    qs = _parse(result, ranked)
     if qs:
         report.llm_successes += 1
         report.items_out = len(qs.get("top_stories", []))
     else:
         report.llm_failures += 1
-        qs = _fallback(scored)
+        qs = _fallback(ranked)
 
+    # Map card indices to ORIGINAL order (for anchor links)
     for i, s in enumerate(qs.get("top_stories", [])):
-        s["card_index"] = i
+        if i < len(ranked):
+            s["card_index"] = ranked[i].get("_original_index", i)
+            s["topic"] = ranked[i].get("topics", ["general"])[0]
+        else:
+            s["card_index"] = i
+            s["topic"] = "general"
+
     return qs, report
 
 
@@ -134,13 +148,15 @@ def _parse(result, cards):
         return None
 
 
-def _fallback(scored):
+def _fallback(ranked):
     stories = []
-    for i, c in enumerate(scored[:10]):
+    for i, c in enumerate(ranked[:10]):
         stories.append({
             "rank": i+1, "headline": c["title"][:80],
-            "summary_line": c.get("what_happened", "")[:200],
+            "fault_line": c.get("disagreements", "")[:150] or "See full analysis",
             "consensus": c.get("_consensus", "split"),
             "key_sources": ", ".join(s["name"] for s in c.get("sources", [])[:3]),
-            "card_index": i, "_heat_score": c.get("_heat_score", 0)})
+            "card_index": c.get("_original_index", i),
+            "topic": c.get("topics", ["general"])[0],
+            "_heat_score": c.get("_heat_score", 0)})
     return {"top_stories": stories, "key_tensions": [], "watch_list": []}
