@@ -95,7 +95,9 @@ def _merge_perspectives(perspectives):
                 break
         if not is_dup:
             merged.append(p)
-    return merged[:5]
+    # Cap based on available sources - more sources = more perspectives worthwhile
+    max_persp = min(7, max(5, len(story_group)))
+    return merged[:max_persp]
 
 
 def select_sources(story_group, perspectives):

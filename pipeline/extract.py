@@ -25,35 +25,34 @@ def run(selected_sources):
         article = item["article"]
         perspective = item["perspective"]
 
-        prompt = """Extract factual claims from this news article.
+        prompt = """Extract factual claims and notable details from this news article.
 
 SOURCE: {source}
 PERSPECTIVE: This source represents: {perspective}
 HEADLINE: {title}
 CONTENT: {summary}
 
-For each claim, identify:
-1. The claim itself (one sentence)
-2. Type: REPORTED_FACT / OFFICIAL_STATEMENT / ANALYSIS / OPINION
-3. Attribution (who said or reported it)
+Extract ALL of the following:
 
-Also note:
-EMPHASIS: What does this source emphasize that others might not?
-FRAMING: Any notable language choices, loaded words, or editorial angle?
+CLAIMS (one per line):
+CLAIM: [specific factual statement] | TYPE: [REPORTED_FACT / OFFICIAL_STATEMENT / ANALYSIS / OPINION] | ATTR: [who said or reported it]
 
-Format each claim on its own line:
-CLAIM: [text] | TYPE: [type] | ATTR: [attribution]
+EMPHASIS: What does this source emphasize that others might not? What angle does it take?
 
-End with EMPHASIS and FRAMING lines.""".format(
+FRAMING: Any notable language choices, loaded words, or editorial angle? Quote specific phrases.
+
+NOTABLE_DETAILS: Any interesting facts, statistics, historical connections, or context that adds depth beyond the core story. Include specific names, numbers, dates, and connections.
+
+Be thorough. Extract every specific claim, number, name, and date mentioned.""".format(
             source=article.source_label(),
             perspective=perspective,
             title=article.title,
-            summary=article.summary[:400])
+            summary=article.summary[:500])
 
         report.llm_calls += 1
         result = llm_caller.call_by_id(extractor_id,
             "You extract structured claims from news. Be precise. Only extract what is stated. Never invent facts.",
-            prompt, 800)
+            prompt, 1200)
         time.sleep(1)
 
         if result:

@@ -78,7 +78,19 @@ def _render_card(card, card_index=0):
                 parts.append('<span class="spectrum-item"><span class="spectrum-label">{}</span> {}</span>'.format(
                     stype.replace("_", " ").title(), count))
         if parts:
-            spectrum_html = '<div class="coverage-spectrum">Coverage: {}</div>'.format(" ".join(parts))
+            spectrum_html = '<div class="coverage-spectrum">Coverage: {}'.format(" ".join(parts))
+            # Add enrichment badges
+            balance = card.get("_political_balance", "")
+            depth = card.get("_coverage_depth", "")
+            bias = card.get("_bias_breakdown", {})
+            if balance:
+                bal_class = "bal-" + balance.replace("_", "-")
+                bias_str = "L:{} C:{} R:{}".format(bias.get("left", 0), bias.get("center", 0), bias.get("right", 0))
+                spectrum_html += ' <span class="balance-badge {bc}" title="{bs}">{bal}</span>'.format(
+                    bc=bal_class, bs=bias_str, bal=balance.replace("_", " ").title())
+            if depth:
+                spectrum_html += ' <span class="depth-badge depth-{d}">{d}</span>'.format(d=depth)
+            spectrum_html += '</div>'
 
     # Source pills with perspective + type
     source_pills = ""
@@ -90,8 +102,14 @@ def _render_card(card, card_index=0):
     # === SCANNABLE LAYER (always visible) ===
 
     # What happened (tight, no prose)
-    what_happened = '<div class="what-happened"><p>{}</p></div>'.format(
-        _esc(card.get("what_happened", "")))
+    # What happened - sanitize any JSON artifacts
+    wh = card.get("what_happened", "")
+    if wh.startswith("{") or wh.startswith('"'):
+        # JSON leak - try to extract just text content
+        import re as _re
+        text_match = _re.search(r'"what_happened"\s*:\s*"([^"]+)"', wh)
+        wh = text_match.group(1) if text_match else wh.strip('{}"\n ')
+    what_happened = '<div class="what-happened"><p>{}</p></div>'.format(_esc(wh))
 
     # Agreed facts as tight bullets with source tags
     facts_html = ""
@@ -147,6 +165,17 @@ def _render_card(card, card_index=0):
                         f=' <span class="framing-desc">{}</span>'.format(frame) if frame else "")
         if framing_blocks:
             framing_html = '<div class="scan-section section-framing"><div class="scan-label">How Sources Frame It</div>{}</div>'.format(framing_blocks)
+
+    # Notable details
+    notable_html = ""
+    notable = card.get("notable_details", [])
+    if isinstance(notable, list) and notable:
+        items = ""
+        for n in notable[:4]:
+            if isinstance(n, str) and n.strip():
+                items += '<li class="notable-item">{}</li>'.format(_esc(n))
+        if items:
+            notable_html = '<div class="scan-section section-notable"><div class="scan-label">Notable Details</div><ul class="scan-list">{}</ul></div>'.format(items)
 
     # Perspective grid (promoted — key visual element)
     grid_html = _render_perspective_grid(card)
@@ -267,6 +296,7 @@ def _render_card(card, card_index=0):
         {facts}
         {disputes}
         {framing}
+        {notable}
 
         <details class="detail-expand">
             <summary>Deep Analysis</summary>
@@ -288,6 +318,7 @@ def _render_card(card, card_index=0):
         facts=facts_html,
         disputes=disputes_html,
         framing=framing_html,
+        notable=notable_html,
         grid=grid_html,
         detail_sections=detail_sections,
         comp=comp_html,
@@ -303,10 +334,17 @@ def _render_perspective_grid(card):
 
     rows = ""
     for s in sources:
-        # Try to find this source's specific framing from the framing text
         source_framing = _extract_source_framing(s["name"], framing)
         if not source_framing:
-            source_framing = "See full analysis"
+            # Also try the structured framing data
+            for f in card.get("framing", []):
+                if isinstance(f, dict) and f.get("source", "").lower() == s["name"].lower():
+                    quote = f.get("quote", "")
+                    frame = f.get("frame", "")
+                    source_framing = '{}: "{}" - {}'.format(s["name"], quote, frame) if quote else frame
+                    break
+        if not source_framing:
+            continue  # Skip sources with no framing data instead of showing placeholder
 
         rows += """<div class="grid-row">
             <div class="grid-source">
@@ -364,9 +402,16 @@ def _render_quickscan(data):
             card_idx = story.get("card_index", 0)
             sources = story.get("key_sources", "")
             fault = story.get("fault_line", "")
-            stories_html += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{headline}</span><span class="qs-fault">{fault}</span><span class="qs-sources">{sources}</span></div></a>'.format(
+            summary = story.get("summary", "")
+            # Filter out boilerplate fault lines
+            boilerplate = ["no substantive contradictions", "no substantive disagreements",
+                          "see full analysis", "no real contradictions", "none identified"]
+            if any(bp in fault.lower() for bp in boilerplate):
+                fault = ""
+            stories_html += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{headline}</span><span class="qs-summary">{summary}</span><span class="qs-fault">{fault}</span><span class="qs-sources">{sources}</span></div></a>'.format(
                 idx=card_idx, icon=icon,
                 headline=_esc(story.get("headline", "")),
+                summary=_esc(summary),
                 fault=_esc(fault),
                 sources=_esc(sources))
         stories_html += '</div>'
@@ -579,7 +624,8 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .qs-story .consensus-dot {{ margin-top: 0.45rem; flex-shrink: 0; }}
 .qs-story-content {{ flex: 1; }}
 .qs-headline {{ font-weight: 600; font-size: 0.9rem; display: block; }}
-.qs-fault {{ font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; font-style: italic; }}
+.qs-summary {{ font-size: 0.82rem; color: var(--text); display: block; margin-top: 0.15rem; }}
+.qs-fault {{ font-size: 0.78rem; color: var(--accent); display: block; margin-top: 0.1rem; font-style: italic; }}
 .qs-sources {{ font-size: 0.72rem; color: var(--purple); display: block; margin-top: 0.15rem; }}
 .qs-bottom-row {{ display: flex; gap: 1rem; margin-top: 1rem; }}
 .qs-box {{ flex: 1; padding: 0.8rem; background: rgba(255,255,255,0.03); border-radius: 6px; }}
@@ -625,6 +671,16 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .coverage-spectrum {{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--muted); padding: 0.3rem 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }}
 .spectrum-item {{ padding: 0.1rem 0.4rem; background: var(--section-bg); border-radius: 3px; }}
 .spectrum-label {{ color: var(--purple); }}
+
+/* Balance and depth badges */
+.balance-badge {{ padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.6rem; margin-left: 0.3rem; }}
+.bal-balanced {{ background: var(--green); color: #fff; }}
+.bal-leans-left {{ background: #3b82f6; color: #fff; }}
+.bal-leans-right {{ background: #ef4444; color: #fff; }}
+.depth-badge {{ padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.6rem; margin-left: 0.3rem; }}
+.depth-deep {{ background: var(--green); color: #fff; }}
+.depth-moderate {{ background: var(--accent); color: #000; }}
+.depth-thin {{ background: var(--slate); color: #fff; }}
 
 /* Source pills */
 .sources-row {{ display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1rem; }}
@@ -708,6 +764,8 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .detail-section {{ margin-top: 0.8rem; padding: 0.8rem; background: var(--section-bg); border-radius: 6px; }}
 .detail-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; font-weight: 600; }}
 .section-framing .detail-label {{ color: var(--purple); }}
+.section-notable .scan-label {{ color: var(--blue); }}
+.notable-item {{ font-size: 0.85rem; color: var(--muted); padding: 0.2rem 0; border-left: 2px solid var(--blue); padding-left: 0.6rem; margin-bottom: 0.3rem; }}
 .section-implications .detail-label {{ color: var(--blue); }}
 .section-predictions .detail-label {{ color: var(--accent); }}
 .section-unknowns .detail-label {{ color: var(--slate); }}

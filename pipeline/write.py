@@ -74,7 +74,7 @@ IMPORTANT: If the comparisons cover multiple unrelated topics, focus on the PRIM
     {{
       "source": "Source name",
       "quote": "Short quoted phrase showing editorial angle",
-      "frame": "Neutral one-sentence description of what this framing implies. If the quote comes from a person IN the article (politician, official, expert), say: [Person name] quoted by [Source] — this implies X."
+      "frame": "What this framing choice REVEALS about the source's priorities or biases. Don't just describe what they covered — explain what their angle tells the reader. If the quote comes from a person IN the article (politician, official, expert), say: [Person name] quoted by [Source] — this reveals X."
     }}
   ],
 
@@ -103,13 +103,17 @@ IMPORTANT: If the comparisons cover multiple unrelated topics, focus on the PRIM
     }}
   ],
 
-  "missing_viewpoints": "Which perspectives were unavailable and why they matter. Or empty string."
+  "missing_viewpoints": "Which perspectives were unavailable and why they matter. Or empty string.",
+
+  "notable_details": [
+    "Interesting fact or detail from the articles that doesn't fit into facts/disputes/framing but adds color or context. E.g. historical parallels, surprising connections, notable quotes, human interest angles."
+  ]
 }}
 
 RULES:
 - agreed_facts: Include all key verifiable facts. If confirmed by 2+ sources, list both. If only 1 source, tag as [Source only]. NEVER leave this empty — every story has facts.
 - disputes: ONLY include genuine contradictions where two sources make INCOMPATIBLE claims about THE SAME THING. Different facts about different aspects are NOT disputes. Two different cities reporting different crowd sizes is NOT a dispute. If a comparison model says "no substantive contradictions" or "not a real disagreement," do NOT create a dispute from it. If sources complement rather than contradict each other, leave disputes as an empty array []. For each dispute, include your confidence (high/medium/low) at the end of side_a.
-- framing: Must include a direct quoted phrase from the source material. Distinguish between a source's own editorial angle and quotes from subjects within the article. If the quote is from a person in the article, say so.
+- framing: Must include a direct quoted phrase from the source material. Distinguish between a source's own editorial angle and quotes from subjects within the article. If the quote is from a person in the article, say so. The frame description MUST explain WHY this framing matters or what it implies for the reader's understanding — don't just describe what the source covered, explain what their angle reveals about their perspective or priorities.
 - predictions: Skip entirely (empty array) for cultural events, human interest stories, celebrations, or single-event stories where future scenarios would be speculative and low-stakes. Only include for policy, conflict, economic, or diplomatic stories where real consequences are developing.
 - No prose paragraphs anywhere. Bullets and structured entries only.
 - No markdown. No bold. Plain text in all string values.""".format(
@@ -232,6 +236,13 @@ def _parse_card(result, title, topics, sources, missing, comparisons, investigat
             if field not in card:
                 card[field] = ""
 
+        if "notable_details" not in card or not isinstance(card["notable_details"], list):
+            old = card.get("notable_details", [])
+            if isinstance(old, str):
+                card["notable_details"] = [l.strip() for l in old.split("\n") if l.strip()]
+            elif not isinstance(old, list):
+                card["notable_details"] = []
+
         if "key_unknowns" not in card:
             card["key_unknowns"] = []
         elif isinstance(card["key_unknowns"], str):
@@ -283,6 +294,14 @@ def _parse_card(result, title, topics, sources, missing, comparisons, investigat
 
     except Exception as e:
         print("    Write parse error: {}".format(str(e)[:80]))
+        # Clean up raw text - strip any JSON artifacts
+        clean_text = ""
+        if result:
+            import re as _re
+            clean_text = _re.sub(r'[{}\[\]"\\]', '', result[:300]).strip()
+            # Remove JSON field names
+            for field in ["what_happened", "agreed_facts", "disputes", "framing", "predictions"]:
+                clean_text = clean_text.replace(field, "").replace(":", " ").strip()
         return {
             "title": title, "topics": topics,
             "source_count": len(sources), "perspectives_used": len(sources),
@@ -294,10 +313,10 @@ def _parse_card(result, title, topics, sources, missing, comparisons, investigat
                 for s in sources],
             "missing_perspective_list": missing,
             "comparisons": comparisons, "investigation": investigation,
-            "what_happened": result[:500] if result else "",
+            "what_happened": clean_text if clean_text else "Analysis could not be completed for this story.",
             "agreed_facts": [], "disputes": [], "framing": [],
             "key_unknowns": [], "implications": "",
-            "watch_items": [], "predictions": [],
+            "watch_items": [], "predictions": [], "notable_details": [],
             "missing_viewpoints": "", "disagreements": "", "framing_differences": "",
             "written_by": "fallback",
         }

@@ -81,9 +81,10 @@ JSON structure:
     {{
       "rank": 1,
       "headline": "Full headline 6-10 words, NEVER truncated",
-      "fault_line": "The core disagreement: X says A while Y says B. If consensus, say so.",
+      "summary": "One sentence explaining what happened and why it matters.",
+      "fault_line": "If disputed: X says A while Y says B. If consensus: All sources agree that [key point]. NEVER say 'no substantive contradictions' — always give useful content.",
       "consensus": "consensus OR split OR contested",
-      "key_sources": "2-3 source names on different sides"
+      "key_sources": "2-3 source names"
     }}
   ]
 }}
@@ -92,7 +93,9 @@ RULES:
 - key_tensions: 3-4 items with type tag
 - watch_list: 3-4 items
 - top_stories: all stories given, in order
-- EVERY story MUST have a fault_line showing the axis of disagreement
+- EVERY story MUST have BOTH a summary AND a fault_line
+- summary: Always a useful one-sentence explanation of the story
+- fault_line: NEVER just say "no contradictions." For consensus stories, summarize what all sources agree on. For disputed stories, show the specific disagreement.
 - COMPLETE sentences only. NEVER truncate mid-word.
 - Use consensus value from brackets.""".format(b="\n\n".join(briefs))
 

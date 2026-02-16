@@ -18,7 +18,7 @@ from pathlib import Path
 
 from config import get_active_sources, get_active_topics, load_query_pack, LLM_CONFIGS
 import llm as llm_caller
-from pipeline import fetch, triage, cluster, select, perspectives, extract, compare, investigate, write, synthesize, quickscan, validate, publish
+from pipeline import fetch, triage, cluster, select, perspectives, extract, compare, investigate, write, enrich, synthesize, quickscan, validate, publish
 
 
 def process_story(story_group, story_num, total):
@@ -136,6 +136,10 @@ def main():
         sys.exit(1)
     print("\n{} topic cards generated".format(len(topic_cards)))
 
+    # Enrich: compute metadata (no LLM calls)
+    enrich_report = enrich.run(topic_cards)
+    all_reports.append(enrich_report)
+
     # Step 10: Synthesize
     synth, synth_report = synthesize.run(topic_cards)
     all_reports.append(synth_report)
@@ -157,6 +161,32 @@ def main():
     output_path = output_dir / "index.html"
     output_path.write_text(html, encoding="utf-8")
     print("\nBriefing: {}".format(output_path))
+
+    # Cache data for backtesting
+    import json
+    from datetime import datetime, timezone
+    cache = {
+        "date": datetime.now(timezone.utc).isoformat(),
+        "runtime_seconds": run_time,
+        "cards": []
+    }
+    for card in topic_cards:
+        cache["cards"].append({
+            "title": card.get("title", ""),
+            "topics": card.get("topics", []),
+            "source_count": card.get("source_count", 0),
+            "sources": [s.get("name", "") for s in card.get("sources", [])],
+            "what_happened": card.get("what_happened", ""),
+            "agreed_facts": card.get("agreed_facts", []),
+            "disputes": card.get("disputes", []),
+            "predictions": card.get("predictions", []),
+            "watch_items": card.get("watch_items", []),
+            "key_unknowns": card.get("key_unknowns", []),
+            "written_by": card.get("written_by", ""),
+        })
+    cache_path = output_dir / "briefing_data.json"
+    cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
+    print("Cache: {}".format(cache_path))
 
     # Run report
     print("\n" + "=" * 70)
