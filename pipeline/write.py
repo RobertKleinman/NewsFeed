@@ -52,13 +52,14 @@ COMPARISONS:
 {investigation}
 
 Return a JSON object. Every field must follow its format rules exactly.
+IMPORTANT: If the comparisons cover multiple unrelated topics, focus on the PRIMARY story only. Do not mix unrelated stories into one card.
 
 {{
   "what_happened": "Max 2 sentences. Actor + action + stake. No adjectives. Include source tag if only one source reports it. Example: The US imposed 25% tariffs on Canadian steel (Reuters, AP). Canada announced retaliatory measures (CBC, Globe and Mail).",
 
   "agreed_facts": [
     "Fact confirmed by 2+ sources. [Source1, Source2]",
-    "Another fact. [Source3, Source4]"
+    "If only 1 source available, include key facts tagged [Source only]. Example: The deal was signed March 1. [Reuters only]"
   ],
 
   "disputes": [
@@ -73,12 +74,15 @@ Return a JSON object. Every field must follow its format rules exactly.
     {{
       "source": "Source name",
       "quote": "Short quoted phrase showing editorial angle",
-      "frame": "Neutral one-sentence description of what this framing implies"
+      "frame": "Neutral one-sentence description of what this framing implies. If the quote comes from a person IN the article (politician, official, expert), say: [Person name] quoted by [Source] — this implies X."
     }}
   ],
 
   "key_unknowns": [
-    "Specific unanswered question"
+    {{
+      "question": "Specific unanswered question from the coverage",
+      "answer": "Best available answer from the investigation research. If no answer found, say 'Not yet reported.'"
+    }}
   ],
 
   "implications": "2-3 sentences. Who is affected and how.",
@@ -103,8 +107,8 @@ Return a JSON object. Every field must follow its format rules exactly.
 }}
 
 RULES:
-- agreed_facts: Only include if confirmed by 2+ sources. Always include source names in brackets.
-- disputes: ONLY include genuine contradictions where two sources make INCOMPATIBLE claims about THE SAME THING. Different facts about different aspects are NOT disputes. Two different cities reporting different crowd sizes is NOT a dispute. If sources complement rather than contradict each other, leave disputes as an empty array []. For each dispute, include your confidence (high/medium/low) at the end of side_a.
+- agreed_facts: Include all key verifiable facts. If confirmed by 2+ sources, list both. If only 1 source, tag as [Source only]. NEVER leave this empty — every story has facts.
+- disputes: ONLY include genuine contradictions where two sources make INCOMPATIBLE claims about THE SAME THING. Different facts about different aspects are NOT disputes. Two different cities reporting different crowd sizes is NOT a dispute. If a comparison model says "no substantive contradictions" or "not a real disagreement," do NOT create a dispute from it. If sources complement rather than contradict each other, leave disputes as an empty array []. For each dispute, include your confidence (high/medium/low) at the end of side_a.
 - framing: Must include a direct quoted phrase from the source material. Distinguish between a source's own editorial angle and quotes from subjects within the article. If the quote is from a person in the article, say so.
 - predictions: Skip entirely (empty array) for cultural events, human interest stories, celebrations, or single-event stories where future scenarios would be speculative and low-stakes. Only include for policy, conflict, economic, or diplomatic stories where real consequences are developing.
 - No prose paragraphs anywhere. Bullets and structured entries only.
@@ -136,7 +140,7 @@ RULES:
     report.llm_calls += 1
     result = llm_caller.call_by_id(writer_id,
         "Return valid JSON only. No markdown. Structured entries, not prose.",
-        prompt, 2500)
+        prompt, 4000)
     time.sleep(1)
 
     if not result:
@@ -224,12 +228,24 @@ def _parse_card(result, title, topics, sources, missing, comparisons, investigat
             else:
                 card["predictions"] = old if isinstance(old, list) else []
 
-        for field in ["what_happened", "key_unknowns", "implications", "missing_viewpoints"]:
+        for field in ["what_happened", "implications", "missing_viewpoints"]:
             if field not in card:
-                card[field] = "" if field != "key_unknowns" else []
+                card[field] = ""
 
-        if isinstance(card["key_unknowns"], str):
-            card["key_unknowns"] = [l.strip() for l in card["key_unknowns"].split("\n") if l.strip()]
+        if "key_unknowns" not in card:
+            card["key_unknowns"] = []
+        elif isinstance(card["key_unknowns"], str):
+            # Convert old string format to Q&A list
+            card["key_unknowns"] = [{"question": l.strip(), "answer": "Not yet reported."} for l in card["key_unknowns"].split("\n") if l.strip()]
+        elif isinstance(card["key_unknowns"], list):
+            # Normalize: could be list of strings or list of dicts
+            normalized = []
+            for item in card["key_unknowns"]:
+                if isinstance(item, str):
+                    normalized.append({"question": item.strip(), "answer": "Not yet reported."})
+                elif isinstance(item, dict):
+                    normalized.append(item)
+            card["key_unknowns"] = normalized
 
         # Compute source type counts for coverage spectrum
         type_counts = {}

@@ -31,6 +31,11 @@ SKIP_WORDS = {
     "before", "under", "every", "show", "here", "week", "month", "day",
     "million", "billion", "percent", "early", "late", "high", "low",
     "former", "current", "major", "expected", "likely", "possible",
+    # Generic terms that cause false clusters
+    "security", "attack", "system", "technology", "policy", "government",
+    "officials", "political", "economic", "global", "international",
+    "national", "public", "social", "digital", "data", "online",
+    "ai", "intelligence", "artificial", "cyber", "threat", "risk",
 }
 
 

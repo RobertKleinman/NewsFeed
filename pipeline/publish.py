@@ -199,12 +199,20 @@ def _render_card(card, card_index=0):
         if pred_html:
             detail_sections += '<div class="detail-section section-predictions"><div class="detail-label">Predictions</div>{}</div>'.format(pred_html)
 
-    # Key unknowns
+    # Key unknowns as Q&A
     unknowns = card.get("key_unknowns", [])
     if isinstance(unknowns, list) and unknowns:
-        items = "".join('<li class="scan-item">{}</li>'.format(_esc(u)) for u in unknowns if isinstance(u, str) and u.strip())
+        items = ""
+        for u in unknowns:
+            if isinstance(u, dict):
+                q = _esc(u.get("question", ""))
+                a = _esc(u.get("answer", "Not yet reported."))
+                if q:
+                    items += '<details class="unknown-qa"><summary class="unknown-q">{}</summary><div class="unknown-a">{}</div></details>'.format(q, a)
+            elif isinstance(u, str) and u.strip():
+                items += '<details class="unknown-qa"><summary class="unknown-q">{}</summary><div class="unknown-a">Not yet reported.</div></details>'.format(_esc(u))
         if items:
-            detail_sections += '<div class="detail-section section-unknowns"><div class="detail-label">Key Unknowns</div><ul class="scan-list">{}</ul></div>'.format(items)
+            detail_sections += '<div class="detail-section section-unknowns"><div class="detail-label">Key Unknowns</div>{}</div>'.format(items)
     elif isinstance(unknowns, str) and unknowns:
         detail_sections += '<div class="detail-section section-unknowns"><div class="detail-label">Key Unknowns</div><div class="detail-text">{}</div></div>'.format(
             _esc(unknowns).replace("\n", "<br>"))
@@ -662,6 +670,13 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .pred-unlikely .pred-likelihood {{ background: var(--slate); color: #fff; }}
 .pred-condition {{ font-size: 0.78rem; color: var(--muted); font-style: italic; display: block; margin-top: 0.15rem; }}
 .watch-driver {{ font-size: 0.78rem; color: var(--muted); font-style: italic; }}
+
+/* Key unknowns Q&A */
+.unknown-qa {{ margin-bottom: 0.3rem; }}
+.unknown-q {{ font-size: 0.85rem; cursor: pointer; padding: 0.3rem 0; color: var(--text); }}
+.unknown-q:hover {{ color: var(--purple); }}
+.unknown-q::marker {{ color: var(--purple); }}
+.unknown-a {{ font-size: 0.82rem; color: var(--muted); padding: 0.3rem 0 0.3rem 1rem; border-left: 2px solid var(--purple); margin: 0.2rem 0 0.4rem 0.5rem; }}
 
 /* Perspective grid */
 .perspective-grid {{ margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }}
