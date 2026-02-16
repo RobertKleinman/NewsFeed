@@ -104,7 +104,7 @@ Return a JSON object. Every field must follow its format rules exactly.
 
 RULES:
 - agreed_facts: Only include if confirmed by 2+ sources. Always include source names in brackets.
-- disputes: Each MUST have two sides with source attribution. Type must be one of: data, causality, attribution, framing.
+- disputes: ONLY include genuine contradictions where two sources make INCOMPATIBLE claims about THE SAME THING. Different facts about different aspects are NOT disputes. Two different cities reporting different crowd sizes is NOT a dispute. If sources complement rather than contradict each other, leave disputes as an empty array [].
 - framing: Must include a direct quoted phrase from the source material.
 - predictions: Must include likelihood and condition.
 - No prose paragraphs anywhere. Bullets and structured entries only.

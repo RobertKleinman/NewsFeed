@@ -22,22 +22,21 @@ def get_available_llms(exclude=None):
             if k not in exclude and os.environ.get(v["env_key"])]
 
 
-def call_by_id(llm_id, system_prompt, user_prompt, max_tokens=1500, use_cache=True):
-    """Call an LLM by its config ID."""
+def call_by_id(llm_id, system_prompt, user_prompt, max_tokens=1500, use_cache=True, web_search=False):
+    """Call an LLM by its config ID. web_search=True enables Gemini grounding."""
     config = LLM_CONFIGS[llm_id]
     api_key = os.environ.get(config["env_key"])
     if not api_key:
         return None
     return call(config["provider"], config["model"],
-                system_prompt, user_prompt, api_key, max_tokens, use_cache)
+                system_prompt, user_prompt, api_key, max_tokens, use_cache, web_search)
 
 
-def call(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500, use_cache=True):
+def call(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500, use_cache=True, web_search=False):
     """Unified LLM call with retry and optional caching."""
-    # Check cache
     if use_cache:
         cache_key = hashlib.md5(
-            "{}:{}:{}:{}".format(provider, model, system_prompt, user_prompt).encode()
+            "{}:{}:{}:{}:{}".format(provider, model, system_prompt, user_prompt, web_search).encode()
         ).hexdigest()
         if cache_key in _cache:
             return _cache[cache_key]
@@ -46,7 +45,7 @@ def call(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500, 
 
     for attempt in range(3):
         try:
-            result = _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens)
+            result = _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens, web_search)
             if result and cache_key:
                 _cache[cache_key] = result
             return result
@@ -65,7 +64,7 @@ def call(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500, 
     return None
 
 
-def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens):
+def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens, web_search=False):
     if provider == "google":
         url = "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}".format(model, api_key)
         payload = {
@@ -73,9 +72,14 @@ def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens)
             "contents": [{"parts": [{"text": user_prompt}]}],
             "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.3}
         }
-        resp = requests.post(url, json=payload, timeout=90)
+        if web_search:
+            payload["tools"] = [{"google_search": {}}]
+        resp = requests.post(url, json=payload, timeout=120)
         resp.raise_for_status()
-        return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+        # Gemini with grounding may return multiple parts
+        parts = resp.json()["candidates"][0]["content"]["parts"]
+        text_parts = [p["text"] for p in parts if "text" in p]
+        return "\n".join(text_parts)
 
     elif provider == "openai":
         url = "https://api.openai.com/v1/chat/completions"

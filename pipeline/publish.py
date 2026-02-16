@@ -213,11 +213,16 @@ def _render_card(card, card_index=0):
         detail_sections += '<div class="detail-section section-missing"><div class="detail-label">Missing Viewpoints</div><div class="detail-text">{}</div></div>'.format(
             _esc(missing).replace("\n", "<br>"))
 
-    # Investigation
+    # Investigation - now concise, but still collapsible for safety
     investigation = card.get("investigation", "")
     if investigation:
-        detail_sections += '<div class="detail-section section-investigation"><div class="detail-label">Background & Context (AI Analysis)</div><div class="detail-text">{}</div></div>'.format(
-            _esc(investigation).replace("\n", "<br>"))
+        # Only show the concise version, not raw essay prose
+        inv_text = _esc(investigation).replace("\n", "<br>")
+        # If it's still very long, truncate and note
+        if len(investigation) > 1000:
+            detail_sections += '<details class="raw-comp"><summary>Background Research (Gemini Web Search)</summary><div class="detail-section section-investigation"><div class="detail-text">{}</div></div></details>'.format(inv_text)
+        else:
+            detail_sections += '<div class="detail-section section-investigation"><div class="detail-label">Background Research</div><div class="detail-text">{}</div></div>'.format(inv_text)
 
     # Raw comparisons
     comp_html = ""
@@ -252,10 +257,10 @@ def _render_card(card, card_index=0):
         {facts}
         {disputes}
         {framing}
-        {grid}
 
         <details class="detail-expand">
             <summary>Deep Analysis</summary>
+            {grid}
             {detail_sections}
             {comp}
             {writer}

@@ -1,11 +1,7 @@
 """
-Step 8: Investigate gaps and generate forward-looking analysis.
-Input: comparisons dict, claims data, lead title
-Output: investigation text, StepReport
-
-When comparisons identify unknowns or missing perspectives, this step asks LLMs
-to fill gaps using their training knowledge (clearly labeled as inference, not reporting).
-Also generates implications and predictions.
+Step 8: Investigate gaps using web search + LLM knowledge.
+Uses Gemini with Google Search grounding when available for current context.
+Output is structured and concise — no essay-length prose.
 """
 
 import time
@@ -16,78 +12,70 @@ from models import StepReport
 
 
 def run(comparisons, claims_data, lead_title):
-    """Investigate gaps and forecast. Returns (investigation_text, report)."""
     report = StepReport("investigate", items_in=len(comparisons))
     available = llm_caller.get_available_llms()
     if not available or not comparisons:
         return None, report
 
-    # Merge comparison outputs to find gaps
+    # Extract unknowns from comparisons
     all_unknowns = []
     for model, text in comparisons.items():
         if "KEY UNKNOWNS:" in text:
-            unknowns_section = text.split("KEY UNKNOWNS:")[-1].strip()
-            # Take first 500 chars of unknowns
-            all_unknowns.append("{} noted: {}".format(model, unknowns_section[:500]))
+            section = text.split("KEY UNKNOWNS:")[-1].strip()
+            all_unknowns.append(section[:400])
 
-    unknowns_text = "\n".join(all_unknowns) if all_unknowns else "No specific unknowns identified."
+    unknowns_text = "\n".join(all_unknowns) if all_unknowns else "No specific unknowns."
 
-    # Build source context
     source_summary = "\n".join([
-        "- {} ({}, {}): {}".format(c["source"], c["region"], c["perspective"], c["headline"])
+        "- {} ({}): {}".format(c["source"], c["perspective"], c["headline"])
         for c in claims_data
     ])
 
-    prompt = """You are a senior intelligence analyst. A news event has been analyzed by multiple
-sources and comparison models. Your job is two-fold:
-
-1. INVESTIGATE GAPS: The comparison identified these unknowns and gaps:
-{unknowns}
-
-Using your training knowledge (not the articles), provide brief context that helps
-explain these gaps. What background does the reader need? What historical context
-is relevant? Be clear about what is established background vs your inference.
-
-2. FORWARD ANALYSIS: Based on the event and sources below, provide:
-- IMPLICATIONS: What are the likely consequences of this event? Who is affected and how?
-- WHAT TO WATCH: What specific developments should the reader look for in the coming days/weeks?
-- PREDICTIONS: What are 2-3 plausible scenarios for how this develops? Note which is most likely and why.
+    prompt = """Research this news event and provide brief, structured context.
 
 EVENT: {title}
-SOURCES:
-{sources}
+SOURCES: {sources}
+GAPS IDENTIFIED: {unknowns}
 
-Write in plain text only. No markdown, no bold, no bullets. Use these section labels exactly:
+Search for current information about this event. Then provide:
 
-BACKGROUND AND CONTEXT:
-[your background analysis — label anything that is inference vs established fact]
+CONTEXT: (3-5 sentences max)
+State the essential background a reader needs. What triggered this event?
+What recent developments led here? State established facts directly — do not
+hedge on well-documented history. Be specific about dates, names, and events.
 
-IMPLICATIONS:
-[who is affected, how, why it matters beyond the headline]
+KEY FINDING: (1-2 sentences)
+The single most important piece of context that the original news coverage missed
+or underemphasized.
 
-WHAT TO WATCH:
-[specific things the reader should monitor]
-
-PREDICTIONS:
-[2-3 scenarios, noting likelihood]""".format(
-        unknowns=unknowns_text,
+Write concisely. No filler. No preamble. Plain text only.""".format(
         title=lead_title,
-        sources=source_summary)
+        sources=source_summary,
+        unknowns=unknowns_text)
 
-    # Use a different model than the comparators for perspective diversity
-    comparator_labels = set(comparisons.keys())
+    # Prefer Gemini for web search grounding
     investigator_id = None
-    for llm_id in available:
-        if LLM_CONFIGS[llm_id]["label"] not in comparator_labels:
-            investigator_id = llm_id
-            break
-    if not investigator_id:
-        investigator_id = available[-1]
+    use_search = False
+
+    # First try: Gemini with web search
+    if "gemini" in available:
+        investigator_id = "gemini"
+        use_search = True
+        print("      Using Gemini with web search")
+    else:
+        # Fallback: use a model not used for comparison
+        comparator_labels = set(comparisons.keys())
+        for llm_id in available:
+            if LLM_CONFIGS[llm_id]["label"] not in comparator_labels:
+                investigator_id = llm_id
+                break
+        if not investigator_id:
+            investigator_id = available[-1]
 
     report.llm_calls += 1
     result = llm_caller.call_by_id(investigator_id,
-        "You are a senior intelligence analyst. Clearly distinguish established facts from inference. Plain text only.",
-        prompt, 1500)
+        "You are a research analyst. Be concise and factual. State established facts directly. Plain text only.",
+        prompt, 800, web_search=use_search)
     time.sleep(1)
 
     if result:
