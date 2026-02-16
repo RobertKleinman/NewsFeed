@@ -69,12 +69,12 @@ Return ONLY a JSON array like:
         else:
             report.llm_failures += 1
 
-    merged = _merge_perspectives(all_perspectives)
+    merged = _merge_perspectives(all_perspectives, len(story_group[:10]))
     report.items_out = len(merged)
     return merged, report
 
 
-def _merge_perspectives(perspectives):
+def _merge_perspectives(perspectives, source_count=5):
     if not perspectives:
         return []
     merged = []
@@ -95,8 +95,7 @@ def _merge_perspectives(perspectives):
                 break
         if not is_dup:
             merged.append(p)
-    # Cap based on available sources - more sources = more perspectives worthwhile
-    max_persp = min(7, max(5, len(story_group)))
+    max_persp = min(7, max(5, source_count))
     return merged[:max_persp]
 
 
