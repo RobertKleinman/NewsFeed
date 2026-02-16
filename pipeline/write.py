@@ -104,9 +104,9 @@ Return a JSON object. Every field must follow its format rules exactly.
 
 RULES:
 - agreed_facts: Only include if confirmed by 2+ sources. Always include source names in brackets.
-- disputes: ONLY include genuine contradictions where two sources make INCOMPATIBLE claims about THE SAME THING. Different facts about different aspects are NOT disputes. Two different cities reporting different crowd sizes is NOT a dispute. If sources complement rather than contradict each other, leave disputes as an empty array [].
-- framing: Must include a direct quoted phrase from the source material.
-- predictions: Must include likelihood and condition.
+- disputes: ONLY include genuine contradictions where two sources make INCOMPATIBLE claims about THE SAME THING. Different facts about different aspects are NOT disputes. Two different cities reporting different crowd sizes is NOT a dispute. If sources complement rather than contradict each other, leave disputes as an empty array []. For each dispute, include your confidence (high/medium/low) at the end of side_a.
+- framing: Must include a direct quoted phrase from the source material. Distinguish between a source's own editorial angle and quotes from subjects within the article. If the quote is from a person in the article, say so.
+- predictions: Skip entirely (empty array) for cultural events, human interest stories, celebrations, or single-event stories where future scenarios would be speculative and low-stakes. Only include for policy, conflict, economic, or diplomatic stories where real consequences are developing.
 - No prose paragraphs anywhere. Bullets and structured entries only.
 - No markdown. No bold. Plain text in all string values.""".format(
         title=lead_title,
@@ -118,10 +118,18 @@ RULES:
     used_labels = set(comparisons.keys())
     available = llm_caller.get_available_llms()
     writer_id = None
-    for llm_id in available:
-        if LLM_CONFIGS[llm_id]["label"] not in used_labels:
-            writer_id = llm_id
+
+    # Priority: ChatGPT > Gemini > Claude > Grok for card writing
+    writer_preference = ["chatgpt", "gemini", "claude", "grok"]
+    for preferred in writer_preference:
+        if preferred in available and LLM_CONFIGS[preferred]["label"] not in used_labels:
+            writer_id = preferred
             break
+    if not writer_id:
+        for preferred in writer_preference:
+            if preferred in available:
+                writer_id = preferred
+                break
     if not writer_id:
         writer_id = available[-1]
 

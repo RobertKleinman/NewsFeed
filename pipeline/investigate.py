@@ -75,7 +75,7 @@ Write concisely. No filler. No preamble. Plain text only.""".format(
     report.llm_calls += 1
     result = llm_caller.call_by_id(investigator_id,
         "You are a research analyst. Be concise and factual. State established facts directly. Plain text only.",
-        prompt, 800, web_search=use_search)
+        prompt, 1200, web_search=use_search)
     time.sleep(1)
 
     if result:

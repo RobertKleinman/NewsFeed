@@ -32,7 +32,7 @@ def run(claims_data, lead_title):
 sources covering the same event: "{title}"
 
 Each source was selected to represent a different perspective. Compare them and identify
-what they agree on, where they differ, and how they frame things differently.
+what they agree on, where they genuinely differ, and how they frame things differently.
 
 SOURCES AND CLAIMS:
 {claims}
@@ -45,12 +45,19 @@ State facts multiple sources confirm. Name which sources. Only facts actually in
 extractions above. Never invent or assume.
 
 DISAGREEMENTS:
-Where sources report different facts, numbers, or conclusions. Specific about what
-each says differently. If no real contradictions: "No substantive contradictions identified."
+ONLY include genuine contradictions where sources make INCOMPATIBLE claims about THE SAME
+specific thing. Two sources covering different aspects of the same story is NOT a disagreement.
+Different cities with different crowd sizes is NOT a disagreement. Different emphasis is NOT
+a disagreement — that goes in FRAMING DIFFERENCES. If sources complement rather than
+contradict each other, write: "No substantive contradictions identified."
+
+For each real disagreement, rate your confidence: [HIGH/MEDIUM/LOW].
 
 FRAMING DIFFERENCES:
-How different sources frame the same event. Quote specific language. What each emphasizes
-or downplays compared to others.
+How different sources frame the same event. Quote specific short phrases that reveal
+editorial angle. IMPORTANT: distinguish between a source's own editorial framing and
+quotes from subjects within the article. If a source quotes a politician, note that
+the framing is the politician's words, not the outlet's angle.
 
 KEY UNKNOWNS:
 Important questions the coverage leaves unanswered. What a well-informed reader would

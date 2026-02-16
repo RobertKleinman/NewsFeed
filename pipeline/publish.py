@@ -15,7 +15,7 @@ import llm as llm_caller
 from config import TOPICS, LLM_CONFIGS
 
 
-def run(topic_cards, synthesis, quickscan_data, reports, run_time):
+def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_review=None):
     """Generate HTML. Returns html string."""
     stories_html = ""
     for i, card in enumerate(topic_cards):
@@ -25,6 +25,7 @@ def run(topic_cards, synthesis, quickscan_data, reports, run_time):
     synthesis_html = _render_synthesis(synthesis)
     filter_buttons = _render_filters()
     run_report_html = _render_run_report(reports, run_time)
+    review_panel_html = _render_review_panel(quality_review)
     llms_used = ", ".join(LLM_CONFIGS[k]["label"] for k in llm_caller.get_available_llms())
     now = datetime.now(timezone.utc).strftime("%B %d, %Y at %H:%M UTC")
 
@@ -37,6 +38,7 @@ def run(topic_cards, synthesis, quickscan_data, reports, run_time):
         filters=filter_buttons,
         stories=stories_html,
         run_report=run_report_html,
+        review_panel=review_panel_html,
         runtime=run_time)
 
 
@@ -465,6 +467,71 @@ def _render_run_report(reports, run_time):
         summary, total_ok, total_llm, run_time)
 
 
+def _render_review_panel(quality_review):
+    """Render hidden quality review panel with copy button."""
+    if not quality_review or not quality_review.get("reviews"):
+        return '<div class="review-panel" id="review-panel" style="display:none"><div class="review-header">Quality review not available</div></div>'
+
+    summary = quality_review.get("summary", "")
+    errors = quality_review.get("error_count", 0)
+    warnings = quality_review.get("warning_count", 0)
+    notes = quality_review.get("note_count", 0)
+
+    if errors > 2:
+        badge_class = "review-badge-error"
+    elif errors > 0 or warnings > 3:
+        badge_class = "review-badge-warning"
+    else:
+        badge_class = "review-badge-ok"
+
+    cards_html = ""
+    for review in quality_review["reviews"]:
+        title = _esc(review.get("card_title", ""))
+        score = review.get("quality_score", "?")
+        strengths = _esc(review.get("strengths", ""))
+        issues = review.get("issues", [])
+
+        issues_html = ""
+        for issue in issues:
+            sev = issue.get("severity", "note")
+            section = _esc(issue.get("section", ""))
+            problem = _esc(issue.get("problem", ""))
+            suggestion = _esc(issue.get("suggestion", ""))
+            issues_html += '<div class="review-issue issue-{sc}"><span class="issue-sev">{sev}</span> <span class="issue-section">[{sect}]</span> {prob}<div class="issue-fix">Fix: {fix}</div></div>'.format(
+                sc=sev, sev=sev.upper(), sect=section, prob=problem, fix=suggestion)
+
+        cards_html += '<div class="review-card"><div class="review-card-header">Card {idx}: {title} <span class="quality-score">Score: {score}/10</span></div>{str_html}{issues}</div>'.format(
+            idx=review.get("card_index", "?"), title=title, score=score,
+            str_html='<div class="review-strengths">{}</div>'.format(strengths) if strengths else "",
+            issues=issues_html or '<div class="review-no-issues">No issues found</div>')
+
+    # Copyable plaintext version
+    copy_lines = ["QUALITY REVIEW: " + summary, ""]
+    for review in quality_review["reviews"]:
+        copy_lines.append("Card {}: {} (Score: {}/10)".format(
+            review.get("card_index", "?"), review.get("card_title", "")[:60], review.get("quality_score", "?")))
+        for issue in review.get("issues", []):
+            copy_lines.append("  {} [{}] {} -> Fix: {}".format(
+                issue.get("severity", "").upper(), issue.get("section", ""),
+                issue.get("problem", ""), issue.get("suggestion", "")))
+        copy_lines.append("")
+    copy_text = "\n".join(copy_lines)
+
+    return """<div class="review-panel" id="review-panel" style="display:none">
+        <div class="review-header">
+            <span class="review-badge {badge_class}">{errors}E {warnings}W {notes}N</span>
+            Quality Review: {summary}
+        </div>
+        <div class="review-cards">{cards}</div>
+        <div class="review-copy-section">
+            <button onclick="navigator.clipboard.writeText(document.getElementById('review-copy-text').textContent).then(function(){{this.textContent='Copied!'}}.bind(this))" class="review-copy-btn">Copy Review for Chat</button>
+            <pre id="review-copy-text" class="review-copy-text">{copy_text}</pre>
+        </div>
+    </div>""".format(
+        badge_class=badge_class, errors=errors, warnings=warnings, notes=notes,
+        summary=_esc(summary), cards=cards_html, copy_text=_esc(copy_text))
+
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -645,6 +712,32 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 /* Run report */
 .run-report {{ margin-top: 2rem; padding: 1rem; background: var(--card-bg); border-radius: 8px; font-size: 0.75rem; color: var(--muted); text-align: center; border: 1px solid var(--border); line-height: 1.8; }}
 
+/* Quality review panel */
+.review-toggle-btn {{ display: block; margin: 1rem auto; padding: 0.4rem 1rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.75rem; cursor: pointer; font-family: 'JetBrains Mono', monospace; }}
+.review-toggle-btn:hover {{ border-color: var(--purple); color: var(--text); }}
+.review-panel {{ margin: 1rem auto; max-width: 900px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }}
+.review-header {{ font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }}
+.review-badge {{ padding: 0.15rem 0.5rem; border-radius: 3px; font-size: 0.7rem; margin-right: 0.5rem; }}
+.review-badge-ok {{ background: var(--green); color: #fff; }}
+.review-badge-warning {{ background: var(--accent); color: #000; }}
+.review-badge-error {{ background: var(--red); color: #fff; }}
+.review-card {{ margin-bottom: 1rem; padding: 0.8rem; background: var(--section-bg); border-radius: 6px; }}
+.review-card-header {{ font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem; }}
+.quality-score {{ float: right; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted); }}
+.review-strengths {{ font-size: 0.8rem; color: var(--green); margin-bottom: 0.5rem; font-style: italic; }}
+.review-issue {{ font-size: 0.8rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); }}
+.issue-sev {{ font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; padding: 0.1rem 0.25rem; border-radius: 2px; }}
+.issue-error .issue-sev {{ background: var(--red); color: #fff; }}
+.issue-warning .issue-sev {{ background: var(--accent); color: #000; }}
+.issue-note .issue-sev {{ background: var(--slate); color: #fff; }}
+.issue-section {{ color: var(--purple); font-size: 0.75rem; }}
+.issue-fix {{ font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; font-style: italic; }}
+.review-no-issues {{ font-size: 0.8rem; color: var(--green); }}
+.review-copy-section {{ margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }}
+.review-copy-btn {{ padding: 0.4rem 0.8rem; background: var(--purple); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; }}
+.review-copy-btn:hover {{ opacity: 0.9; }}
+.review-copy-text {{ font-size: 0.7rem; color: var(--muted); max-height: 300px; overflow-y: auto; white-space: pre-wrap; margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 4px; }}
+
 @media (max-width: 600px) {{
     body {{ padding: 0 0.5rem; }}
     .story-card {{ padding: 1rem; }}
@@ -677,6 +770,9 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 {stories}
 
 <div class="run-report">{run_report}</div>
+
+<button onclick="var p=document.getElementById('review-panel');p.style.display=p.style.display==='none'?'block':'none'" class="review-toggle-btn">Quality Review</button>
+{review_panel}
 
 <script>
 document.querySelectorAll('.filter-btn').forEach(btn => {{
