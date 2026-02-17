@@ -65,14 +65,24 @@ want to know.""".format(title=lead_title, claims=claims_text)
 
     comparisons = {}
     available = llm_caller.get_available_llms()
-    comparators = available[:2] if len(available) >= 2 else available
+
+    # Comparison is the most critical step — use the best models
+    # Prefer: gemini_pro (best reasoning) + chatgpt (reliable structured output)
+    # Fallback: whatever's available
+    preferred_comparators = ["gemini_pro", "chatgpt", "claude", "gemini", "grok"]
+    comparators = []
+    for pref in preferred_comparators:
+        if pref in available and len(comparators) < 2:
+            comparators.append(pref)
+    if not comparators:
+        comparators = available[:2] if len(available) >= 2 else available
 
     for llm_id in comparators:
         config = LLM_CONFIGS[llm_id]
         report.llm_calls += 1
         result = llm_caller.call_by_id(llm_id,
             "You are a precise, evidence-based news auditor. Only reference the provided extractions. Never invent facts. Plain text only.",
-            prompt, 1500)
+            prompt, 3000)
         time.sleep(2)
         if result:
             comparisons[config["label"]] = result

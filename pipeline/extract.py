@@ -18,7 +18,9 @@ def run(selected_sources):
     available = llm_caller.get_available_llms()
     if not available:
         return [], report
-    extractor_id = available[0]  # Use cheapest available
+    # Use cheapest model for extraction — gemini flash preferred, skip pro
+    flash_options = [k for k in available if k != "gemini_pro"]
+    extractor_id = flash_options[0] if flash_options else available[0]
 
     claims = []
     for item in selected_sources:
@@ -52,7 +54,7 @@ Be thorough. Extract every specific claim, number, name, and date mentioned.""".
         report.llm_calls += 1
         result = llm_caller.call_by_id(extractor_id,
             "You extract structured claims from news. Be precise. Only extract what is stated. Never invent facts.",
-            prompt, 1200)
+            prompt, 2000)
         time.sleep(1)
 
         if result:

@@ -48,12 +48,12 @@ Return ONLY a JSON array like:
     all_perspectives = []
     report = StepReport("perspectives", items_in=len(story_group))
 
-    for llm_id in llm_caller.get_available_llms()[:3]:
+    for llm_id in [k for k in llm_caller.get_available_llms() if k != "gemini_pro"][:3]:
         config = LLM_CONFIGS[llm_id]
         report.llm_calls += 1
         result = llm_caller.call_by_id(llm_id,
             "You are a media analyst who understands editorial perspectives globally. Return only JSON.",
-            prompt, 600)
+            prompt, 1200)
         time.sleep(1)
         if result:
             try:

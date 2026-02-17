@@ -106,6 +106,17 @@ RULES:
         core_prompt, 3000)
     time.sleep(1)
 
+    if core_result:
+        # Check if JSON was truncated
+        stripped = core_result.strip().rstrip('`').strip()
+        if stripped and not stripped.endswith('}'):
+            print("    Core truncated (no closing brace), retrying with shorter output...")
+            report.llm_calls += 1
+            core_result = llm_caller.call_by_id(writer_id,
+                "Return valid JSON only. BE CONCISE. 3 facts max. 2 framing max. COMPLETE every sentence.",
+                core_prompt, 3000, use_cache=False)
+            time.sleep(1)
+
     if not core_result:
         report.llm_failures += 1
         return None, report
@@ -170,8 +181,19 @@ RULES:
     report.llm_calls += 1
     extras_result = llm_caller.call_by_id(writer_id,
         "Return valid JSON only. COMPLETE every sentence.",
-        extras_prompt, 2000)
+        extras_prompt, 3000)
     time.sleep(1)
+
+    if extras_result:
+        # Check if JSON was truncated (doesn't end with closing brace)
+        stripped = extras_result.strip().rstrip('`').strip()
+        if stripped and not stripped.endswith('}'):
+            print("    Extras truncated (no closing brace), retrying...")
+            report.llm_calls += 1
+            extras_result = llm_caller.call_by_id(writer_id,
+                "Return valid JSON only. KEEP IT SHORT. 2 items max per field. COMPLETE every sentence.",
+                extras_prompt, 3000, use_cache=False)
+            time.sleep(1)
 
     if extras_result:
         extras = _parse_extras(extras_result)

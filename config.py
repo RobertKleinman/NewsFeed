@@ -205,10 +205,14 @@ RSS_SOURCES = [
 
 LLM_CONFIGS = {
     "gemini": {
-        # gemini-3-flash-preview: latest Flash, good for comparison + investigation w/ web search
-        # If truncating, check: finish_reason in logs, billing limits, max_tokens
-        "provider": "google", "model": "gemini-3-flash-preview",
+        # gemini-2.5-flash: fast, cheap, used for extraction and perspectives
+        "provider": "google", "model": "gemini-2.5-flash",
         "env_key": "GOOGLE_API_KEY", "label": "Gemini",
+    },
+    "gemini_pro": {
+        # gemini-2.5-pro: best quality, used for comparison and investigation
+        "provider": "google", "model": "gemini-2.5-pro",
+        "env_key": "GOOGLE_API_KEY", "label": "Gemini Pro",
     },
     "chatgpt": {
         # gpt-4.1: preferred writer model — most reliable at completing structured JSON
@@ -221,7 +225,7 @@ LLM_CONFIGS = {
         "env_key": "ANTHROPIC_API_KEY", "label": "Claude",
     },
     "grok": {
-        # grok-3-fast: comparator only, deprioritized for writing
+        # grok-3-fast: comparator, deprioritized for writing
         "provider": "xai", "model": "grok-3-fast",
         "env_key": "XAI_API_KEY", "label": "Grok",
     },

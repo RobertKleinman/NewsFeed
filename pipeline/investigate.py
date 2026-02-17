@@ -53,15 +53,19 @@ Write concisely. No filler. No preamble. Plain text only.""".format(
         sources=source_summary,
         unknowns=unknowns_text)
 
-    # Prefer Gemini for web search grounding
+    # Prefer Gemini Pro for web search grounding (best quality)
     investigator_id = None
     use_search = False
 
-    # First try: Gemini with web search
-    if "gemini" in available:
+    # First try: Gemini Pro with web search
+    if "gemini_pro" in available:
+        investigator_id = "gemini_pro"
+        use_search = True
+        print("      Using Gemini Pro with web search")
+    elif "gemini" in available:
         investigator_id = "gemini"
         use_search = True
-        print("      Using Gemini with web search")
+        print("      Using Gemini Flash with web search")
     else:
         # Fallback: use a model not used for comparison
         comparator_labels = set(comparisons.keys())
@@ -75,8 +79,19 @@ Write concisely. No filler. No preamble. Plain text only.""".format(
     report.llm_calls += 1
     result = llm_caller.call_by_id(investigator_id,
         "You are a research analyst. Be concise and factual. State established facts directly. Plain text only.",
-        prompt, 3000, web_search=use_search)
+        prompt, 5000, web_search=use_search)
     time.sleep(1)
+
+    # If truncated, retry with shorter instruction
+    if result and not result.strip().endswith(('.', '!', '?', '"')):
+        last_char = result.strip()[-1] if result.strip() else ''
+        if last_char.isalpha() and last_char.islower():
+            print("      Investigation truncated, retrying shorter...")
+            report.llm_calls += 1
+            result = llm_caller.call_by_id(investigator_id,
+                "Be very concise. 3 sentences CONTEXT, 1 sentence KEY FINDING. Complete every sentence.",
+                prompt, 5000, use_cache=False, web_search=use_search)
+            time.sleep(1)
 
     if result:
         report.llm_successes += 1

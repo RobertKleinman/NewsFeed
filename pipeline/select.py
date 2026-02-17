@@ -50,7 +50,7 @@ Stories:
     vote_counts = {}
     voters = 0
 
-    available_voters = llm_caller.get_available_llms()[:3]
+    available_voters = [k for k in llm_caller.get_available_llms() if k != "gemini_pro"][:3]
     print("    Voters: {}".format(", ".join(LLM_CONFIGS[k]["label"] for k in available_voters)))
 
     for llm_id in available_voters:
@@ -58,7 +58,7 @@ Stories:
         report.llm_calls += 1
         print("    {} voting...".format(config["label"]))
         result = llm_caller.call_by_id(llm_id,
-            "You are a concise news editor. Return only a JSON array.", prompt, 400)
+            "You are a concise news editor. Return only a JSON array.", prompt, 800)
         time.sleep(1)
         if result:
             try:
