@@ -124,7 +124,7 @@ def _detect_issues(card):
 
 
 def _repair_truncation(card, issues):
-    """Attempt to repair truncated fields by re-calling the writer."""
+    """Attempt to repair truncated fields one at a time."""
     truncated_fields = set()
     for issue in issues:
         if issue["type"] == "truncation":
@@ -134,32 +134,7 @@ def _repair_truncation(card, issues):
     if not truncated_fields:
         return card, 0
 
-    # Build repair prompt with just the truncated content
-    repair_sections = []
-    for field in truncated_fields:
-        current = card.get(field, "")
-        if isinstance(current, list):
-            current = json.dumps(current)[:200]
-        elif isinstance(current, str):
-            current = current[:200]
-        repair_sections.append("{}: {}...".format(field, current))
-
-    prompt = """The following sections of a news analysis card were truncated mid-sentence.
-Rewrite ONLY these sections, completing them properly. Return valid JSON with just these fields.
-
-STORY: {title}
-
-TRUNCATED SECTIONS:
-{sections}
-
-Return a JSON object with ONLY the truncated fields, completed properly.
-Every sentence must be complete. Every list item must be complete.
-Do not add new fields. Just fix what was cut off.""".format(
-        title=card.get("title", "")[:80],
-        sections="\n".join(repair_sections))
-
     available = llm_caller.get_available_llms()
-    # Use same preference as writer
     writer_preference = ["chatgpt", "gemini", "claude", "grok"]
     writer_id = None
     for preferred in writer_preference:
@@ -169,36 +144,60 @@ Do not add new fields. Just fix what was cut off.""".format(
     if not writer_id:
         return card, 0
 
-    result = llm_caller.call_by_id(writer_id,
-        "Complete truncated text. Return valid JSON only. Complete every sentence.",
-        prompt, 2000)
+    fixed = 0
+    for field_name in truncated_fields:
+        current = card.get(field_name, "")
+        if isinstance(current, list):
+            current_text = json.dumps(current, indent=1)[:400]
+        elif isinstance(current, str):
+            current_text = current[:400]
+        else:
+            continue
 
-    if not result:
-        return card, 0
+        prompt = """This text was cut off mid-sentence. Complete it.
 
-    try:
-        cleaned = re.sub(r'```json\s*', '', result)
-        cleaned = re.sub(r'```\s*', '', cleaned).strip()
-        m = re.search(r'\{.*\}', cleaned, re.DOTALL)
-        repairs = json.loads(m.group() if m else cleaned)
+STORY: {title}
+FIELD: {field}
+CURRENT (TRUNCATED):
+{current}
 
-        fixed = 0
-        for field, value in repairs.items():
-            if field in truncated_fields and value:
-                # Only accept if the repair is longer and not itself truncated
-                old = card.get(field, "")
-                if isinstance(value, str) and isinstance(old, str):
-                    if len(value) >= len(old) and not _is_truncated(value):
-                        card[field] = value
-                        fixed += 1
-                elif isinstance(value, list) and isinstance(old, list):
-                    if not _check_list_truncation(value):
-                        card[field] = value
-                        fixed += 1
-        return card, fixed
-    except Exception as e:
-        print("    Repair parse error: {}".format(str(e)[:60]))
-        return card, 0
+Return ONLY the completed version of this field. If it's a JSON array, return the complete array.
+If it's a string, return the complete string. COMPLETE every sentence. Do not add unrelated content.""".format(
+            title=card.get("title", "")[:80],
+            field=field_name,
+            current=current_text)
+
+        result = llm_caller.call_by_id(writer_id,
+            "Complete the truncated text. Return only the fixed content.",
+            prompt, 1000)
+        time.sleep(0.5)
+
+        if not result:
+            continue
+
+        try:
+            result = result.strip()
+            # Try parsing as JSON first (for list fields)
+            if isinstance(current, list):
+                cleaned = re.sub(r'```json\s*', '', result)
+                cleaned = re.sub(r'```\s*', '', cleaned).strip()
+                m = re.search(r'\[.*\]', cleaned, re.DOTALL)
+                if m:
+                    repaired = json.loads(m.group())
+                    if isinstance(repaired, list) and len(repaired) >= len(current):
+                        if not _check_list_truncation(repaired):
+                            card[field_name] = repaired
+                            fixed += 1
+            elif isinstance(current, str):
+                # For string fields, just take the result if it's longer and complete
+                cleaned = result.strip().strip('"').strip("'")
+                if len(cleaned) >= len(current) and not _is_truncated(cleaned):
+                    card[field_name] = cleaned
+                    fixed += 1
+        except Exception:
+            continue
+
+    return card, fixed
 
 
 def run(topic_cards):

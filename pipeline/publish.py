@@ -92,12 +92,20 @@ def _render_card(card, card_index=0):
                 spectrum_html += ' <span class="depth-badge depth-{d}">{d}</span>'.format(d=depth)
             spectrum_html += '</div>'
 
-    # Source pills with perspective + type
+    # Source pills with perspective + type + date
     source_pills = ""
     for s in card.get("sources", []):
         stype = s.get("source_type", "mainstream")
-        source_pills += '<span class="source-pill"><strong>{name}</strong> <span class="perspective-label">{persp}</span> <span class="source-type-tag type-{stype}">{stype}</span></span>'.format(
-            name=s["name"], persp=s["perspective"], stype=stype)
+        pub_date = s.get("pub_date", "")
+        date_tag = ""
+        if pub_date:
+            # Show just the date portion
+            short_date = pub_date[:10] if len(pub_date) >= 10 else pub_date
+            date_tag = ' <span class="source-date">{}</span>'.format(short_date)
+        url = s.get("url", "")
+        name_html = '<a href="{}" target="_blank" rel="noopener">{}</a>'.format(url, s["name"]) if url else s["name"]
+        source_pills += '<span class="source-pill"><strong>{name}</strong> <span class="perspective-label">{persp}</span> <span class="source-type-tag type-{stype}">{stype}</span>{date}</span>'.format(
+            name=name_html, persp=s["perspective"], stype=stype, date=date_tag)
 
     # === SCANNABLE LAYER (always visible) ===
 
@@ -688,6 +696,9 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .source-pill strong {{ color: var(--text); }}
 .perspective-label {{ color: var(--purple); font-style: italic; }}
 .perspective-label::before {{ content: "— "; }}
+.source-pill a {{ color: var(--purple); text-decoration: none; }}
+.source-pill a:hover {{ text-decoration: underline; }}
+.source-date {{ font-size: 0.65rem; color: var(--slate); margin-left: 0.3rem; }}
 .source-type-tag {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.05rem 0.25rem; border-radius: 2px; margin-left: 0.2rem; }}
 .type-mainstream {{ background: var(--blue); color: #fff; }}
 .type-wire {{ background: var(--green); color: #fff; }}

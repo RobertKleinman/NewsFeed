@@ -144,7 +144,7 @@ def run(articles):
 
             # Lower threshold than before (was 0.25)
             # Also check against best match in group, not just the lead article
-            if score > 0.15:
+            if score > 0.20:
                 group.append(other)
                 used.add(j)
 
