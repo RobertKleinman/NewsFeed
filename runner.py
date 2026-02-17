@@ -66,8 +66,70 @@ def process_story(story_group, story_num, total):
     reports.append(write_report)
 
     if card:
+        # Quality gate: check for material errors and re-write if needed
+        card = _quality_gate(card, lead.title, lead.topics, selected_sources,
+                            missing, comparisons, investigation, reports)
         print("      Topic card complete")
     return card, reports
+
+
+def _quality_gate(card, title, topics, sources, missing, comparisons, investigation, reports, max_attempts=2):
+    """Check card for material errors. Re-write if fixable. Max 2 retries."""
+    material_issues = []
+
+    # Check 1: Completely empty facts (misleading — implies no verified info)
+    if not card.get("agreed_facts"):
+        material_issues.append("agreed_facts is empty — every story has facts")
+
+    # Check 2: What happened is empty or truncated to uselessness
+    what = card.get("what_happened", "")
+    if not what or len(what) < 30:
+        material_issues.append("what_happened is empty or too short")
+
+    # Check 3: Disputes that are obviously not contradictions (different sources ≠ dispute)
+    for d in card.get("disputes", []):
+        if isinstance(d, dict):
+            side_a = d.get("side_a", "").lower()
+            side_b = d.get("side_b", "").lower()
+            # If both sides reference different sources but no actual contradiction
+            if "not mention" in side_a or "not mention" in side_b:
+                material_issues.append("Fake dispute: 'not mentioning' something is not a contradiction")
+            if "different" in side_a and "different" in side_b:
+                material_issues.append("Fake dispute: different coverage angles, not contradictory claims")
+
+    # Check 4: Mixed stories (facts about unrelated topics)
+    # Simple heuristic: if title mentions one topic but facts mention clearly unrelated topics
+    # This is hard to detect without Claude, so skip for now
+
+    if not material_issues:
+        return card  # Card passes quality gate
+
+    # Only retry if we haven't exhausted attempts
+    attempt = card.get("_qa_attempt", 0)
+    if attempt >= max_attempts:
+        print("      Quality gate: {} material issues remain after {} attempts".format(
+            len(material_issues), max_attempts))
+        card["_qa_issues"] = material_issues
+        return card
+
+    print("      Quality gate: {} material issues, re-writing...".format(len(material_issues)))
+    for issue in material_issues:
+        print("        - {}".format(issue))
+
+    # Re-write with feedback
+    card_v2, rewrite_report = write.run(
+        title, topics, sources, missing, comparisons, investigation)
+    reports.append(rewrite_report)
+
+    if card_v2:
+        card_v2["_qa_attempt"] = attempt + 1
+        # Recursively check the rewrite
+        return _quality_gate(card_v2, title, topics, sources, missing,
+                            comparisons, investigation, reports, max_attempts)
+
+    # Rewrite failed, return original
+    card["_qa_issues"] = material_issues
+    return card
 
 
 def main():
@@ -166,7 +228,7 @@ def main():
     output_path.write_text(html, encoding="utf-8")
     print("\nBriefing: {}".format(output_path))
 
-    # Cache data for backtesting
+    # Cache data for backtesting AND component testing
     import json
     from datetime import datetime, timezone
     cache = {
@@ -179,14 +241,24 @@ def main():
             "title": card.get("title", ""),
             "topics": card.get("topics", []),
             "source_count": card.get("source_count", 0),
-            "sources": [s.get("name", "") for s in card.get("sources", [])],
+            "sources": card.get("sources", []),
             "what_happened": card.get("what_happened", ""),
             "agreed_facts": card.get("agreed_facts", []),
             "disputes": card.get("disputes", []),
+            "framing": card.get("framing", []),
             "predictions": card.get("predictions", []),
             "watch_items": card.get("watch_items", []),
             "key_unknowns": card.get("key_unknowns", []),
+            "notable_details": card.get("notable_details", []),
+            "implications": card.get("implications", ""),
+            "missing_viewpoints": card.get("missing_viewpoints", ""),
+            "investigation": card.get("investigation", ""),
+            "comparisons": {k: v[:1000] if isinstance(v, str) else v
+                          for k, v in card.get("comparisons", {}).items()},
             "written_by": card.get("written_by", ""),
+            "_political_balance": card.get("_political_balance", ""),
+            "_coverage_depth": card.get("_coverage_depth", ""),
+            "_repair_issues": card.get("_repair_issues", 0),
         })
     cache_path = output_dir / "briefing_data.json"
     cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")

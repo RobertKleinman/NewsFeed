@@ -129,7 +129,8 @@ Return:
         title_esc=title.replace('"', '\\"')[:60])
 
     result = llm_caller.call_by_id("claude",
-        "You are a quality reviewer for a news intelligence briefing. Be specific and actionable. Return valid JSON only.",
+        "You are a quality reviewer for an AI-powered news intelligence briefing. Cards are assembled by AI models from real news sources. 'Written by: ChatGPT' means that model assembled the card — this is expected, not an error. Today is {}. Dates in 2025-2026 are current. Return valid JSON only.".format(
+            datetime.utcnow().strftime("%B %d, %Y")),
         prompt, 800, use_cache=False)
 
     if not result:
