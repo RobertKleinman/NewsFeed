@@ -76,8 +76,13 @@ def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens,
             payload["tools"] = [{"google_search": {}}]
         resp = requests.post(url, json=payload, timeout=120)
         resp.raise_for_status()
-        # Gemini with grounding may return multiple parts
-        parts = resp.json()["candidates"][0]["content"]["parts"]
+        data = resp.json()
+        candidate = data["candidates"][0]
+        # Check finish reason
+        finish = candidate.get("finishReason", "")
+        if finish == "MAX_TOKENS":
+            print("    WARNING: Gemini hit max tokens ({})".format(max_tokens))
+        parts = candidate["content"]["parts"]
         text_parts = [p["text"] for p in parts if "text" in p]
         return "\n".join(text_parts)
 
@@ -94,7 +99,12 @@ def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens,
         }
         resp = requests.post(url, headers=headers, json=payload, timeout=90)
         resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
+        data = resp.json()
+        # Check finish reason
+        finish = data["choices"][0].get("finish_reason", "")
+        if finish == "length":
+            print("    WARNING: ChatGPT hit max tokens ({})".format(max_tokens))
+        return data["choices"][0]["message"]["content"]
 
     elif provider == "anthropic":
         url = "https://api.anthropic.com/v1/messages"
@@ -109,7 +119,11 @@ def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens,
         }
         resp = requests.post(url, headers=headers, json=payload, timeout=90)
         resp.raise_for_status()
-        return resp.json()["content"][0]["text"]
+        data = resp.json()
+        # Check finish reason
+        if data.get("stop_reason") == "max_tokens":
+            print("    WARNING: Claude hit max tokens ({})".format(max_tokens))
+        return data["content"][0]["text"]
 
     elif provider == "xai":
         url = "https://api.x.ai/v1/chat/completions"
@@ -124,4 +138,8 @@ def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens,
         }
         resp = requests.post(url, headers=headers, json=payload, timeout=90)
         resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"]
+        data = resp.json()
+        finish = data["choices"][0].get("finish_reason", "")
+        if finish == "length":
+            print("    WARNING: Grok hit max tokens ({})".format(max_tokens))
+        return data["choices"][0]["message"]["content"]

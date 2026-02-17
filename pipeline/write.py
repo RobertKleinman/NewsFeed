@@ -61,10 +61,10 @@ COMPARISONS:
 
 Return a JSON object with ONLY these fields:
 {{
-  "what_happened": "Max 2 sentences. Actor + action + stake. Include source tags.",
+  "what_happened": "Max 2 sentences. THE HEADLINE — what happened, who did it, what's at stake. This is the overview, NOT the evidence.",
 
   "agreed_facts": [
-    "Specific verifiable fact. [Source1, Source2]"
+    "Specific verifiable EVIDENCE — numbers, dates, names, actions. Do NOT repeat what_happened. These are the supporting facts, not the summary."
   ],
 
   "disputes": [
@@ -194,10 +194,9 @@ RULES:
 
 
 def _pick_writer(available, used_labels):
-    writer_preference = ["chatgpt", "gemini", "claude", "grok"]
-    for preferred in writer_preference:
-        if preferred in available and LLM_CONFIGS[preferred]["label"] not in used_labels:
-            return preferred
+    """Always prefer ChatGPT for writing — it completes JSON most reliably.
+    Don't skip it just because it was a comparator; writing is a different task."""
+    writer_preference = ["chatgpt", "claude", "gemini", "grok"]
     for preferred in writer_preference:
         if preferred in available:
             return preferred
@@ -246,6 +245,12 @@ def _parse_core(result):
         if not isinstance(card.get("agreed_facts"), list):
             old = card.get("agreed_facts", "")
             card["agreed_facts"] = [l.strip() for l in old.split("\n") if l.strip()] if isinstance(old, str) else []
+
+        # Fallback: if facts are empty, extract from what_happened
+        if not card["agreed_facts"] and card.get("what_happened"):
+            sentences = [s.strip() for s in card["what_happened"].split(".") if s.strip() and len(s.strip()) > 15]
+            card["agreed_facts"] = [s + "." for s in sentences[:3]]
+
         if not isinstance(card.get("disputes"), list):
             card["disputes"] = []
         if not isinstance(card.get("framing"), list):

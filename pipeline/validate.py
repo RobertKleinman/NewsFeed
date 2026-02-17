@@ -7,6 +7,7 @@ quality data for the review panel.
 import json
 import re
 import time
+from datetime import datetime
 
 import llm as llm_caller
 from config import LLM_CONFIGS
@@ -92,6 +93,7 @@ INVESTIGATION: {invest}""".format(
         invest=(card.get("investigation", "") or "")[:300])
 
     prompt = """Review this news briefing card for quality issues. Return ONLY valid JSON.
+TODAY'S DATE: {today}
 
 {card}
 
@@ -103,6 +105,8 @@ Check for these specific problems:
 5. TRUNCATED TEXT: Any text that appears cut off mid-sentence or mid-word?
 6. REDUNDANCY: Do sections repeat the same information?
 7. VAGUE ENTRIES: Are facts, disputes, or framing entries too vague to be useful?
+
+NOTE: Today is {today}. Dates in January-February 2026 are CURRENT events, not future dates. Do NOT flag 2026 dates as errors.
 
 Return:
 {{
@@ -119,6 +123,7 @@ Return:
   ],
   "strengths": "What this card does well (1 sentence)"
 }}""".format(
+        today=datetime.utcnow().strftime("%B %d, %Y"),
         card=card_summary,
         idx=card_index + 1,
         title_esc=title.replace('"', '\\"')[:60])
