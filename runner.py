@@ -18,7 +18,7 @@ from pathlib import Path
 
 from config import get_active_sources, get_active_topics, load_query_pack, LLM_CONFIGS
 import llm as llm_caller
-from pipeline import fetch, triage, cluster, select, perspectives, extract, compare, investigate, write, enrich, synthesize, quickscan, validate, publish
+from pipeline import fetch, triage, cluster, select, perspectives, extract, compare, investigate, write, repair, enrich, synthesize, quickscan, validate, publish
 
 
 def process_story(story_group, story_num, total):
@@ -135,6 +135,10 @@ def main():
         print("\nNo topic cards generated")
         sys.exit(1)
     print("\n{} topic cards generated".format(len(topic_cards)))
+
+    # Step 9c: Repair truncation and mechanical issues
+    repair_report = repair.run(topic_cards)
+    all_reports.append(repair_report)
 
     # Enrich: compute metadata (no LLM calls)
     enrich_report = enrich.run(topic_cards)

@@ -100,19 +100,38 @@ def _merge_perspectives(perspectives, source_count=5):
 
 
 def select_sources(story_group, perspectives):
-    """Deterministic: pick one source per perspective. Code decides, not LLMs."""
+    """Deterministic: pick one source per perspective, favoring diversity."""
     available = {a.source_name: a for a in story_group}
     selected = []
     used = set()
+    used_regions = set()
+    used_biases = set()
     missing = []
 
     for persp in perspectives:
         recommended = persp.get("sources", [])
         picked = None
+        # Score candidates: prefer sources from new regions and different biases
+        candidates = []
         for src in recommended:
             if src in available and src not in used:
-                picked = available[src]
-                break
+                a = available[src]
+                score = 1.0
+                region = a.source_region.lower().split("-")[0]
+                bias = a.source_bias.lower()
+                # Bonus for new region
+                if region not in used_regions:
+                    score += 0.5
+                # Bonus for different political leaning
+                if bias not in used_biases:
+                    score += 0.3
+                candidates.append((src, a, score, region, bias))
+        if candidates:
+            candidates.sort(key=lambda x: x[2], reverse=True)
+            src, picked, _, region, bias = candidates[0]
+            used_regions.add(region)
+            used_biases.add(bias)
+
         if picked:
             used.add(picked.source_name)
             selected.append({

@@ -113,7 +113,7 @@ IMPORTANT: If the comparisons cover multiple unrelated topics, focus on the PRIM
 RULES:
 - agreed_facts: Include all key verifiable facts. If confirmed by 2+ sources, list both. If only 1 source, tag as [Source only]. NEVER leave this empty — every story has facts.
 - disputes: ONLY include genuine contradictions where two sources make INCOMPATIBLE claims about THE SAME THING. Different facts about different aspects are NOT disputes. Two different cities reporting different crowd sizes is NOT a dispute. If a comparison model says "no substantive contradictions" or "not a real disagreement," do NOT create a dispute from it. If sources complement rather than contradict each other, leave disputes as an empty array []. For each dispute, include your confidence (high/medium/low) at the end of side_a.
-- framing: Must include a direct quoted phrase from the source material. Distinguish between a source's own editorial angle and quotes from subjects within the article. If the quote is from a person in the article, say so. The frame description MUST explain WHY this framing matters or what it implies for the reader's understanding — don't just describe what the source covered, explain what their angle reveals about their perspective or priorities.
+- framing: Must include a direct quoted phrase from the source material. The frame description must be INSIGHTFUL, not obvious. Don't state what any reader would already know (e.g. "emphasizes humanitarian toll" for a war story is obvious). Instead explain what the framing choice REVEALS — what does this source want the reader to think or feel? What agenda or worldview does the framing serve? If you can't say something genuinely insightful about the framing, omit that source. The frame description MUST explain WHY this framing matters or what it implies for the reader's understanding — don't just describe what the source covered, explain what their angle reveals about their perspective or priorities.
 - predictions: Skip entirely (empty array) for cultural events, human interest stories, celebrations, or single-event stories where future scenarios would be speculative and low-stakes. Only include for policy, conflict, economic, or diplomatic stories where real consequences are developing.
 - No prose paragraphs anywhere. Bullets and structured entries only.
 - No markdown. No bold. Plain text in all string values.""".format(
@@ -144,7 +144,7 @@ RULES:
     report.llm_calls += 1
     result = llm_caller.call_by_id(writer_id,
         "Return valid JSON only. No markdown. Structured entries, not prose.",
-        prompt, 4000)
+        prompt, 6000)
     time.sleep(1)
 
     if not result:
