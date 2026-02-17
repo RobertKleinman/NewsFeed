@@ -168,8 +168,8 @@ If it's a string, return the complete string. COMPLETE every sentence. Do not ad
             current=current_text)
 
         result = llm_caller.call_by_id(writer_id,
-            "Complete the truncated text. Return only the fixed content.",
-            prompt, 1000)
+            "Complete the truncated text. Return only the fixed content. No markdown.",
+            prompt, 2000)
         time.sleep(0.5)
 
         if not result:
@@ -184,17 +184,21 @@ If it's a string, return the complete string. COMPLETE every sentence. Do not ad
                 m = re.search(r'\[.*\]', cleaned, re.DOTALL)
                 if m:
                     repaired = json.loads(m.group())
-                    if isinstance(repaired, list) and len(repaired) >= len(current):
+                    if isinstance(repaired, list) and len(repaired) > 0:
                         if not _check_list_truncation(repaired):
                             card[field_name] = repaired
                             fixed += 1
             elif isinstance(current, str):
-                # For string fields, just take the result if it's longer and complete
+                # Accept any complete result (not truncated)
                 cleaned = result.strip().strip('"').strip("'")
-                if len(cleaned) >= len(current) and not _is_truncated(cleaned):
+                # Remove JSON wrapper if present
+                cleaned = re.sub(r'```json\s*', '', cleaned)
+                cleaned = re.sub(r'```\s*', '', cleaned).strip()
+                if cleaned and not _is_truncated(cleaned) and len(cleaned) > 20:
                     card[field_name] = cleaned
                     fixed += 1
-        except Exception:
+        except Exception as e:
+            print("      Repair error on {}: {}".format(field_name, str(e)[:50]))
             continue
 
     return card, fixed

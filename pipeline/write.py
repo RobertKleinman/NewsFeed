@@ -47,7 +47,8 @@ def run(lead_title, topics, selected_sources, missing_perspectives, comparisons,
     # === PASS 1: Core card ===
     core_prompt = """Write a structured topic card. Use ONLY facts from the comparisons below.
 You are an editor. Do not add facts. Do not write prose paragraphs.
-COMPLETE EVERY SENTENCE. Never stop mid-word or mid-sentence.
+
+CRITICAL: Every string value must end with a period. If a sentence ends mid-word, the entire output is INVALID.
 
 EVENT: {title}
 
@@ -103,7 +104,7 @@ RULES:
     report.llm_calls += 1
     core_result = llm_caller.call_by_id(writer_id,
         "Return valid JSON only. COMPLETE every sentence. Short but complete.",
-        core_prompt, 3000)
+        core_prompt, 4000)
     time.sleep(1)
 
     if core_result:
@@ -114,7 +115,7 @@ RULES:
             report.llm_calls += 1
             core_result = llm_caller.call_by_id(writer_id,
                 "Return valid JSON only. BE CONCISE. 3 facts max. 2 framing max. COMPLETE every sentence.",
-                core_prompt, 3000, use_cache=False)
+                core_prompt, 4000, use_cache=False)
             time.sleep(1)
 
     if not core_result:
@@ -132,7 +133,8 @@ RULES:
 
     # === PASS 2: Extras ===
     extras_prompt = """Based on this news story, add analysis fields. Use the investigation research below.
-COMPLETE EVERY SENTENCE. Never stop mid-word.
+
+CRITICAL: Every string value must end with a period. If a sentence ends mid-word, the entire output is INVALID.
 
 EVENT: {title}
 SUMMARY: {what}
@@ -181,7 +183,7 @@ RULES:
     report.llm_calls += 1
     extras_result = llm_caller.call_by_id(writer_id,
         "Return valid JSON only. COMPLETE every sentence.",
-        extras_prompt, 3000)
+        extras_prompt, 4000)
     time.sleep(1)
 
     if extras_result:
@@ -192,7 +194,7 @@ RULES:
             report.llm_calls += 1
             extras_result = llm_caller.call_by_id(writer_id,
                 "Return valid JSON only. KEEP IT SHORT. 2 items max per field. COMPLETE every sentence.",
-                extras_prompt, 3000, use_cache=False)
+                extras_prompt, 4000, use_cache=False)
             time.sleep(1)
 
     if extras_result:

@@ -67,10 +67,18 @@ def call(provider, model, system_prompt, user_prompt, api_key, max_tokens=1500, 
 def _call_once(provider, model, system_prompt, user_prompt, api_key, max_tokens, web_search=False):
     if provider == "google":
         url = "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}".format(model, api_key)
+        gen_config = {"maxOutputTokens": max_tokens, "temperature": 0.3}
+        # Disable or minimize thinking to preserve output token budget
+        # Gemini 2.5 Flash: disable thinking entirely (thinkingBudget: 0)
+        # Gemini 2.5 Pro: minimal thinking (thinkingBudget: 128)
+        if "pro" in model:
+            gen_config["thinkingConfig"] = {"thinkingBudget": 128}
+        else:
+            gen_config["thinkingConfig"] = {"thinkingBudget": 0}
         payload = {
             "systemInstruction": {"parts": [{"text": system_prompt}]},
             "contents": [{"parts": [{"text": user_prompt}]}],
-            "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.3}
+            "generationConfig": gen_config
         }
         if web_search:
             payload["tools"] = [{"google_search": {}}]

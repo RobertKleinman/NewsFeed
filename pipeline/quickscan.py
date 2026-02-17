@@ -105,7 +105,7 @@ RULES:
 
     report.llm_calls += 1
     result = llm_caller.call_by_id(available[0],
-        "Return valid JSON only. Complete sentences. Never truncate.", prompt, 3500)
+        "Return valid JSON only. Complete sentences. Never truncate.", prompt, 5000)
 
     if not result:
         report.llm_failures += 1

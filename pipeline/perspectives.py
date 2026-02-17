@@ -53,7 +53,7 @@ Return ONLY a JSON array like:
         report.llm_calls += 1
         result = llm_caller.call_by_id(llm_id,
             "You are a media analyst who understands editorial perspectives globally. Return only JSON.",
-            prompt, 1200)
+            prompt, 2000)
         time.sleep(1)
         if result:
             try:

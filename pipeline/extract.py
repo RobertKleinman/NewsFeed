@@ -54,7 +54,7 @@ Be thorough. Extract every specific claim, number, name, and date mentioned.""".
         report.llm_calls += 1
         result = llm_caller.call_by_id(extractor_id,
             "You extract structured claims from news. Be precise. Only extract what is stated. Never invent facts.",
-            prompt, 2000)
+            prompt, 3000)
         time.sleep(1)
 
         if result:
