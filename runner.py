@@ -1,158 +1,169 @@
 #!/usr/bin/env python3
 """
-Global Briefing Runner
-======================
-Orchestrates the pipeline: Fetch > Triage > Cluster > Select > Perspectives >
-Extract > Compare > Investigate > Write > Synthesize > Publish
+Global Briefing v3 Runner
+=========================
+Importance-driven pipeline with depth tiers:
+  BRIEF (1-2★): summary only
+  STANDARD (3★): perspectives → extract → compare → write
+  DEEP (4-5★): + investigate → full analysis
 
-Usage:
-  python runner.py                          # Default broad briefing
-  python runner.py --config config/broad.json  # Specific query pack
+Fetch → Triage → Cluster → Select → [per story: tiered processing] →
+Enrich → Synthesize → Quickscan → Validate → Publish
 """
 
 import argparse
+import json
 import sys
 import time
 import traceback
+from datetime import datetime, timezone
 from pathlib import Path
 
 from config import get_active_sources, get_active_topics, load_query_pack, LLM_CONFIGS
 import llm as llm_caller
-from pipeline import fetch, triage, cluster, select, perspectives, extract, compare, investigate, write, repair, enrich, synthesize, quickscan, validate, publish
+from pipeline import (fetch, triage, cluster, select, perspectives,
+                      extract, compare, investigate, write, enrich,
+                      synthesize, quickscan, validate, publish)
 
 
-def process_story(story_group, story_num, total):
-    """Run one story through steps 5-9."""
-    lead = story_group[0]
-    print("\n" + "=" * 70)
-    print("STORY {}/{}: {}".format(story_num, total, lead.title[:80]))
-    print("  Sources in cluster: {}".format(len(story_group)))
+def process_brief(ranked_story, story_num, total):
+    """BRIEF tier: minimal processing, summary from cluster data."""
+    cluster_obj = ranked_story.cluster
+    print("\n" + "-" * 50)
+    print("STORY {}/{} [BRIEF {}★]: {}".format(
+        story_num, total, ranked_story.stars, cluster_obj.lead_title[:70]))
 
     reports = []
 
-    # Step 5: Map perspectives + select sources
-    print("  [5] Mapping perspectives...")
-    selected_sources, missing, persp_list, persp_report = perspectives.run(story_group)
-    reports.append(persp_report)
-    print("      {} sources, {} missing perspectives".format(
-        len(selected_sources), len(missing)))
+    # Minimal source selection (just use first few sources)
+    from models import SelectedSource
+    selected = [
+        SelectedSource(
+            article=a,
+            perspective="General coverage",
+            angle=""
+        )
+        for a in cluster_obj.articles[:3]
+    ]
 
-    # Step 6: Extract claims
-    print("  [6] Extracting claims...")
-    claims, extract_report = extract.run(selected_sources)
-    reports.append(extract_report)
-    if not claims:
-        print("      No claims extracted, skipping")
-        return None, reports
-
-    # Step 7: Compare
-    print("  [7] Comparing across sources...")
-    comparisons, compare_report = compare.run(claims, lead.title)
-    reports.append(compare_report)
-    if not comparisons:
-        print("      No comparisons, skipping")
-        return None, reports
-
-    # Step 8: Investigate gaps + forecast
-    print("  [8] Investigating gaps & forecasting...")
-    investigation, invest_report = investigate.run(comparisons, claims, lead.title)
-    reports.append(invest_report)
-
-    # Step 9: Write topic card
-    print("  [9] Writing topic card...")
     card, write_report = write.run(
-        lead.title, lead.topics, selected_sources,
-        missing, comparisons, investigation)
+        ranked_story, selected, [], None, None)
     reports.append(write_report)
 
-    if card:
-        # Quality gate: check for material errors and re-write if needed
-        card = _quality_gate(card, lead.title, lead.topics, selected_sources,
-                            missing, comparisons, investigation, reports)
-        print("      Topic card complete")
     return card, reports
 
 
-def _quality_gate(card, title, topics, sources, missing, comparisons, investigation, reports, max_attempts=2):
-    """Check card for material errors. Re-write if fixable. Max 2 retries."""
-    material_issues = []
+def process_standard(ranked_story, story_num, total):
+    """STANDARD tier: perspectives + compare + write."""
+    cluster_obj = ranked_story.cluster
+    print("\n" + "=" * 60)
+    print("STORY {}/{} [STANDARD {}★]: {}".format(
+        story_num, total, ranked_story.stars, cluster_obj.lead_title[:70]))
+    print("  Sources: {}".format(cluster_obj.size))
 
-    # Check 1: Completely empty facts (misleading — implies no verified info)
-    if not card.get("agreed_facts"):
-        material_issues.append("agreed_facts is empty — every story has facts")
+    reports = []
 
-    # Check 2: What happened is empty or truncated to uselessness
-    what = card.get("what_happened", "")
-    if not what or len(what) < 30:
-        material_issues.append("what_happened is empty or too short")
+    # Step 5: Perspectives
+    print("  [5] Mapping perspectives...")
+    selected, missing, persp_report = perspectives.run(cluster_obj)
+    reports.append(persp_report)
+    print("      {} sources, {} missing".format(len(selected), len(missing)))
 
-    # Check 3: Disputes that are obviously not contradictions (different sources ≠ dispute)
-    for d in card.get("disputes", []):
-        if isinstance(d, dict):
-            side_a = d.get("side_a", "").lower()
-            side_b = d.get("side_b", "").lower()
-            # If both sides reference different sources but no actual contradiction
-            if "not mention" in side_a or "not mention" in side_b:
-                material_issues.append("Fake dispute: 'not mentioning' something is not a contradiction")
-            if "different" in side_a and "different" in side_b:
-                material_issues.append("Fake dispute: different coverage angles, not contradictory claims")
+    # Step 6: Extract
+    print("  [6] Extracting claims...")
+    claims, extract_report = extract.run(selected)
+    reports.append(extract_report)
+    if not claims:
+        print("      No claims, falling back to brief")
+        card, wr = write.run(ranked_story, selected, missing, None, None)
+        reports.append(wr)
+        return card, reports
 
-    # Check 4: Mixed stories (facts about unrelated topics)
-    # Simple heuristic: if title mentions one topic but facts mention clearly unrelated topics
-    # This is hard to detect without Claude, so skip for now
+    # Step 7: Compare
+    print("  [7] Comparing...")
+    comp_result, comp_report = compare.run(claims, cluster_obj.lead_title)
+    reports.append(comp_report)
 
-    if not material_issues:
-        return card  # Card passes quality gate
+    # Step 9: Write
+    print("  [9] Writing card ({})...".format(comp_result.contention_level))
+    card, write_report = write.run(
+        ranked_story, selected, missing, comp_result, None)
+    reports.append(write_report)
 
-    # Only retry if we haven't exhausted attempts
-    attempt = card.get("_qa_attempt", 0)
-    if attempt >= max_attempts:
-        print("      Quality gate: {} material issues remain after {} attempts".format(
-            len(material_issues), max_attempts))
-        card["_qa_issues"] = material_issues
-        return card
+    print("      {} mode, {}★".format(card.card_mode, card.importance))
+    return card, reports
 
-    print("      Quality gate: {} material issues, re-writing...".format(len(material_issues)))
-    for issue in material_issues:
-        print("        - {}".format(issue))
 
-    # Re-write with feedback
-    card_v2, rewrite_report = write.run(
-        title, topics, sources, missing, comparisons, investigation)
-    reports.append(rewrite_report)
+def process_deep(ranked_story, story_num, total):
+    """DEEP tier: full pipeline including investigation."""
+    cluster_obj = ranked_story.cluster
+    print("\n" + "=" * 70)
+    print("STORY {}/{} [DEEP {}★]: {}".format(
+        story_num, total, ranked_story.stars, cluster_obj.lead_title[:70]))
+    print("  Sources: {}".format(cluster_obj.size))
 
-    if card_v2:
-        card_v2["_qa_attempt"] = attempt + 1
-        # Recursively check the rewrite
-        return _quality_gate(card_v2, title, topics, sources, missing,
-                            comparisons, investigation, reports, max_attempts)
+    reports = []
 
-    # Rewrite failed, return original
-    card["_qa_issues"] = material_issues
-    return card
+    # Step 5: Perspectives
+    print("  [5] Mapping perspectives...")
+    selected, missing, persp_report = perspectives.run(cluster_obj)
+    reports.append(persp_report)
+    print("      {} sources, {} missing".format(len(selected), len(missing)))
+
+    # Step 6: Extract
+    print("  [6] Extracting claims...")
+    claims, extract_report = extract.run(selected)
+    reports.append(extract_report)
+    if not claims:
+        print("      No claims, falling back to standard")
+        card, wr = write.run(ranked_story, selected, missing, None, None)
+        reports.append(wr)
+        return card, reports
+
+    # Step 7: Compare
+    print("  [7] Comparing...")
+    comp_result, comp_report = compare.run(claims, cluster_obj.lead_title)
+    reports.append(comp_report)
+
+    # Step 8: Investigate
+    print("  [8] Investigating...")
+    inv_result, inv_report = investigate.run(
+        comp_result, claims, cluster_obj.lead_title)
+    reports.append(inv_report)
+    if inv_result.adds_value:
+        print("      Investigation adds value: {}".format(inv_result.story_impact[:80]))
+    else:
+        print("      Investigation confirms coverage — no new findings")
+
+    # Step 9: Write
+    print("  [9] Writing deep card ({})...".format(comp_result.contention_level))
+    card, write_report = write.run(
+        ranked_story, selected, missing, comp_result, inv_result)
+    reports.append(write_report)
+
+    print("      {} mode, {}★".format(card.card_mode, card.importance))
+    return card, reports
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Global Intelligence Briefing")
+    parser = argparse.ArgumentParser(description="Global Intelligence Briefing v3")
     parser.add_argument("--config", help="Path to query pack JSON", default=None)
-    parser.add_argument("--max-stories", type=int, default=12)
     args = parser.parse_args()
 
     start_time = time.time()
     print("=" * 70)
-    print("GLOBAL INTELLIGENCE BRIEFING v2")
+    print("GLOBAL INTELLIGENCE BRIEFING v3")
     print("=" * 70)
 
-    # Load config
     pack = load_query_pack(args.config)
     if pack:
-        print("Config pack: {}".format(pack.get("name", args.config)))
+        print("Config: {}".format(pack.get("name", args.config)))
     sources = get_active_sources(pack)
     topics = get_active_topics(pack)
 
     available = llm_caller.get_available_llms()
     if not available:
-        print("\nNo LLM API keys found. Set at least GOOGLE_API_KEY.")
+        print("\nNo LLM API keys found.")
         sys.exit(1)
     print("LLMs: {}".format(", ".join(LLM_CONFIGS[k]["label"] for k in available)))
     print("Sources: {} | Topics: {}".format(len(sources), len(topics)))
@@ -166,26 +177,43 @@ def main():
         print("No articles fetched")
         sys.exit(1)
 
-    # Step 2: Triage
+    # Step 2: Triage (LLM-based)
     relevant, triage_report = triage.run(articles, topics)
     all_reports.append(triage_report)
     if not relevant:
         print("No relevant articles")
         sys.exit(1)
 
-    # Step 3: Cluster
+    # Step 3: Cluster (mechanical + LLM review)
     clusters, cluster_report = cluster.run(relevant)
     all_reports.append(cluster_report)
 
-    # Step 4: Select stories
-    selected, select_report = select.run(clusters, topics, args.max_stories)
+    # Step 4: Select (importance rating + materiality cutoff)
+    ranked_stories, select_report = select.run(clusters, topics)
     all_reports.append(select_report)
 
-    # Steps 5-9: Process each story
+    if not ranked_stories:
+        print("No stories above materiality cutoff")
+        sys.exit(1)
+
+    # Report tier breakdown
+    tier_counts = {"deep": 0, "standard": 0, "brief": 0}
+    for r in ranked_stories:
+        tier_counts[r.depth_tier] = tier_counts.get(r.depth_tier, 0) + 1
+    print("\nStory tiers: {} deep, {} standard, {} brief".format(
+        tier_counts["deep"], tier_counts["standard"], tier_counts["brief"]))
+
+    # Process each story by tier
     topic_cards = []
-    for i, group in enumerate(selected):
+    for i, ranked in enumerate(ranked_stories):
         try:
-            card, story_reports = process_story(group, i + 1, len(selected))
+            if ranked.depth_tier == "deep":
+                card, story_reports = process_deep(ranked, i + 1, len(ranked_stories))
+            elif ranked.depth_tier == "standard":
+                card, story_reports = process_standard(ranked, i + 1, len(ranked_stories))
+            else:
+                card, story_reports = process_brief(ranked, i + 1, len(ranked_stories))
+
             all_reports.extend(story_reports)
             if card:
                 topic_cards.append(card)
@@ -198,71 +226,40 @@ def main():
         sys.exit(1)
     print("\n{} topic cards generated".format(len(topic_cards)))
 
-    # Step 9c: Repair truncation and mechanical issues
-    repair_report = repair.run(topic_cards)
-    all_reports.append(repair_report)
-
-    # Enrich: compute metadata (no LLM calls)
+    # Enrich
     enrich_report = enrich.run(topic_cards)
     all_reports.append(enrich_report)
 
-    # Step 10: Synthesize
+    # Synthesize
     synth, synth_report = synthesize.run(topic_cards)
     all_reports.append(synth_report)
 
-    # Step 10b: Quickscan
+    # Quickscan
     qscan, qscan_report = quickscan.run(topic_cards)
     all_reports.append(qscan_report)
 
-    # Step 10c: Quality validation (Claude)
-    quality_review, validate_report = validate.run(topic_cards)
+    # Validate
+    quality, validate_report = validate.run(topic_cards)
     all_reports.append(validate_report)
 
-    # Step 11: Publish
+    # Publish
     run_time = int(time.time() - start_time)
-    html = publish.run(topic_cards, synth, qscan, all_reports, run_time, quality_review)
+    html = publish.run(topic_cards, synth, qscan, all_reports, run_time, quality)
 
     output_dir = Path("output")
     output_dir.mkdir(exist_ok=True)
-    output_path = output_dir / "index.html"
-    output_path.write_text(html, encoding="utf-8")
-    print("\nBriefing: {}".format(output_path))
+    (output_dir / "index.html").write_text(html, encoding="utf-8")
+    print("\nBriefing: output/index.html")
 
-    # Cache data for backtesting AND component testing
-    import json
-    from datetime import datetime, timezone
+    # Cache data
     cache = {
         "date": datetime.now(timezone.utc).isoformat(),
         "runtime_seconds": run_time,
-        "cards": []
+        "tier_counts": tier_counts,
+        "cards": [card.to_dict() for card in topic_cards],
     }
-    for card in topic_cards:
-        cache["cards"].append({
-            "title": card.get("title", ""),
-            "topics": card.get("topics", []),
-            "source_count": card.get("source_count", 0),
-            "sources": card.get("sources", []),
-            "what_happened": card.get("what_happened", ""),
-            "agreed_facts": card.get("agreed_facts", []),
-            "disputes": card.get("disputes", []),
-            "framing": card.get("framing", []),
-            "predictions": card.get("predictions", []),
-            "watch_items": card.get("watch_items", []),
-            "key_unknowns": card.get("key_unknowns", []),
-            "notable_details": card.get("notable_details", []),
-            "implications": card.get("implications", ""),
-            "missing_viewpoints": card.get("missing_viewpoints", ""),
-            "investigation": card.get("investigation", ""),
-            "comparisons": {k: v[:1000] if isinstance(v, str) else v
-                          for k, v in card.get("comparisons", {}).items()},
-            "written_by": card.get("written_by", ""),
-            "_political_balance": card.get("_political_balance", ""),
-            "_coverage_depth": card.get("_coverage_depth", ""),
-            "_repair_issues": card.get("_repair_issues", 0),
-        })
-    cache_path = output_dir / "briefing_data.json"
-    cache_path.write_text(json.dumps(cache, indent=2), encoding="utf-8")
-    print("Cache: {}".format(cache_path))
+    (output_dir / "briefing_data.json").write_text(
+        json.dumps(cache, indent=2, default=str), encoding="utf-8")
 
     # Run report
     print("\n" + "=" * 70)

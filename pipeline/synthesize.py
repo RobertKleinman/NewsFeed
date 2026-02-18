@@ -1,7 +1,5 @@
 """
 Step 10: Executive synthesis across all topic cards.
-Input: list of topic card dicts
-Output: synthesis text, StepReport
 """
 
 import llm as llm_caller
@@ -9,47 +7,33 @@ from models import StepReport
 
 
 def run(topic_cards):
-    """Generate executive synthesis. Returns (synthesis_text, report)."""
+    """Generate executive synthesis. Returns (text, report)."""
     print("\n>>> SYNTHESIZE...")
     report = StepReport("synthesize", items_in=len(topic_cards))
     available = llm_caller.get_available_llms()
     if not available:
-        return "No LLM available for synthesis.", report
+        return "No LLM available.", report
 
-    card_summaries = []
+    summaries = []
     for i, card in enumerate(topic_cards):
-        what = card.get("what_happened", "")[:300]
-        topics = ", ".join(card.get("topics", [])[:2])
-        card_summaries.append(
-            "Story {}: [{}] {}\n{}\nSources: {}, Perspectives: {}".format(
-                i + 1, topics, card["title"], what,
-                card.get("source_count", 0), card.get("perspectives_used", 0)))
+        tier_label = {"deep": "DEEP", "standard": "STD", "brief": "BRIEF"}.get(card.depth_tier, "?")
+        summaries.append("{}. [{}★ {}] {} — {}".format(
+            i + 1, card.importance, tier_label, card.title,
+            card.what_happened[:200]))
 
-    all_summaries = "\n\n".join(card_summaries)
+    prompt = """Write the executive synthesis for today's intelligence briefing.
+Plain text, no markdown, no bold, no bullets.
 
-    prompt = """You are writing the executive synthesis for a daily intelligence briefing.
-Based on these topic cards, write a compelling overview with this structure
-(plain text, no markdown, no bold, no bullets):
+THEMES: 2-3 biggest themes connecting today's stories. 2-3 sentences each.
+NOTABLE DISAGREEMENTS: Where did sources most sharply diverge? 1-2 paragraphs.
+LOOKING AHEAD: 3-4 specific things to watch in coming days.
 
-THEMES:
-Identify the 2-3 biggest themes and connecting threads across stories today.
-2-3 sentences per theme.
-
-NOTABLE DISAGREEMENTS:
-Where did different sources and perspectives most sharply diverge today?
-Which stories had the most contested framing? 1-2 paragraphs.
-
-LOOKING AHEAD:
-What are the 3-4 most important things to watch in the coming days
-based on today's stories? Be specific.
-
-TODAY'S STORIES:
-""" + all_summaries
+STORIES:
+""" + "\n\n".join(summaries)
 
     report.llm_calls += 1
     result = llm_caller.call_by_id(available[0],
-        "You write concise intelligence briefings. Plain text only. No markdown.",
-        prompt, 2000)
+        "Concise intelligence briefings. Plain text only.", prompt, 2000)
 
     if result:
         report.llm_successes += 1

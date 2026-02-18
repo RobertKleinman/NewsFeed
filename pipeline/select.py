@@ -1,7 +1,8 @@
 """
-Step 4: Select top stories via multi-LLM voting + topic diversity enforcement.
-Input: list of story groups, topics dict, max_stories
-Output: list of story groups (selected), StepReport
+Step 4: Select stories by importance with materiality cutoff.
+LLMs rate importance 1-10 (not just pick/skip).
+Diversity is a soft nudge on ordering, not a hard gate.
+Stories below materiality threshold are dropped.
 """
 
 import json
@@ -9,45 +10,65 @@ import re
 import time
 
 import llm as llm_caller
-from config import LLM_CONFIGS
-from models import StepReport
+from config import LLM_CONFIGS, TOPICS, MATERIALITY_CUTOFF, MAX_STORIES
+from models import RankedStory, StepReport
 
 
-def run(story_groups, topics, max_stories=12):
-    print("\n>>> SELECT: voting on {} candidates...".format(min(len(story_groups), 50)))
-    report = StepReport("select", items_in=len(story_groups))
+def run(clusters, topics):
+    """Select and rank stories. Returns (ranked_stories, report)."""
+    # Only consider clusters worth evaluating (2+ articles or high relevance)
+    candidates = []
+    for c in clusters:
+        if c.size >= 2 or (c.lead and c.lead.relevance_score >= 0.6):
+            candidates.append(c)
 
+    candidates.sort(key=lambda c: c.size, reverse=True)
+    candidates = candidates[:50]  # Cap for LLM prompt size
+
+    print("\n>>> SELECT: rating {} candidates...".format(len(candidates)))
+    report = StepReport("select", items_in=len(candidates))
+
+    # Build candidate list for LLMs
     summaries = []
-    for i, group in enumerate(story_groups[:50]):
-        lead = group[0]
-        source_details = []
-        for a in group[:5]:
-            source_details.append("{} ({})".format(a.source_name, a.source_region))
-        sources = ", ".join(source_details)
-        topic_str = ", ".join(lead.topics[:2])
-        summaries.append("{}. [{}] {} ({} sources: {})".format(
-            i, topic_str, lead.title, len(group), sources))
+    for i, c in enumerate(candidates):
+        lead = c.lead
+        source_list = ", ".join(c.source_names()[:5])
+        topic_str = ", ".join(c.topic_spread[:2])
+        regions = ", ".join(c.unique_regions()[:3])
+        summaries.append("{}. [{}] {} ({} sources from {}: {})".format(
+            i, topic_str, lead.title, c.size, regions, source_list))
 
-    stories_list = "\n".join(summaries)
-    prompt = """You are a news editor selecting stories for a global intelligence briefing.
-Pick 15-20 of the most important stories. The reader cares about: world politics,
-Canadian politics, US politics, economics/business, AI/technology, Canadian insurance,
-data privacy/AI governance, and culture/good news.
+    stories_text = "\n".join(summaries)
 
-Selection criteria IN ORDER OF PRIORITY:
-1. IMPORTANCE: Genuine significance and real-world impact comes first. A major story
-   covered by only 2 sources beats a minor story covered by 10.
-2. TOPIC DIVERSITY: Ensure coverage across different topic areas, not just politics.
-3. SOURCE DIVERSITY: When two stories are equally important, prefer the one with
-   coverage from more diverse regions/perspectives.
-4. Include at least 1-2 uplifting/cultural stories.
+    prompt = """Rate each story's importance for a global intelligence briefing on a 1-10 scale.
 
-Return ONLY a JSON array of story numbers, e.g. [0, 3, 5, 12, ...]
+The reader cares about: {topic_names}
 
-Stories:
-""" + stories_list
+Rating criteria:
+- 9-10: Major global event, affects millions, breaking news
+- 7-8: Significant development, policy change, important trend
+- 5-6: Noteworthy news, relevant to briefing audience
+- 3-4: Minor development, limited impact
+- 1-2: Trivial, local interest only, not briefing-worthy
 
-    vote_counts = {}
+Consider: real-world impact, number of people affected, novelty, geopolitical weight.
+More sources covering a story suggests importance but isn't the only factor.
+
+STORIES:
+{stories}
+
+Return ONLY a JSON array, one entry per story:
+[
+  {{"id": 0, "importance": 8, "reason": "Major trade policy shift affecting global markets"}},
+  {{"id": 1, "importance": 3, "reason": "Local event with limited broader impact"}},
+  ...
+]""".format(
+        topic_names=", ".join(info["name"] for info in topics.values()),
+        stories=stories_text)
+
+    # Collect ratings from multiple LLMs
+    all_ratings = {}  # id → [list of scores]
+    all_reasons = {}  # id → [list of reasons]
     voters = 0
 
     available_voters = [k for k in llm_caller.get_available_llms() if k != "gemini_pro"][:3]
@@ -56,75 +77,120 @@ Stories:
     for llm_id in available_voters:
         config = LLM_CONFIGS[llm_id]
         report.llm_calls += 1
-        print("    {} voting...".format(config["label"]))
+        print("    {} rating...".format(config["label"]))
         result = llm_caller.call_by_id(llm_id,
-            "You are a concise news editor. Return only a JSON array.", prompt, 1500)
+            "You rate news importance. Return only JSON array.", prompt, 3000)
         time.sleep(1)
-        if result:
-            try:
-                # Try multiple parsing strategies
-                parsed = None
-                # Strategy 1: exact array match
-                match = re.search(r'\[[\d,\s]+\]', result)
-                if match:
-                    parsed = json.loads(match.group())
-                # Strategy 2: strip markdown and try again
-                if not parsed:
-                    cleaned = result.replace('```json', '').replace('```', '').strip()
-                    match = re.search(r'\[[\d,\s]+\]', cleaned)
-                    if match:
-                        parsed = json.loads(match.group())
-                # Strategy 3: extract all numbers if response looks like a list
-                if not parsed:
-                    nums = re.findall(r'\b(\d{1,2})\b', result)
-                    if len(nums) >= 5:
-                        parsed = [int(n) for n in nums]
 
-                if parsed:
-                    voters += 1
-                    report.llm_successes += 1
-                    for idx in parsed:
-                        if idx < len(story_groups):
-                            vote_counts[idx] = vote_counts.get(idx, 0) + 1
-                    print("      {} picked {} stories".format(config["label"], len(parsed)))
-                else:
-                    report.llm_failures += 1
-                    print("      {} not parseable: {}".format(config["label"], result[:80]))
-            except Exception as e:
-                report.llm_failures += 1
-                print("      {} parse error: {}".format(config["label"], str(e)[:60]))
-        else:
+        if not result:
             report.llm_failures += 1
-            print("      {} returned nothing".format(config["label"]))
+            continue
 
-    if not vote_counts:
-        print("    No votes received, using keyword ranking")
-        selected = story_groups[:max_stories]
-        report.items_out = len(selected)
-        return selected, report
+        try:
+            cleaned = re.sub(r'```json\s*', '', result)
+            cleaned = re.sub(r'```\s*', '', cleaned).strip()
+            m = re.search(r'\[.*\]', cleaned, re.DOTALL)
+            ratings = json.loads(m.group() if m else cleaned)
+            report.llm_successes += 1
+            voters += 1
 
-    sorted_cands = sorted(vote_counts.items(), key=lambda x: (-x[1], x[0]))
+            for entry in ratings:
+                idx = entry.get("id", -1)
+                score = float(entry.get("importance", 0))
+                reason = entry.get("reason", "")
+                if 0 <= idx < len(candidates):
+                    all_ratings.setdefault(idx, []).append(score)
+                    all_reasons.setdefault(idx, []).append(reason)
 
-    # First pass: ensure topic diversity
-    selected = []
-    topics_covered = set()
-    for idx, votes in sorted_cands:
-        group = story_groups[idx]
-        lead = group[0]
-        new_topics = set(lead.topics) - topics_covered
-        if new_topics and len(selected) < max_stories:
-            selected.append(group)
-            topics_covered.update(lead.topics)
+            print("      {} rated {} stories".format(config["label"], len(ratings)))
+        except (json.JSONDecodeError, ValueError, AttributeError):
+            report.llm_failures += 1
+            print("      {} parse failed".format(config["label"]))
 
-    # Second pass: fill by votes
-    for idx, votes in sorted_cands:
-        group = story_groups[idx]
-        if group not in selected and len(selected) < max_stories:
-            selected.append(group)
+    if not all_ratings:
+        print("    No ratings received, using cluster size as proxy")
+        ranked = []
+        for c in candidates[:MAX_STORIES]:
+            ranked.append(RankedStory(
+                cluster=c,
+                importance_score=min(c.size, 10),
+                vote_count=0,
+                importance_reason="Fallback: {} sources".format(c.size),
+            ))
+        report.items_out = len(ranked)
+        return _assign_tiers(ranked), report
 
-    report.items_out = len(selected)
-    report.notes.append("{} topics covered by {} voters".format(
-        len(topics_covered), voters))
-    print("    {} stories selected, {} topics covered".format(
-        len(selected), len(topics_covered)))
-    return selected, report
+    # Average ratings and apply materiality cutoff
+    ranked = []
+    for idx, scores in all_ratings.items():
+        avg = sum(scores) / len(scores)
+        reasons = all_reasons.get(idx, [])
+        # Pick the most informative reason (longest)
+        best_reason = max(reasons, key=len) if reasons else ""
+
+        if avg >= MATERIALITY_CUTOFF:
+            ranked.append(RankedStory(
+                cluster=candidates[idx],
+                importance_score=avg,
+                vote_count=len(scores),
+                importance_reason=best_reason,
+            ))
+
+    # Sort by importance (primary) then source count (tiebreaker)
+    ranked.sort(key=lambda r: (r.importance_score, r.cluster.size), reverse=True)
+
+    # Soft diversity nudge: if top stories are all same topic, promote variety
+    ranked = _soft_diversity(ranked, topics)
+
+    # Safety cap
+    ranked = ranked[:MAX_STORIES]
+
+    dropped = len(all_ratings) - len(ranked)
+    report.items_out = len(ranked)
+    report.notes.append("{} stories above cutoff, {} dropped, {} voters".format(
+        len(ranked), dropped, voters))
+    print("    {} stories selected ({} below materiality cutoff)".format(
+        len(ranked), dropped))
+
+    return _assign_tiers(ranked), report
+
+
+def _soft_diversity(ranked, topics):
+    """Nudge ordering to avoid topic monoculture, without overriding importance."""
+    if len(ranked) <= 5:
+        return ranked
+
+    # Check if top 5 are dominated by one topic
+    top_topics = []
+    for r in ranked[:5]:
+        top_topics.extend(r.cluster.topic_spread[:1])
+
+    from collections import Counter
+    topic_counts = Counter(top_topics)
+    dominant = topic_counts.most_common(1)[0] if topic_counts else None
+
+    if dominant and dominant[1] >= 4:
+        # Too many of one topic in top 5 — find a different-topic story to promote
+        promoted = None
+        for i, r in enumerate(ranked[5:], start=5):
+            if r.cluster.topic_spread and r.cluster.topic_spread[0] != dominant[0]:
+                if r.importance_score >= ranked[4].importance_score * 0.8:
+                    promoted = ranked.pop(i)
+                    ranked.insert(4, promoted)
+                    break
+
+    return ranked
+
+
+def _assign_tiers(ranked):
+    """Assign depth tiers based on importance stars."""
+    from config import DEPTH_THRESHOLDS
+    for r in ranked:
+        stars = r.stars
+        if stars >= DEPTH_THRESHOLDS["deep"]:
+            r.depth_tier = "deep"
+        elif stars >= DEPTH_THRESHOLDS["standard"]:
+            r.depth_tier = "standard"
+        else:
+            r.depth_tier = "brief"
+    return ranked

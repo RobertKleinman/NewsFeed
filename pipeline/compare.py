@@ -1,79 +1,64 @@
 """
-Step 7: Cross-source comparison. Multi-model — this is where bias detection matters most.
-Input: list of claim dicts, lead title
-Output: dict of {model_label: comparison_text}, StepReport
-
-Two models independently compare claims across sources. Their disagreement about
-what counts as a contradiction vs minor difference is itself valuable signal.
+Step 7: Cross-source comparison. Multi-model.
+Outputs structured contention assessment alongside comparison text.
 """
 
 import time
 
 import llm as llm_caller
 from config import LLM_CONFIGS
-from models import StepReport
+from models import ComparisonResult, StepReport
 
 
 def run(claims_data, lead_title):
-    """Compare claims across sources. Returns (comparisons_dict, report)."""
+    """Compare claims across sources. Returns (ComparisonResult, report)."""
     report = StepReport("compare", items_in=len(claims_data))
     if not claims_data:
-        return {}, report
+        return ComparisonResult(), report
 
     claims_sections = []
     for c in claims_data:
+        flags_note = ""
+        if c.hallucination_flags:
+            flags_note = "\n  [CAUTION: extraction may contain unverified details: {}]".format(
+                "; ".join(c.hallucination_flags[:2]))
         claims_sections.append(
-            "--- SOURCE: {src} ({region}, {bias}) | PERSPECTIVE: {persp} ---\n{text}".format(
-                src=c["source"], region=c["region"], bias=c["bias"],
-                persp=c["perspective"], text=c["extracted"]))
+            "--- SOURCE: {src} ({region}, {bias}) | PERSPECTIVE: {persp} ---\n{text}{flags}".format(
+                src=c.source_name, region=c.source_region, bias=c.source_bias,
+                persp=c.perspective, text=c.extracted_text, flags=flags_note))
     claims_text = "\n\n".join(claims_sections)
 
-    prompt = """You are a cross-source news auditor. Below are claim extractions from multiple
-sources covering the same event: "{title}"
-
-Each source was selected to represent a different perspective. Compare them and identify
-what they agree on, where they genuinely differ, and how they frame things differently.
+    prompt = """You are a cross-source news auditor. Compare claim extractions from multiple
+sources covering: "{title}"
 
 SOURCES AND CLAIMS:
 {claims}
 
-Produce this analysis in plain text (no markdown, no bold, no bullets, no # headers).
-Use these exact section labels:
+Produce analysis in plain text (no markdown, no bold, no bullets):
 
 AGREED FACTS:
-State facts multiple sources confirm. Name which sources. Only facts actually in the
-extractions above. Never invent or assume.
+Facts multiple sources confirm. Name which sources. Only facts in the extractions.
 
 DISAGREEMENTS:
-ONLY include genuine contradictions where sources make INCOMPATIBLE claims about THE SAME
-specific thing. Two sources covering different aspects of the same story is NOT a disagreement.
-Different cities with different crowd sizes is NOT a disagreement. Different emphasis is NOT
-a disagreement — that goes in FRAMING DIFFERENCES. If sources complement rather than
-contradict each other, write: "No substantive contradictions identified."
-
-For each real disagreement, rate your confidence: [HIGH/MEDIUM/LOW].
+ONLY genuine contradictions — sources making INCOMPATIBLE claims about THE SAME thing.
+Different coverage ≠ disagreement. Different emphasis ≠ disagreement.
+If no real contradictions: "No substantive contradictions identified."
+For each real disagreement, rate confidence: [HIGH/MEDIUM/LOW].
 
 FRAMING DIFFERENCES:
-How different sources frame the same event. Quote specific short phrases that reveal
-editorial angle. IMPORTANT: distinguish between a source's own editorial framing and
-quotes from subjects within the article. If a source quotes a politician, note that
-the framing is the politician's words, not the outlet's angle.
+How sources frame the same event differently. Quote specific phrases.
+Distinguish source editorial framing from quotes of subjects in the article.
 
 KEY UNKNOWNS:
-Important questions the coverage leaves unanswered. What a well-informed reader would
-want to know.""".format(title=lead_title, claims=claims_text)
+Important questions the coverage leaves unanswered.""".format(
+        title=lead_title, claims=claims_text)
 
     comparisons = {}
     available = llm_caller.get_available_llms()
 
-    # Comparison is the most critical step — use the best models
-    # Prefer: gemini_pro (best reasoning) + chatgpt (reliable structured output)
-    # Fallback: whatever's available
-    preferred_comparators = ["gemini_pro", "chatgpt", "claude", "gemini", "grok"]
-    comparators = []
-    for pref in preferred_comparators:
-        if pref in available and len(comparators) < 2:
-            comparators.append(pref)
+    # Use best models for comparison
+    preferred = ["gemini_pro", "chatgpt", "claude", "gemini", "grok"]
+    comparators = [p for p in preferred if p in available][:2]
     if not comparators:
         comparators = available[:2] if len(available) >= 2 else available
 
@@ -81,7 +66,7 @@ want to know.""".format(title=lead_title, claims=claims_text)
         config = LLM_CONFIGS[llm_id]
         report.llm_calls += 1
         result = llm_caller.call_by_id(llm_id,
-            "You are a precise, evidence-based news auditor. Only reference the provided extractions. Never invent facts. Plain text only.",
+            "Precise, evidence-based news auditor. Only reference provided extractions. Plain text.",
             prompt, 3000)
         time.sleep(2)
         if result:
@@ -90,5 +75,59 @@ want to know.""".format(title=lead_title, claims=claims_text)
         else:
             report.llm_failures += 1
 
+    # Detect contention level from comparison outputs
+    contention = _detect_contention(comparisons)
+
+    result = ComparisonResult(
+        comparisons=comparisons,
+        contention_level=contention,
+        has_real_disputes=(contention == "contested"),
+    )
+
     report.items_out = len(comparisons)
-    return comparisons, report
+    return result, report
+
+
+def _detect_contention(comparisons):
+    """Detect whether sources genuinely disagree."""
+    combined = " ".join(comparisons.values()).lower()
+
+    # Strong agreement signals
+    agreement_phrases = [
+        "no substantive contradictions",
+        "no genuine contradictions",
+        "no real disagreements",
+        "no significant disagreements",
+        "sources broadly agree",
+        "sources are largely consistent",
+        "no incompatible claims",
+        "complement rather than contradict",
+    ]
+    for phrase in agreement_phrases:
+        if phrase in combined:
+            return "straight_news"
+
+    # Strong dispute signals
+    dispute_phrases = [
+        "contradicts", "incompatible claim", "directly conflicts",
+        "disputes the figure", "different numbers",
+        "conflicting accounts", "[high]",
+    ]
+    dispute_count = sum(1 for p in dispute_phrases if p in combined)
+    if dispute_count >= 2:
+        return "contested"
+
+    # Check DISAGREEMENTS section length
+    for text in comparisons.values():
+        lower = text.lower()
+        if "disagreements:" in lower:
+            parts = lower.split("disagreements:")
+            if len(parts) > 1:
+                rest = parts[1]
+                for next_sec in ["framing", "key unknowns", "---"]:
+                    if next_sec in rest:
+                        rest = rest.split(next_sec)[0]
+                if len(rest.strip()) > 80:
+                    return "contested"
+
+    return "straight_news"

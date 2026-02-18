@@ -17,8 +17,36 @@ from config import TOPICS, LLM_CONFIGS
 
 def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_review=None):
     """Generate HTML. Returns html string."""
+    # Convert TopicCard objects to dicts if needed
+    card_dicts = []
+    for card in topic_cards:
+        if hasattr(card, 'to_dict'):
+            d = card.to_dict()
+            # Map new field names to legacy names for template compatibility
+            d.setdefault("what_happened", d.get("what_happened", ""))
+            d.setdefault("implications", d.get("so_what", ""))
+            d.setdefault("missing_viewpoints", ", ".join(d.get("missing_perspectives", [])))
+            d.setdefault("_political_balance", d.get("political_balance", ""))
+            d.setdefault("_coverage_depth", d.get("coverage_depth", ""))
+            d.setdefault("_bias_breakdown", {})
+            d.setdefault("source_type_counts", {})
+            d.setdefault("perspectives_used", len(d.get("sources", [])))
+            d.setdefault("comparisons", d.get("comparisons", {}))
+            d.setdefault("investigation", d.get("investigation_raw", ""))
+            d.setdefault("disagreements",
+                "\n".join("{}: {} vs {}".format(
+                    dd.get("type", ""), dd.get("side_a", ""), dd.get("side_b", ""))
+                    for dd in d.get("disputes", [])) or "No substantive contradictions identified.")
+            d.setdefault("framing_differences",
+                "\n".join('{}: "{}" - {}'.format(
+                    f.get("source", ""), f.get("quote", ""), f.get("frame", ""))
+                    for f in d.get("framing", [])))
+            card_dicts.append(d)
+        else:
+            card_dicts.append(card)
+
     stories_html = ""
-    for i, card in enumerate(topic_cards):
+    for i, card in enumerate(card_dicts):
         stories_html += _render_card(card, i)
 
     quickscan_html = _render_quickscan(quickscan_data)
@@ -60,6 +88,19 @@ def _lines_to_items(text):
 
 
 def _render_card(card, card_index=0):
+    # Importance badge
+    importance = card.get("importance", 3)
+    importance_reason = _esc(card.get("importance_reason", ""))
+    importance_stars = "&#9733;" * importance + "&#9734;" * (5 - importance)
+    importance_html = '<span class="importance-badge importance-{}" title="{}">{}</span>'.format(
+        importance, importance_reason, importance_stars)
+
+    # Card mode badge
+    card_mode = card.get("card_mode", "straight_news")
+    mode_label = "CONTESTED" if card_mode == "contested" else "NEWS"
+    mode_class = "mode-contested" if card_mode == "contested" else "mode-news"
+    mode_html = '<span class="card-mode-badge {}">{}</span>'.format(mode_class, mode_label)
+
     # Topic tags
     topic_tags = ""
     for t in card.get("topics", [])[:3]:
@@ -287,10 +328,36 @@ def _render_card(card, card_index=0):
     if written_by:
         writer_html = '<div class="written-by">Card written by {}</div>'.format(written_by)
 
+    # So What section
+    so_what_html = ""
+    so_what = card.get("so_what", "")
+    if so_what:
+        so_what_html = '<div class="so-what"><strong>Why it matters:</strong> {}</div>'.format(_esc(so_what))
+
+    # Investigation impact (visible callout for DEEP cards)
+    inv_impact_html = ""
+    inv_impact = card.get("investigation_impact", "")
+    if inv_impact:
+        inv_impact_html = '<div class="inv-impact"><strong>&#128270; Investigation finding:</strong> {}</div>'.format(_esc(inv_impact))
+
+    # Coverage note (straight news mode)
+    coverage_note_html = ""
+    coverage_note = card.get("coverage_note", "")
+    if coverage_note:
+        coverage_note_html = '<div class="coverage-note">{}</div>'.format(_esc(coverage_note))
+
+    # Tier badge
+    tier = card.get("depth_tier", "standard")
+    tier_html = ""
+    if tier == "deep":
+        tier_html = '<span class="tier-badge tier-deep">DEEP ANALYSIS</span>'
+    elif tier == "brief":
+        tier_html = '<span class="tier-badge tier-brief">BRIEF</span>'
+
     return """
     <article class="story-card" id="topic-card-{card_idx}" data-topics="{topic_ids}">
         <div class="card-header">
-            <div class="topic-tags">{tags}</div>
+            <div class="topic-tags">{importance} {mode} {tier} {tags}</div>
             <h2 class="story-title">{title}</h2>
             <div class="story-meta">
                 <span>{src_count} sources</span>
@@ -301,7 +368,10 @@ def _render_card(card, card_index=0):
         <div class="sources-row">{pills}</div>
 
         {what_happened}
+        {so_what}
+        {inv_impact}
         {facts}
+        {coverage_note}
         {disputes}
         {framing}
         {notable}
@@ -316,6 +386,9 @@ def _render_card(card, card_index=0):
     </article>""".format(
         topic_ids=" ".join(card.get("topics", [])[:3]),
         card_idx=card_index,
+        importance=importance_html,
+        mode=mode_html,
+        tier=tier_html,
         tags=topic_tags,
         title=card.get("title", ""),
         src_count=card.get("source_count", 0),
@@ -323,7 +396,10 @@ def _render_card(card, card_index=0):
         spectrum=spectrum_html,
         pills=source_pills,
         what_happened=what_happened,
+        so_what=so_what_html,
+        inv_impact=inv_impact_html,
         facts=facts_html,
+        coverage_note=coverage_note_html,
         disputes=disputes_html,
         framing=framing_html,
         notable=notable_html,
@@ -409,19 +485,14 @@ def _render_quickscan(data):
 
             card_idx = story.get("card_index", 0)
             sources = story.get("key_sources", "")
-            fault = story.get("fault_line", "")
-            summary = story.get("summary", "")
-            # Filter out boilerplate fault lines
-            boilerplate = ["no substantive contradictions", "no substantive disagreements",
-                          "see full analysis", "no real contradictions", "none identified"]
-            if any(bp in fault.lower() for bp in boilerplate):
-                fault = ""
-            stories_html += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{headline}</span><span class="qs-summary">{summary}</span><span class="qs-fault">{fault}</span><span class="qs-sources">{sources}</span></div></a>'.format(
+            one_liner = story.get("one_liner", story.get("summary", ""))
+            importance = story.get("importance", 3)
+            stars = "&#9733;" * importance
+            stories_html += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{stars} {headline}</span><span class="qs-summary">{one_liner}</span></div></a>'.format(
                 idx=card_idx, icon=icon,
+                stars=stars,
                 headline=_esc(story.get("headline", "")),
-                summary=_esc(summary),
-                fault=_esc(fault),
-                sources=_esc(sources))
+                one_liner=_esc(one_liner))
         stories_html += '</div>'
 
     # Key tensions with type tags
@@ -670,8 +741,23 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 /* Story cards */
 .story-card {{ background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; }}
 .card-header {{ margin-bottom: 0.5rem; }}
-.topic-tags {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }}
+.topic-tags {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; align-items: center; }}
 .topic-tag {{ font-size: 0.73rem; padding: 0.15rem 0.5rem; border-radius: 12px; border: 1px solid var(--border); color: var(--muted); }}
+.importance-badge {{ font-size: 0.85rem; letter-spacing: -1px; color: #d4a017; cursor: help; }}
+.importance-1 {{ opacity: 0.4; }}
+.importance-2 {{ opacity: 0.55; }}
+.importance-3 {{ opacity: 0.7; }}
+.importance-4 {{ opacity: 0.85; }}
+.importance-5 {{ opacity: 1.0; }}
+.card-mode-badge {{ font-size: 0.65rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }}
+.mode-news {{ background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }}
+.mode-contested {{ background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }}
+.so-what {{ font-size: 0.92rem; color: var(--text); margin: 0.6rem 0; padding: 0.5rem 0.8rem; background: rgba(100, 149, 237, 0.06); border-left: 3px solid cornflowerblue; border-radius: 0 4px 4px 0; }}
+.inv-impact {{ font-size: 0.88rem; color: var(--text); margin: 0.5rem 0; padding: 0.5rem 0.8rem; background: rgba(255, 152, 0, 0.06); border-left: 3px solid #ff9800; border-radius: 0 4px 4px 0; }}
+.coverage-note {{ font-size: 0.8rem; color: var(--muted); font-style: italic; margin: 0.4rem 0; }}
+.tier-badge {{ font-size: 0.6rem; font-weight: 600; padding: 0.1rem 0.4rem; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }}
+.tier-deep {{ background: #e8eaf6; color: #283593; border: 1px solid #9fa8da; }}
+.tier-brief {{ background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }}
 .story-title {{ font-family: 'Newsreader', serif; font-size: 1.25rem; line-height: 1.4; margin-bottom: 0.4rem; }}
 .story-meta {{ font-size: 0.8rem; color: var(--muted); margin-bottom: 0.3rem; display: flex; gap: 1rem; }}
 

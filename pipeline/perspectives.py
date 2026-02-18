@@ -1,11 +1,7 @@
 """
-Step 5: Map perspectives (multi-model) and select sources (code).
-Input: story group (list of Article)
-Output: (selected_sources, missing_perspectives, perspectives, report)
-
-Multiple LLMs independently identify the meaningful viewpoint axes for the story
-and map them to available sources. Their divergence expands the lens.
-Code then deterministically picks one source per perspective.
+Step 5: Identify perspectives from actual sources in the cluster.
+Looks at what angles are PRESENT, not what axes might theoretically exist.
+No artificial limit on perspective count.
 """
 
 import json
@@ -14,94 +10,136 @@ import time
 
 import llm as llm_caller
 from config import LLM_CONFIGS
-from models import StepReport
+from models import Perspective, SelectedSource, StepReport
 
 
-def map_perspectives(story_group):
-    """Ask multiple LLMs what perspectives matter for this story."""
-    lead = story_group[0]
+def run(cluster):
+    """Identify perspectives and select sources. Returns (selected, missing, report)."""
+    report = StepReport("perspectives", items_in=cluster.size)
+
+    # Build source descriptions from actual cluster content
     source_lines = []
-    for a in story_group[:10]:
-        source_lines.append("- {} (region: {}, leaning: {}): \"{}\"".format(
-            a.source_name, a.source_region, a.source_bias, a.title))
+    for a in cluster.articles[:15]:  # Cap to keep prompt reasonable
+        source_lines.append(
+            '- {} (region: {}, leaning: {}): "{}" — {}'.format(
+                a.source_name, a.source_region, a.source_bias,
+                a.title, a.summary[:120]))
     source_list = "\n".join(source_lines)
 
-    prompt = """This story is about: {title}
+    prompt = """Look at these sources covering the same story and identify what different angles they bring.
 
-Here are the sources covering it:
+STORY: {title}
+
+SOURCES:
 {sources}
 
-Identify 3-5 meaningfully different perspectives or stakeholder positions on this story.
-These could be political (left/right), regional (Western/Global South), institutional
-(government/industry/civil society), ideological, religious, economic, or any other axis
-that matters for THIS specific story.
+For each source, describe what angle or perspective it actually takes based on its headline and summary.
+Then group sources with similar angles.
+Finally, identify any important perspectives that are MISSING — viewpoints not represented by any source.
 
-Don't default to generic left/right if other axes are more relevant.
-For each perspective, name which of the available sources above would best represent it.
+Return JSON:
+{{
+  "perspectives": [
+    {{
+      "label": "Brief label for this angle",
+      "angle": "What this perspective emphasizes or how it frames the story",
+      "sources": ["Source Name 1", "Source Name 2"]
+    }}
+  ],
+  "missing": [
+    "Description of a viewpoint not represented by any source and why it matters"
+  ]
+}}
 
-Return ONLY a JSON array like:
-[
-  {{"perspective": "US administration position", "sources": ["Fox News", "AP News"], "reasoning": "brief why"}},
-  {{"perspective": "Canadian sovereignty concern", "sources": ["CBC News"], "reasoning": "brief why"}}
-]""".format(title=lead.title, sources=source_list)
+Rules:
+- Base perspectives on what sources ACTUALLY say, not theoretical axes
+- Don't force left/right if that's not the real axis of difference
+- Group sources with genuinely similar angles, don't make each source its own perspective
+- Include ALL meaningfully different angles — no artificial limit
+- Missing perspectives should be genuinely important gaps, not padding""".format(
+        title=cluster.lead_title,
+        sources=source_list)
 
+    # Use 2 LLMs for perspective diversity
     all_perspectives = []
-    report = StepReport("perspectives", items_in=len(story_group))
+    all_missing = []
 
-    for llm_id in [k for k in llm_caller.get_available_llms() if k != "gemini_pro"][:3]:
-        config = LLM_CONFIGS[llm_id]
+    available = [k for k in llm_caller.get_available_llms() if k != "gemini_pro"][:2]
+    for llm_id in available:
         report.llm_calls += 1
         result = llm_caller.call_by_id(llm_id,
-            "You are a media analyst who understands editorial perspectives globally. Return only JSON.",
+            "You analyze news perspectives. Return only JSON.",
             prompt, 2000)
         time.sleep(1)
-        if result:
-            try:
-                json_match = re.search(r'\[.*\]', result, re.DOTALL)
-                if json_match:
-                    perspectives = json.loads(json_match.group())
-                    for p in perspectives:
-                        p["identified_by"] = config["label"]
-                    all_perspectives.extend(perspectives)
-                    report.llm_successes += 1
-            except Exception:
-                report.llm_failures += 1
-        else:
+
+        if not result:
+            report.llm_failures += 1
+            continue
+
+        try:
+            cleaned = re.sub(r'```json\s*', '', result)
+            cleaned = re.sub(r'```\s*', '', cleaned).strip()
+            m = re.search(r'\{.*\}', cleaned, re.DOTALL)
+            data = json.loads(m.group() if m else cleaned)
+            report.llm_successes += 1
+
+            for p in data.get("perspectives", []):
+                p["identified_by"] = LLM_CONFIGS[llm_id]["label"]
+                all_perspectives.append(p)
+            all_missing.extend(data.get("missing", []))
+        except (json.JSONDecodeError, ValueError, AttributeError):
             report.llm_failures += 1
 
-    merged = _merge_perspectives(all_perspectives, len(story_group[:10]))
-    report.items_out = len(merged)
-    return merged, report
+    # Merge similar perspectives
+    merged = _merge_perspectives(all_perspectives)
+
+    # Select one source per perspective (diversity-weighted)
+    selected, missing_perspectives = _select_sources(cluster, merged)
+
+    # Add LLM-identified missing perspectives
+    for m in all_missing:
+        if isinstance(m, str) and m not in missing_perspectives:
+            missing_perspectives.append(m)
+
+    # Deduplicate missing
+    missing_perspectives = list(dict.fromkeys(missing_perspectives))
+
+    report.items_out = len(selected)
+    report.notes.append("{} perspectives, {} sources, {} missing".format(
+        len(merged), len(selected), len(missing_perspectives)))
+
+    return selected, missing_perspectives, report
 
 
-def _merge_perspectives(perspectives, source_count=5):
+def _merge_perspectives(perspectives):
+    """Merge perspectives with similar labels."""
     if not perspectives:
         return []
     merged = []
     for p in perspectives:
-        name = p.get("perspective", "").lower().strip()
+        label = p.get("label", "").lower().strip()
         is_dup = False
         for existing in merged:
-            ex_name = existing.get("perspective", "").lower().strip()
-            words_a = set(name.split())
-            words_b = set(ex_name.split())
+            ex_label = existing.get("label", "").lower().strip()
+            words_a = set(label.split())
+            words_b = set(ex_label.split())
             overlap = len(words_a & words_b) / max(len(words_a | words_b), 1)
             if overlap > 0.4:
+                # Merge sources
+                ex_sources = set(existing.get("sources", []))
+                new_sources = set(p.get("sources", []))
+                existing["sources"] = list(ex_sources | new_sources)
                 existing["identified_by"] = existing.get("identified_by", "") + ", " + p.get("identified_by", "")
-                existing_s = set(existing.get("sources", []))
-                new_s = set(p.get("sources", []))
-                existing["sources"] = list(existing_s | new_s)
                 is_dup = True
                 break
         if not is_dup:
             merged.append(p)
-    max_persp = min(7, max(5, source_count))
-    return merged[:max_persp]
+    return merged
 
 
-def select_sources(story_group, perspectives):
-    """Deterministic: pick one source per perspective, favoring diversity."""
-    available = {a.source_name: a for a in story_group}
+def _select_sources(cluster, perspectives):
+    """Pick one source per perspective, maximizing diversity."""
+    available = {a.source_name: a for a in cluster.articles}
     selected = []
     used = set()
     used_regions = set()
@@ -110,57 +148,39 @@ def select_sources(story_group, perspectives):
 
     for persp in perspectives:
         recommended = persp.get("sources", [])
-        picked = None
-        # Score candidates: prefer sources from new regions and different biases
         candidates = []
         for src in recommended:
             if src in available and src not in used:
                 a = available[src]
                 score = 1.0
-                region = a.source_region.lower().split("-")[0]
+                region = a.source_region.split("-")[0]
                 bias = a.source_bias.lower()
-                # Bonus for new region
                 if region not in used_regions:
                     score += 0.5
-                # Bonus for different political leaning
                 if bias not in used_biases:
                     score += 0.3
                 candidates.append((src, a, score, region, bias))
+
         if candidates:
             candidates.sort(key=lambda x: x[2], reverse=True)
-            src, picked, _, region, bias = candidates[0]
+            src, article, _, region, bias = candidates[0]
+            used.add(src)
             used_regions.add(region)
             used_biases.add(bias)
-
-        if picked:
-            used.add(picked.source_name)
-            selected.append({
-                "article": picked,
-                "perspective": persp.get("perspective", ""),
-                "identified_by": persp.get("identified_by", ""),
-            })
+            selected.append(SelectedSource(
+                article=article,
+                perspective=persp.get("label", ""),
+                angle=persp.get("angle", ""),
+            ))
         else:
-            missing.append(persp.get("perspective", "Unknown"))
+            missing.append(persp.get("label", "Unknown perspective"))
 
-    # Always include lead if nothing matched
-    if not selected and story_group:
-        selected.append({
-            "article": story_group[0],
-            "perspective": "Primary report",
-            "identified_by": "system",
-        })
+    # Ensure at least one source
+    if not selected and cluster.articles:
+        selected.append(SelectedSource(
+            article=cluster.articles[0],
+            perspective="Primary report",
+            angle="Lead coverage",
+        ))
 
     return selected, missing
-
-
-def run(story_group):
-    """Full step: map perspectives then select sources. Returns (selected, missing, perspectives, report)."""
-    perspectives, report = map_perspectives(story_group)
-
-    if not perspectives:
-        perspectives = [{"perspective": "General coverage",
-                        "sources": [a.source_name for a in story_group[:3]]}]
-
-    selected, missing = select_sources(story_group, perspectives)
-    report.notes.append("{} sources, {} missing".format(len(selected), len(missing)))
-    return selected, missing, perspectives, report
