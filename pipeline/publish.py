@@ -88,18 +88,19 @@ def _lines_to_items(text):
 
 
 def _render_card(card, card_index=0):
-    # Importance badge
+    # Importance dot (color-coded, matches quickscan)
     importance = card.get("importance", 3)
     importance_reason = _esc(card.get("importance_reason", ""))
-    importance_stars = "&#9733;" * importance + "&#9734;" * (5 - importance)
-    importance_html = '<span class="importance-badge importance-{}" title="{}">{}</span>'.format(
-        importance, importance_reason, importance_stars)
+    if importance >= 4:
+        importance_html = '<span class="importance-dot dot-red" title="{}"></span>'.format(importance_reason)
+    elif importance >= 3:
+        importance_html = '<span class="importance-dot dot-yellow" title="{}"></span>'.format(importance_reason)
+    else:
+        importance_html = '<span class="importance-dot dot-green" title="{}"></span>'.format(importance_reason)
 
-    # Card mode badge
+    # Card mode badge — only show for contested stories
     card_mode = card.get("card_mode", "straight_news")
-    mode_label = "CONTESTED" if card_mode == "contested" else "NEWS"
-    mode_class = "mode-contested" if card_mode == "contested" else "mode-news"
-    mode_html = '<span class="card-mode-badge {}">{}</span>'.format(mode_class, mode_label)
+    mode_html = '<span class="card-mode-badge mode-contested">CONTESTED</span>' if card_mode == "contested" else ""
 
     # Topic tags
     topic_tags = ""
@@ -169,11 +170,11 @@ def _render_card(card, card_index=0):
             if isinstance(fact, str) and fact.strip():
                 items += '<li class="scan-item">{}</li>'.format(_esc(fact))
         if items:
-            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Confirmed Facts</div><ul class="scan-list">{}</ul></div>'.format(items)
+            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Facts You Should Know</div><ul class="scan-list">{}</ul></div>'.format(items)
     elif isinstance(agreed, str) and agreed:
         items = _lines_to_items(agreed)
         if items:
-            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Confirmed Facts</div><ul class="scan-list">{}</ul></div>'.format(items)
+            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Facts You Should Know</div><ul class="scan-list">{}</ul></div>'.format(items)
 
     # Disputes as paired side-by-side comparisons
     disputes_html = ""
@@ -475,24 +476,34 @@ def _render_quickscan(data):
             icon=topic_info.get("icon", ""), name=topic_info.get("name", topic_id))
 
         for story in stories:
-            consensus = story.get("consensus", "split")
-            if consensus == "consensus":
-                icon = '<span class="consensus-dot dot-green" title="Sources agree"></span>'
-            elif consensus == "contested":
-                icon = '<span class="consensus-dot dot-red" title="Highly contested"></span>'
+            # Color dot based on importance level instead of consensus
+            importance = story.get("importance", 3)
+            card_mode = story.get("card_mode", "straight_news")
+            if importance >= 4:
+                dot = '<span class="importance-dot dot-red" title="High importance"></span>'
+            elif importance >= 3:
+                dot = '<span class="importance-dot dot-yellow" title="Notable"></span>'
             else:
-                icon = '<span class="consensus-dot dot-yellow" title="Sources split"></span>'
+                dot = '<span class="importance-dot dot-green" title="Background"></span>'
+
+            # Add contested indicator
+            mode_tag = ""
+            if card_mode == "contested":
+                mode_tag = ' <span class="qs-contested-tag">CONTESTED</span>'
 
             card_idx = story.get("card_index", 0)
-            sources = story.get("key_sources", "")
             one_liner = story.get("one_liner", story.get("summary", ""))
-            importance = story.get("importance", 3)
-            stars = "&#9733;" * importance
-            stories_html += '<a href="#topic-card-{idx}" class="qs-story">{icon}<div class="qs-story-content"><span class="qs-headline">{stars} {headline}</span><span class="qs-summary">{one_liner}</span></div></a>'.format(
-                idx=card_idx, icon=icon,
-                stars=stars,
+            why_care = story.get("why_care", "")
+            why_html = ""
+            if why_care:
+                why_html = '<span class="qs-why">{}</span>'.format(_esc(why_care))
+
+            stories_html += '<a href="#topic-card-{idx}" class="qs-story">{dot}<div class="qs-story-content"><span class="qs-headline">{headline}{mode}</span><span class="qs-summary">{one_liner}</span>{why}</div></a>'.format(
+                idx=card_idx, dot=dot,
                 headline=_esc(story.get("headline", "")),
-                one_liner=_esc(one_liner))
+                mode=mode_tag,
+                one_liner=_esc(one_liner),
+                why=why_html)
         stories_html += '</div>'
 
     # Key tensions with type tags
@@ -743,12 +754,12 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .card-header {{ margin-bottom: 0.5rem; }}
 .topic-tags {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; align-items: center; }}
 .topic-tag {{ font-size: 0.73rem; padding: 0.15rem 0.5rem; border-radius: 12px; border: 1px solid var(--border); color: var(--muted); }}
-.importance-badge {{ font-size: 0.85rem; letter-spacing: -1px; color: #d4a017; cursor: help; }}
-.importance-1 {{ opacity: 0.4; }}
-.importance-2 {{ opacity: 0.55; }}
-.importance-3 {{ opacity: 0.7; }}
-.importance-4 {{ opacity: 0.85; }}
-.importance-5 {{ opacity: 1.0; }}
+.importance-dot {{ width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; cursor: help; }}
+.dot-red {{ background: #e53935; }}
+.dot-yellow {{ background: #ffa726; }}
+.dot-green {{ background: #66bb6a; }}
+.qs-why {{ display: block; font-size: 0.78rem; color: #555; font-style: italic; margin-top: 2px; }}
+.qs-contested-tag {{ font-size: 0.6rem; background: #fff3e0; color: #e65100; padding: 1px 5px; border-radius: 3px; margin-left: 6px; font-weight: 600; vertical-align: middle; }}
 .card-mode-badge {{ font-size: 0.65rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }}
 .mode-news {{ background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }}
 .mode-contested {{ background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }}

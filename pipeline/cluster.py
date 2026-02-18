@@ -121,14 +121,18 @@ def _llm_review_clusters(groups, report):
 CLUSTERS:
 {}
 
-Identify:
-1. MERGE: Which clusters should be combined because they're about the SAME event?
-2. No splits needed — mechanical clustering is conservative.
+Identify clusters that should be MERGED because they cover the EXACT SAME specific event.
+
+CRITICAL: Only merge if the clusters are clearly about the same event.
+- Two stories happening in the same country are NOT the same event
+- Two stories in the same topic area are NOT the same event
+- A death of a public figure and a diplomatic meeting are NEVER the same event
+- When in doubt, do NOT merge
 
 Return JSON:
 {{
   "merges": [[2, 5], [8, 12, 15]],
-  "notes": "brief explanation"
+  "notes": "brief explanation of each merge"
 }}
 
 If no merges needed: {{"merges": [], "notes": "clusters look correct"}}""".format(

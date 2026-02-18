@@ -102,9 +102,14 @@ def _write_standard(card, cluster, sources, comparison, writer_id, report):
         card.what_happened = parts[0]
         card.so_what = parts[1]
 
-    # Facts
+    # Facts You Should Know — ONLY things that add context beyond the summary
     facts = _call(writer_id, context,
-        'List 3-5 confirmed facts as a JSON array of strings. Each: specific number, date, name, or action. Tag single-source facts: [Source only]. Return: ["fact 1.", "fact 2."]',
+        """List 3-5 key facts as a JSON array of strings.
+CRITICAL: Do NOT repeat information already in this summary: "{summary}"
+Only include facts that ADD new context: specific numbers, dates, names, background details, or consequences not covered in the summary.
+If the summary already covers everything, return just 1-2 additional contextual facts.
+Return: ["additional fact 1.", "additional fact 2."]""".format(
+            summary=(card.what_happened + " " + card.so_what)[:200]),
         "json_array", report)
     if facts:
         card.agreed_facts = facts
