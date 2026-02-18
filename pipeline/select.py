@@ -183,14 +183,28 @@ def _soft_diversity(ranked, topics):
 
 
 def _assign_tiers(ranked):
-    """Assign depth tiers based on importance stars."""
+    """Assign depth tiers based on importance stars and source count."""
     from config import DEPTH_THRESHOLDS
     for r in ranked:
         stars = r.stars
-        if stars >= DEPTH_THRESHOLDS["deep"]:
-            r.depth_tier = "deep"
-        elif stars >= DEPTH_THRESHOLDS["standard"]:
-            r.depth_tier = "standard"
-        else:
+        source_count = r.cluster.size
+
+        # Single-source stories can't meaningfully compare perspectives
+        # Cap them at standard tier max (no investigation)
+        if source_count <= 1:
             r.depth_tier = "brief"
+        elif source_count <= 2:
+            # Two sources — standard at most
+            if stars >= DEPTH_THRESHOLDS["standard"]:
+                r.depth_tier = "standard"
+            else:
+                r.depth_tier = "brief"
+        else:
+            # 3+ sources — full tier based on importance
+            if stars >= DEPTH_THRESHOLDS["deep"]:
+                r.depth_tier = "deep"
+            elif stars >= DEPTH_THRESHOLDS["standard"]:
+                r.depth_tier = "standard"
+            else:
+                r.depth_tier = "brief"
     return ranked

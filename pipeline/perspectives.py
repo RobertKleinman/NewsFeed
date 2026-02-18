@@ -101,8 +101,10 @@ Rules:
         if isinstance(m, str) and m not in missing_perspectives:
             missing_perspectives.append(m)
 
-    # Deduplicate missing
+    # Deduplicate and condense to top 3 most important
     missing_perspectives = list(dict.fromkeys(missing_perspectives))
+    # Keep only short labels (< 80 chars) — dump the essay-length ones
+    missing_perspectives = [m for m in missing_perspectives if len(m) < 80][:3]
 
     report.items_out = len(selected)
     report.notes.append("{} perspectives, {} sources, {} missing".format(
