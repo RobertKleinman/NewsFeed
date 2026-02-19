@@ -23,7 +23,7 @@ from config import get_active_sources, get_active_topics, load_query_pack, LLM_C
 import llm as llm_caller
 from pipeline import (fetch, triage, cluster, arc_merge, select, perspectives,
                       extract, compare, investigate, write, enrich,
-                      synthesize, quickscan, validate, publish)
+                      synthesize, quickscan, validate, publish, card_dedup)
 
 
 def process_brief(ranked_story, story_num, total):
@@ -229,6 +229,10 @@ def main():
         print("\nNo topic cards generated")
         sys.exit(1)
     print("\n{} topic cards generated".format(len(topic_cards)))
+
+    # Card dedup — merge any remaining duplicate/overlapping cards
+    topic_cards, dedup_report = card_dedup.run(topic_cards)
+    all_reports.append(dedup_report)
 
     # Enrich
     enrich_report = enrich.run(topic_cards)
