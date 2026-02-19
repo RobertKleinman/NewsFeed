@@ -1,11 +1,18 @@
 """
-Step 9: Write topic cards — tiered by importance, field-by-field.
+Step 9: Write topic cards — restructured around reader questions.
 
-BRIEF (1-2★): summary + so_what only, from cluster data directly
-STANDARD (3★): summary + facts + mode-appropriate analysis
-DEEP (4-5★): full card with investigation impact
+Card structure:
+  WHY THIS MATTERS — direct impact / world-shaping / cultural gravity
+  WHAT'S HAPPENING — concrete situation right now
+  HOW IT'S BEING USED — spin detection + predicted use (contested only)
+  WHAT YOU NEED TO KNOW — facts + context + history + unknowns (Q&A)
+  BIGGER PICTURE — second/third order effects
+  WHAT YOU CAN DO — actionable items (when applicable)
 
-Each field is a separate LLM call to prevent truncation.
+Tiers control depth:
+  BRIEF: why_matters + whats_happening only
+  STANDARD: + key_facts + context + unknowns + bigger_picture
+  DEEP: + spin analysis + spin predictions + actions + full investigation
 """
 
 import json
@@ -19,7 +26,7 @@ from models import TopicCard, StepReport
 
 def run(ranked_story, selected_sources, missing_perspectives,
         comparison_result=None, investigation_result=None):
-    """Write a topic card. Depth varies by tier. Returns (TopicCard, report)."""
+    """Write a topic card. Returns (TopicCard, report)."""
     report = StepReport("write")
     cluster = ranked_story.cluster
     tier = ranked_story.depth_tier
@@ -62,126 +69,211 @@ def run(ranked_story, selected_sources, missing_perspectives,
 
     card.written_by = LLM_CONFIGS[writer_id]["label"]
     _sanitize_card(card)
+
+    # Bridge to legacy fields for backward compat
+    card.what_happened = card.whats_happening
+    card.so_what = card.why_matters
+    card.agreed_facts = card.key_facts
+    card.key_unknowns = [{"question": u.get("q", ""), "answer": u.get("a", "")} for u in card.unknowns]
+
     report.items_out = 1
     return card, report
 
 
+# ── BRIEF ─────────────────────────────────────────────────────────────────
+
 def _write_brief(card, cluster, writer_id, report):
-    """Brief card: summary + so_what only. Minimal LLM usage."""
-    # Build context from cluster headlines
+    """Brief card: why_matters + whats_happening only."""
     headlines = "\n".join(
         "- {} ({}): {}".format(a.source_name, a.source_region, a.title)
         for a in cluster.articles[:8])
 
     result = _call(writer_id,
         "EVENT: {}\n\nHEADLINES:\n{}".format(cluster.lead_title, headlines),
-        "Write exactly 2 sentences. Sentence 1: what happened. Sentence 2: why it matters (the 'so what'). End each with a period.",
-        "text", report)
+        """Write two sections. Return JSON:
+{{
+  "whats_happening": "2-3 sentences. What is concretely happening right now. Who did what, where, when. No analysis.",
+  "why_matters": "1-2 sentences. Why should someone care? Cover: direct impact on people's lives OR world-shaping significance OR cultural gravity (everyone will be talking about this). Be specific, not generic."
+}}""",
+        "json_object", report)
 
-    if result:
-        parts = _split_summary(result)
-        card.what_happened = parts[0]
-        card.so_what = parts[1]
+    if result and isinstance(result, dict):
+        card.whats_happening = result.get("whats_happening", "")
+        card.why_matters = result.get("why_matters", "")
     else:
-        card.what_happened = cluster.lead_title
+        card.whats_happening = cluster.lead_title
     card.card_mode = "brief"
 
 
+# ── STANDARD ──────────────────────────────────────────────────────────────
+
 def _write_standard(card, cluster, sources, comparison, writer_id, report):
-    """Standard card: summary + facts + mode-appropriate content."""
+    """Standard card: situation + facts + context + unknowns + bigger picture."""
     context = _build_context(cluster, comparison)
     contention = comparison.contention_level if comparison else "straight_news"
     card.card_mode = contention
 
-    # Summary
+    # WHY THIS MATTERS + WHAT'S HAPPENING
     result = _call(writer_id, context,
-        "Write 2 sentences. Sentence 1: what happened (who, what, when). Sentence 2: why it matters. End each with a period.",
-        "text", report)
-    if result:
-        parts = _split_summary(result)
-        card.what_happened = parts[0]
-        card.so_what = parts[1]
+        """Write two sections. Return JSON:
+{{
+  "whats_happening": "2-4 sentences. Concrete situation right now. Who did what, where, when. Current state of play. Draw from all sources. No analysis — just what's happening.",
+  "why_matters": "2-3 sentences. Why should someone care about this? Address whichever apply: (1) Direct impact — does this affect people's money, rights, safety, or daily life? (2) World-shaping — is this changing power dynamics, could it lead to conflict, is it a turning point? (3) Cultural gravity — will everyone be talking about this, will it shape opinions and decisions? Be specific and concrete, not generic."
+}}""",
+        "json_object", report)
 
-    # Facts You Should Know — ONLY things that add context beyond the summary
+    if result and isinstance(result, dict):
+        card.whats_happening = result.get("whats_happening", "")
+        card.why_matters = result.get("why_matters", "")
+
+    # WHAT YOU NEED TO KNOW: key facts
+    summary_so_far = (card.whats_happening + " " + card.why_matters)[:300]
     facts = _call(writer_id, context,
-        """List 3-5 key facts as a JSON array of strings.
-CRITICAL: Do NOT repeat information already in this summary: "{summary}"
-Only include facts that ADD new context: specific numbers, dates, names, background details, or consequences not covered in the summary.
-If the summary already covers everything, return just 1-2 additional contextual facts.
-Return: ["additional fact 1.", "additional fact 2."]""".format(
-            summary=(card.what_happened + " " + card.so_what)[:200]),
+        """List 3-5 key facts the reader needs to know. Return JSON array of strings.
+CRITICAL: Do NOT repeat information already covered here: "{summary}"
+Only include facts that ADD context: specific numbers, names, dates, background, consequences.
+Return: ["fact 1.", "fact 2."]""".format(summary=summary_so_far),
         "json_array", report)
     if facts:
-        card.agreed_facts = facts
+        card.key_facts = facts
 
-    if contention == "contested":
-        # Disputes
-        disputes = _call(writer_id, context,
-            'List real factual contradictions as JSON array. Each: {"type": "data", "side_a": "Claim. [Source]", "side_b": "Contradicting claim. [Source]"}. If none: return []',
-            "json_array", report)
-        if disputes:
-            card.disputes = disputes
+    # WHAT YOU NEED TO KNOW: unknowns (Q&A)
+    unknowns = _call(writer_id, context,
+        """Identify 2-3 important questions this coverage does NOT answer.
+Return JSON: [{{"q": "Important unanswered question?", "a": "What we know so far, or 'Not yet reported.' if nothing."}}]
+Focus on gaps that would change how a reader understands this story.""",
+        "json_array", report)
+    if unknowns:
+        card.unknowns = unknowns
 
-        # Framing/bias analysis
-        framing = _call(writer_id, context,
-            'For 2-3 sources, explain how their framing shapes reader beliefs. Return JSON: [{"source": "Name", "quote": "phrase", "frame": "What readers are led to think."}]',
-            "json_array", report)
-        if framing:
-            card.framing = framing
-    else:
-        # Coverage note for straight news
-        if card.missing_perspectives:
-            card.coverage_note = "Coverage note: missing perspectives from {}.".format(
-                ", ".join(card.missing_perspectives[:3]))
+    # BIGGER PICTURE
+    bigger = _call(writer_id, context,
+        """Where is this story heading? Write 2-3 sentences about second and third order effects.
+Think: what happens next, who else is affected, what chain reactions could this trigger?
+Connect to broader trends when relevant. Be specific.""",
+        "text", report)
+    if bigger:
+        card.bigger_picture = bigger
 
-    # Fallback facts
-    if not card.agreed_facts and card.what_happened:
-        sentences = [s.strip() for s in card.what_happened.split(".") if s.strip() and len(s.strip()) > 15]
-        card.agreed_facts = [s + "." for s in sentences[:3]]
+    # Fallback
+    if not card.key_facts and card.whats_happening:
+        sentences = [s.strip() for s in card.whats_happening.split(".") if s.strip() and len(s.strip()) > 15]
+        card.key_facts = [s + "." for s in sentences[:3]]
 
     if comparison:
         card.comparisons = comparison.comparisons
 
 
+# ── DEEP ──────────────────────────────────────────────────────────────────
+
 def _write_deep(card, cluster, sources, comparison, investigation, writer_id, report):
-    """Deep card: full analysis with investigation impact."""
+    """Deep card: full analysis including spin detection and investigation."""
     # Start with standard content
     _write_standard(card, cluster, sources, comparison, writer_id, report)
 
-    # Add investigation impact (only if it adds value)
+    context = _build_context(cluster, comparison)
+    contention = comparison.contention_level if comparison else "straight_news"
+
+    # HOW IT'S BEING USED (only when contested or politically significant)
+    if contention == "contested" or _is_politically_significant(cluster):
+        spin = _call(writer_id, context,
+            """Analyze how different groups are framing this story to serve their agenda.
+Return JSON:
+{{
+  "positions": [
+    {{
+      "position": "One-line description of this side's stance",
+      "who": "Who holds this position (specific: 'Israeli government officials', not just 'one side')",
+      "key_claim": "The main factual claim they use to support their position",
+      "verified": "Verified / Partially verified / Unverified — with brief explanation"
+    }}
+  ],
+  "watch_for": [
+    {{
+      "prediction": "How this story will likely be used or spun going forward. Be specific: who will use it, how, for what purpose.",
+      "confidence": "likely or speculative"
+    }}
+  ]
+}}
+Only include positions where there are genuinely different agendas at play.
+2-3 positions max. 2-3 watch_for predictions max.
+If this story isn't being used to push competing agendas, return {{"positions": [], "watch_for": []}}""",
+            "json_object", report, max_tokens=2500)
+
+        if spin and isinstance(spin, dict):
+            positions = spin.get("positions", [])
+            if positions and isinstance(positions, list):
+                card.spin_positions = positions
+                card.card_mode = "contested"
+            watch = spin.get("watch_for", [])
+            if watch and isinstance(watch, list):
+                card.spin_predictions = watch
+
+    # Add investigation findings to WHAT YOU NEED TO KNOW
     if investigation and investigation.adds_value:
         card.investigation_impact = investigation.story_impact
         card.investigation_raw = investigation.raw_text
 
-        # Investigation-informed extras
-        context = _build_context(cluster, comparison)
-        context += "\n\nINVESTIGATION FINDINGS:\n" + investigation.raw_text[:1500]
+        # Extract context and history from investigation
+        inv_context = context + "\n\nINVESTIGATION FINDINGS:\n" + investigation.raw_text[:2000]
 
-        extras = _call(writer_id, context,
-            """Based on the investigation findings, return JSON:
+        extras = _call(writer_id, inv_context,
+            """Based on the investigation findings, extract additional context for the reader.
+Return JSON:
 {{
-  "key_unknowns": [{{"question": "Gap in coverage.", "answer": "What investigation found."}}],
-  "predictions": [{{"scenario": "Likely development.", "likelihood": "likely", "condition": "Trigger."}}]
+  "research_context": ["Important context from research that readers need. Label each as coming from research.", "Another piece of context."],
+  "historical_context": ["Relevant historical background that helps understand this story."],
+  "unknowns_answered": [{{"q": "Question the coverage left open", "a": "What investigation found."}}],
+  "actions": ["Concrete action the reader could take based on this story. Only include if genuinely actionable."]
 }}
-2-3 items max per field. Complete sentences.""",
-            "json_object", report, max_tokens=2000)
+Be concise. 2-3 items max per field. Empty arrays are fine if nothing fits.""",
+            "json_object", report, max_tokens=2500)
 
         if extras and isinstance(extras, dict):
-            for key in ["key_unknowns", "predictions"]:
-                if key in extras and isinstance(extras[key], list):
-                    setattr(card, key, extras[key])
+            # Merge research context into card.context
+            research = extras.get("research_context", [])
+            if research and isinstance(research, list):
+                card.context = research
+
+            # Merge historical context
+            history = extras.get("historical_context", [])
+            if history and isinstance(history, list):
+                card.history = history
+
+            # Add answered unknowns to the unknowns list
+            answered = extras.get("unknowns_answered", [])
+            if answered and isinstance(answered, list):
+                card.unknowns.extend(answered)
+
+            # Actions
+            actions = extras.get("actions", [])
+            if actions and isinstance(actions, list):
+                card.actions = [a for a in actions if a.strip()]
+
     elif investigation:
-        # Investigation ran but didn't add value — note that
         card.investigation_raw = investigation.raw_text
         card.coverage_note = (card.coverage_note + " " if card.coverage_note else "") + \
             "Investigation confirmed coverage is substantially accurate."
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────
+
+def _is_politically_significant(cluster):
+    """Check if story topics suggest political spin is likely."""
+    political_topics = {"world_politics", "us_politics", "canadian_politics",
+                       "climate_energy", "data_privacy_governance"}
+    return bool(set(cluster.topic_spread) & political_topics)
 
 
 def _build_context(cluster, comparison):
     """Build shared context string for LLM calls."""
     sources_summary = "\n".join(
         "- {} ({}, {})".format(a.source_name, a.source_region, a.source_bias)
-        for a in cluster.articles[:8])
+        for a in cluster.articles[:10])
+
+    headlines = "\n".join(
+        "- {}: {}".format(a.source_name, a.title[:100])
+        for a in cluster.articles[:10])
 
     comp_text = ""
     if comparison and comparison.comparisons:
@@ -190,18 +282,11 @@ def _build_context(cluster, comparison):
             sections.append("--- {} ---\n{}".format(model, text))
         comp_text = "\n\n".join(sections)
 
-    return "EVENT: {title}\nSOURCES:\n{sources}\n\nCOMPARISONS:\n{comp}".format(
+    return "EVENT: {title}\n\nSOURCES:\n{sources}\n\nHEADLINES:\n{headlines}\n\nCOMPARISONS:\n{comp}".format(
         title=cluster.lead_title,
         sources=sources_summary,
+        headlines=headlines,
         comp=comp_text[:3000])
-
-
-def _split_summary(text):
-    """Split a 2-sentence text into what_happened and so_what."""
-    sentences = [s.strip() for s in text.split(".") if s.strip() and len(s.strip()) > 10]
-    if len(sentences) >= 2:
-        return sentences[0] + ".", ". ".join(sentences[1:]) + "."
-    return text, ""
 
 
 def _call(writer_id, context, instruction, output_type, report, max_tokens=1500):
@@ -209,7 +294,7 @@ def _call(writer_id, context, instruction, output_type, report, max_tokens=1500)
     prompt = "{}\n\n{}".format(context, instruction)
     report.llm_calls += 1
     result = llm_caller.call_by_id(writer_id,
-        "News editor. Use ONLY provided facts. Return ONLY requested output. Every sentence ends with a period.",
+        "Intelligence analyst writing a briefing. Use ONLY provided facts. Return ONLY requested output. Every sentence ends with a period.",
         prompt, max_tokens)
     time.sleep(0.5)
 
@@ -254,13 +339,15 @@ def _pick_writer(available):
 
 def _sanitize_card(card):
     """Clean non-ASCII artifacts from all string fields."""
-    for field_name in ["what_happened", "so_what", "coverage_note",
+    for field_name in ["whats_happening", "why_matters", "bigger_picture",
+                       "what_happened", "so_what", "coverage_note",
                        "investigation_impact", "investigation_raw"]:
         val = getattr(card, field_name, "")
         if isinstance(val, str):
             setattr(card, field_name, _sanitize_text(val))
 
-    for field_name in ["agreed_facts", "notable_details"]:
+    for field_name in ["key_facts", "context", "history", "actions",
+                       "agreed_facts", "notable_details"]:
         val = getattr(card, field_name, [])
         if isinstance(val, list):
             setattr(card, field_name, [
@@ -270,7 +357,8 @@ def _sanitize_card(card):
                 for item in val
             ])
 
-    for field_name in ["disputes", "framing", "key_unknowns", "predictions"]:
+    for field_name in ["spin_positions", "spin_predictions", "unknowns",
+                       "disputes", "framing", "key_unknowns", "predictions"]:
         val = getattr(card, field_name, [])
         if isinstance(val, list):
             setattr(card, field_name, [

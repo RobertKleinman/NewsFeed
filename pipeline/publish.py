@@ -141,7 +141,6 @@ def _render_card(card, card_index=0):
         pub_date = s.get("pub_date", "")
         date_tag = ""
         if pub_date:
-            # Show just the date portion
             short_date = pub_date[:10] if len(pub_date) >= 10 else pub_date
             date_tag = ' <span class="source-date">{}</span>'.format(short_date)
         url = s.get("url", "")
@@ -149,203 +148,150 @@ def _render_card(card, card_index=0):
         source_pills += '<span class="source-pill"><strong>{name}</strong> <span class="perspective-label">{persp}</span> <span class="source-type-tag type-{stype}">{stype}</span>{date}</span>'.format(
             name=name_html, persp=s["perspective"], stype=stype, date=date_tag)
 
-    # === SCANNABLE LAYER (always visible) ===
+    # === WHY THIS MATTERS ===
+    why_html = ""
+    why_matters = card.get("why_matters", card.get("so_what", ""))
+    if why_matters:
+        why_html = '<div class="card-section section-why"><div class="section-label">Why This Matters</div><p>{}</p></div>'.format(_esc(why_matters))
 
-    # What happened (tight, no prose)
-    # What happened - sanitize any JSON artifacts
-    wh = card.get("what_happened", "")
-    if wh.startswith("{") or wh.startswith('"'):
-        # JSON leak - try to extract just text content
-        import re as _re
-        text_match = _re.search(r'"what_happened"\s*:\s*"([^"]+)"', wh)
-        wh = text_match.group(1) if text_match else wh.strip('{}"\n ')
-    what_happened = '<div class="what-happened"><p>{}</p></div>'.format(_esc(wh))
+    # === WHAT'S HAPPENING ===
+    whats_html = ""
+    whats = card.get("whats_happening", card.get("what_happened", ""))
+    if whats:
+        whats_html = '<div class="card-section section-whats"><div class="section-label">What\'s Happening</div><p>{}</p></div>'.format(_esc(whats))
 
-    # Agreed facts as tight bullets with source tags
-    facts_html = ""
-    agreed = card.get("agreed_facts", [])
-    if isinstance(agreed, list) and agreed:
+    # === HOW IT'S BEING USED (contested/political only) ===
+    spin_html = ""
+    positions = card.get("spin_positions", [])
+    spin_preds = card.get("spin_predictions", [])
+    if positions or spin_preds:
+        spin_content = ""
+
+        # Current framing positions
+        if positions:
+            spin_content += '<div class="spin-subsection"><div class="spin-sublabel">Current Framing</div>'
+            for p in positions[:3]:
+                if isinstance(p, dict):
+                    position = _esc(p.get("position", ""))
+                    who = _esc(p.get("who", ""))
+                    claim = _esc(p.get("key_claim", ""))
+                    verified = _esc(p.get("verified", ""))
+                    # Color the verified tag
+                    v_class = "verified-yes" if verified.lower().startswith("verified") else (
+                        "verified-partial" if "partial" in verified.lower() else "verified-no")
+                    spin_content += '<div class="spin-position"><div class="spin-stance">{}</div><div class="spin-who">Who: {}</div>'.format(position, who)
+                    if claim:
+                        spin_content += '<div class="spin-claim">Key claim: {}</div>'.format(claim)
+                    if verified:
+                        spin_content += '<div class="spin-verified {}">Verdict: {}</div>'.format(v_class, verified)
+                    spin_content += '</div>'
+            spin_content += '</div>'
+
+        # Predicted spin
+        if spin_preds:
+            spin_content += '<div class="spin-subsection"><div class="spin-sublabel">Watch For</div>'
+            for sp in spin_preds[:3]:
+                if isinstance(sp, dict):
+                    pred = _esc(sp.get("prediction", ""))
+                    conf = sp.get("confidence", "likely")
+                    conf_class = "conf-likely" if conf == "likely" else "conf-speculative"
+                    spin_content += '<div class="spin-prediction {cc}"><span class="spin-conf">{conf}</span> {pred}</div>'.format(
+                        cc=conf_class, conf=conf.upper(), pred=pred)
+            spin_content += '</div>'
+
+        if spin_content:
+            spin_html = '<div class="card-section section-spin"><div class="section-label">How It\'s Being Used</div>{}</div>'.format(spin_content)
+
+    # === WHAT YOU NEED TO KNOW ===
+    know_content = ""
+
+    # Key facts from coverage
+    key_facts = card.get("key_facts", card.get("agreed_facts", []))
+    if isinstance(key_facts, list) and key_facts:
         items = ""
-        for fact in agreed[:5]:
-            if isinstance(fact, str) and fact.strip():
-                items += '<li class="scan-item">{}</li>'.format(_esc(fact))
+        for f in key_facts[:5]:
+            if isinstance(f, str) and f.strip():
+                items += '<li class="know-item">{}</li>'.format(_esc(f))
         if items:
-            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Facts You Should Know</div><ul class="scan-list">{}</ul></div>'.format(items)
-    elif isinstance(agreed, str) and agreed:
-        items = _lines_to_items(agreed)
-        if items:
-            facts_html = '<div class="scan-section section-agreed"><div class="scan-label">Facts You Should Know</div><ul class="scan-list">{}</ul></div>'.format(items)
+            know_content += '<div class="know-subsection"><div class="know-sublabel">Key Facts</div><ul class="know-list">{}</ul></div>'.format(items)
 
-    # Disputes as paired side-by-side comparisons
-    disputes_html = ""
-    disputes = card.get("disputes", [])
-    if isinstance(disputes, list) and disputes:
-        dispute_blocks = ""
-        for d in disputes[:4]:
-            if isinstance(d, dict):
-                dtype = d.get("type", "framing").upper()
-                side_a = _esc(d.get("side_a", ""))
-                side_b = _esc(d.get("side_b", ""))
-                if side_a or side_b:
-                    dispute_blocks += """<div class="dispute-pair">
-                        <span class="dispute-type-tag">{dtype}</span>
-                        <div class="dispute-sides">
-                            <div class="dispute-side side-a">{side_a}</div>
-                            <div class="dispute-vs">vs</div>
-                            <div class="dispute-side side-b">{side_b}</div>
-                        </div>
-                    </div>""".format(dtype=dtype, side_a=side_a, side_b=side_b)
-        if dispute_blocks:
-            disputes_html = '<div class="scan-section section-disagree"><div class="scan-label">What\'s Disputed</div>{}</div>'.format(dispute_blocks)
-
-    # Framing as quoted blocks
-    framing_html = ""
-    framing = card.get("framing", [])
-    if isinstance(framing, list) and framing:
-        framing_blocks = ""
-        for f in framing[:5]:
-            if isinstance(f, dict):
-                source = _esc(f.get("source", ""))
-                quote = _esc(f.get("quote", ""))
-                frame = _esc(f.get("frame", ""))
-                if quote or frame:
-                    framing_blocks += '<div class="framing-quote"><span class="framing-source">{src}</span>{q}{f}</div>'.format(
-                        src=source,
-                        q=' <span class="framing-quoted">&ldquo;{}&rdquo;</span>'.format(quote) if quote else "",
-                        f=' <span class="framing-desc">{}</span>'.format(frame) if frame else "")
-        if framing_blocks:
-            framing_html = '<div class="scan-section section-framing"><div class="scan-label">How Sources Frame It</div>{}</div>'.format(framing_blocks)
-
-    # Notable details
-    notable_html = ""
-    notable = card.get("notable_details", [])
-    if isinstance(notable, list) and notable:
+    # Context from research
+    context_items = card.get("context", [])
+    if isinstance(context_items, list) and context_items:
         items = ""
-        for n in notable[:4]:
-            if isinstance(n, str) and n.strip():
-                items += '<li class="notable-item">{}</li>'.format(_esc(n))
+        for c in context_items[:3]:
+            if isinstance(c, str) and c.strip():
+                items += '<li class="know-item know-research">{}</li>'.format(_esc(c))
         if items:
-            notable_html = '<div class="scan-section section-notable"><div class="scan-label">Notable Details</div><ul class="scan-list">{}</ul></div>'.format(items)
+            know_content += '<div class="know-subsection"><div class="know-sublabel">Context (from research)</div><ul class="know-list">{}</ul></div>'.format(items)
 
-    # Perspective grid (promoted — key visual element)
-    grid_html = _render_perspective_grid(card)
+    # Historical context
+    history_items = card.get("history", [])
+    if isinstance(history_items, list) and history_items:
+        items = ""
+        for h in history_items[:3]:
+            if isinstance(h, str) and h.strip():
+                items += '<li class="know-item know-history">{}</li>'.format(_esc(h))
+        if items:
+            know_content += '<div class="know-subsection"><div class="know-sublabel">Historical Context</div><ul class="know-list">{}</ul></div>'.format(items)
 
-    # === COLLAPSED DETAIL LAYER ===
-    detail_sections = ""
-
-    # Implications
-    implications = card.get("implications", "")
-    if implications:
-        detail_sections += '<div class="detail-section section-implications"><div class="detail-label">Implications</div><div class="detail-text">{}</div></div>'.format(
-            _esc(implications).replace("\n", "<br>"))
-
-    # Watch items (structured)
-    watch_items = card.get("watch_items", [])
-    if isinstance(watch_items, list) and watch_items:
-        items_html = ""
-        for w in watch_items[:4]:
-            if isinstance(w, dict):
-                event = _esc(w.get("event", ""))
-                horizon = w.get("time_horizon", "")
-                driver = _esc(w.get("driver", ""))
-                badge = ""
-                if horizon:
-                    badge = '<span class="horizon-badge badge-developing">{}</span> '.format(_esc(horizon))
-                items_html += '<li class="scan-item">{}{}{}</li>'.format(
-                    badge, event,
-                    ' <span class="watch-driver">If: {}</span>'.format(driver) if driver else "")
-            elif isinstance(w, str):
-                items_html += '<li class="scan-item">{}</li>'.format(_esc(w))
-        if items_html:
-            detail_sections += '<div class="detail-section section-watch"><div class="detail-label">What to Watch</div><ul class="scan-list">{}</ul></div>'.format(items_html)
-
-    # Predictions (structured)
-    predictions = card.get("predictions", [])
-    if isinstance(predictions, list) and predictions:
-        pred_html = ""
-        for p in predictions[:3]:
-            if isinstance(p, dict):
-                scenario = _esc(p.get("scenario", ""))
-                likelihood = p.get("likelihood", "")
-                condition = _esc(p.get("condition", ""))
-                lclass = "pred-" + likelihood if likelihood in ("likely", "possible", "unlikely") else ""
-                pred_html += '<div class="prediction {lc}"><span class="pred-likelihood">{like}</span> {scen}{cond}</div>'.format(
-                    lc=lclass, like=likelihood.upper() if likelihood else "",
-                    scen=scenario,
-                    cond=' <span class="pred-condition">Condition: {}</span>'.format(condition) if condition else "")
-            elif isinstance(p, str):
-                pred_html += '<div class="prediction">{}</div>'.format(_esc(p))
-        if pred_html:
-            detail_sections += '<div class="detail-section section-predictions"><div class="detail-label">Predictions</div>{}</div>'.format(pred_html)
-
-    # Key unknowns as Q&A
-    unknowns = card.get("key_unknowns", [])
+    # What we still don't know (Q&A)
+    unknowns = card.get("unknowns", card.get("key_unknowns", []))
     if isinstance(unknowns, list) and unknowns:
-        items = ""
+        qa_items = ""
         for u in unknowns:
             if isinstance(u, dict):
-                q = _esc(u.get("question", ""))
-                a = _esc(u.get("answer", "Not yet reported."))
+                q = _esc(u.get("q", u.get("question", "")))
+                a = _esc(u.get("a", u.get("answer", "Not yet reported.")))
                 if q:
-                    items += '<details class="unknown-qa"><summary class="unknown-q">{}</summary><div class="unknown-a">{}</div></details>'.format(q, a)
-            elif isinstance(u, str) and u.strip():
-                items += '<details class="unknown-qa"><summary class="unknown-q">{}</summary><div class="unknown-a">Not yet reported.</div></details>'.format(_esc(u))
+                    qa_items += '<details class="unknown-qa"><summary class="unknown-q">{}</summary><div class="unknown-a">{}</div></details>'.format(q, a)
+        if qa_items:
+            know_content += '<div class="know-subsection"><div class="know-sublabel">What We Still Don\'t Know</div>{}</div>'.format(qa_items)
+
+    know_html = ""
+    if know_content:
+        know_html = '<div class="card-section section-know"><div class="section-label">What You Need to Know</div>{}</div>'.format(know_content)
+
+    # === BIGGER PICTURE ===
+    bigger_html = ""
+    bigger = card.get("bigger_picture", "")
+    if bigger:
+        bigger_html = '<div class="card-section section-bigger"><div class="section-label">Bigger Picture</div><p>{}</p></div>'.format(_esc(bigger))
+
+    # === WHAT YOU CAN DO ===
+    action_html = ""
+    actions = card.get("actions", [])
+    if isinstance(actions, list) and actions:
+        items = ""
+        for a in actions[:3]:
+            if isinstance(a, str) and a.strip():
+                items += '<li class="action-item">{}</li>'.format(_esc(a))
         if items:
-            detail_sections += '<div class="detail-section section-unknowns"><div class="detail-label">Key Unknowns</div>{}</div>'.format(items)
-    elif isinstance(unknowns, str) and unknowns:
-        detail_sections += '<div class="detail-section section-unknowns"><div class="detail-label">Key Unknowns</div><div class="detail-text">{}</div></div>'.format(
-            _esc(unknowns).replace("\n", "<br>"))
+            action_html = '<div class="card-section section-actions"><div class="section-label">What You Can Do</div><ul class="action-list">{}</ul></div>'.format(items)
 
-    # Missing viewpoints
-    missing = card.get("missing_viewpoints", "")
-    if missing and "all identified" not in missing.lower() and not missing.strip() == "":
-        detail_sections += '<div class="detail-section section-missing"><div class="detail-label">Missing Viewpoints</div><div class="detail-text">{}</div></div>'.format(
-            _esc(missing).replace("\n", "<br>"))
+    # === COLLAPSED: raw data ===
+    collapsed_content = ""
 
-    # Investigation - now concise, but still collapsible for safety
-    investigation = card.get("investigation", "")
+    # Investigation raw
+    investigation = card.get("investigation_raw", card.get("investigation", ""))
     if investigation:
-        # Only show the concise version, not raw essay prose
         inv_text = _esc(investigation).replace("\n", "<br>")
-        # If it's still very long, truncate and note
-        if len(investigation) > 1000:
-            detail_sections += '<details class="raw-comp"><summary>Background Research (Gemini Web Search)</summary><div class="detail-section section-investigation"><div class="detail-text">{}</div></div></details>'.format(inv_text)
-        else:
-            detail_sections += '<div class="detail-section section-investigation"><div class="detail-label">Background Research</div><div class="detail-text">{}</div></div>'.format(inv_text)
+        collapsed_content += '<details class="raw-comp"><summary>Background Research (Gemini Web Search)</summary><div class="detail-section section-investigation"><div class="detail-text">{}</div></div></details>'.format(inv_text)
 
     # Raw comparisons
-    comp_html = ""
     comparisons = card.get("comparisons", {})
     if comparisons:
         comp_blocks = ""
         for model, text in comparisons.items():
             comp_blocks += '<div class="comp-block"><div class="comp-model">{}</div><div class="comp-text">{}</div></div>'.format(
                 model, _esc(text).replace("\n", "<br>"))
-        comp_html = '<details class="raw-comp"><summary>Raw Model Comparisons ({} models)</summary>{}</details>'.format(
+        collapsed_content += '<details class="raw-comp"><summary>Raw Model Comparisons ({} models)</summary>{}</details>'.format(
             len(comparisons), comp_blocks)
 
     written_by = card.get("written_by", "")
     writer_html = ""
     if written_by:
         writer_html = '<div class="written-by">Card written by {}</div>'.format(written_by)
-
-    # So What section
-    so_what_html = ""
-    so_what = card.get("so_what", "")
-    if so_what:
-        so_what_html = '<div class="so-what"><strong>Why it matters:</strong> {}</div>'.format(_esc(so_what))
-
-    # Investigation impact (visible callout for DEEP cards)
-    inv_impact_html = ""
-    inv_impact = card.get("investigation_impact", "")
-    if inv_impact:
-        inv_impact_html = '<div class="inv-impact"><strong>&#128270; Investigation finding:</strong> {}</div>'.format(_esc(inv_impact))
-
-    # Coverage note (straight news mode)
-    coverage_note_html = ""
-    coverage_note = card.get("coverage_note", "")
-    if coverage_note:
-        coverage_note_html = '<div class="coverage-note">{}</div>'.format(_esc(coverage_note))
 
     # Tier badge
     tier = card.get("depth_tier", "standard")
@@ -368,20 +314,16 @@ def _render_card(card, card_index=0):
         </div>
         <div class="sources-row">{pills}</div>
 
-        {what_happened}
-        {so_what}
-        {inv_impact}
-        {facts}
-        {coverage_note}
-        {disputes}
-        {framing}
-        {notable}
+        {why}
+        {whats}
+        {spin}
+        {know}
+        {bigger}
+        {actions}
 
         <details class="detail-expand">
-            <summary>Deep Analysis</summary>
-            {grid}
-            {detail_sections}
-            {comp}
+            <summary>Full Sources & Research</summary>
+            {collapsed}
             {writer}
         </details>
     </article>""".format(
@@ -396,17 +338,13 @@ def _render_card(card, card_index=0):
         persp_count=card.get("perspectives_used", 0),
         spectrum=spectrum_html,
         pills=source_pills,
-        what_happened=what_happened,
-        so_what=so_what_html,
-        inv_impact=inv_impact_html,
-        facts=facts_html,
-        coverage_note=coverage_note_html,
-        disputes=disputes_html,
-        framing=framing_html,
-        notable=notable_html,
-        grid=grid_html,
-        detail_sections=detail_sections,
-        comp=comp_html,
+        why=why_html,
+        whats=whats_html,
+        spin=spin_html,
+        know=know_html,
+        bigger=bigger_html,
+        actions=action_html,
+        collapsed=collapsed_content,
         writer=writer_html)
 
 
@@ -855,6 +793,54 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 /* Scan sections (quick read) */
 .scan-section {{ margin-bottom: 0.8rem; padding: 0.6rem 0.8rem; background: var(--section-bg); border-radius: 6px; }}
 .scan-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; font-weight: 600; }}
+
+/* New card section styles */
+.card-section {{ margin-bottom: 1rem; padding: 0.8rem 1rem; background: var(--section-bg); border-radius: 8px; border-left: 3px solid var(--border); }}
+.section-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700; }}
+.section-why {{ border-left-color: var(--accent); }}
+.section-why .section-label {{ color: var(--accent); }}
+.section-whats {{ border-left-color: var(--blue); }}
+.section-whats .section-label {{ color: var(--blue); }}
+.section-spin {{ border-left-color: var(--red); }}
+.section-spin .section-label {{ color: var(--red); }}
+.section-know {{ border-left-color: var(--green); }}
+.section-know .section-label {{ color: var(--green); }}
+.section-bigger {{ border-left-color: var(--purple); }}
+.section-bigger .section-label {{ color: var(--purple); }}
+.section-actions {{ border-left-color: var(--accent); background: rgba(245, 158, 11, 0.05); }}
+.section-actions .section-label {{ color: var(--accent); }}
+.card-section p {{ font-size: 0.9rem; line-height: 1.7; color: var(--text); }}
+
+/* Spin section */
+.spin-subsection {{ margin-bottom: 0.6rem; }}
+.spin-sublabel {{ font-size: 0.7rem; font-weight: 600; color: var(--muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.03em; }}
+.spin-position {{ padding: 0.6rem; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 0.4rem; }}
+.spin-stance {{ font-weight: 600; font-size: 0.88rem; margin-bottom: 0.2rem; }}
+.spin-who {{ font-size: 0.78rem; color: var(--muted); }}
+.spin-claim {{ font-size: 0.82rem; margin-top: 0.3rem; font-style: italic; }}
+.spin-verified {{ font-size: 0.75rem; margin-top: 0.2rem; padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; }}
+.verified-yes {{ background: rgba(16, 185, 129, 0.15); color: var(--green); }}
+.verified-partial {{ background: rgba(245, 158, 11, 0.15); color: var(--accent); }}
+.verified-no {{ background: rgba(239, 68, 68, 0.15); color: var(--red); }}
+.spin-prediction {{ padding: 0.4rem 0.6rem; font-size: 0.82rem; border-left: 2px solid var(--red); margin-bottom: 0.3rem; }}
+.spin-conf {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.1rem 0.3rem; border-radius: 3px; margin-right: 0.4rem; }}
+.conf-likely .spin-conf {{ background: var(--red); color: #fff; }}
+.conf-speculative .spin-conf {{ background: var(--slate); color: #fff; }}
+
+/* Know section */
+.know-subsection {{ margin-bottom: 0.6rem; }}
+.know-sublabel {{ font-size: 0.7rem; font-weight: 600; color: var(--muted); margin-bottom: 0.3rem; }}
+.know-list {{ list-style: none; padding-left: 1rem; }}
+.know-item {{ position: relative; font-size: 0.85rem; padding: 0.2rem 0; }}
+.know-item::before {{ content: "\\2022"; position: absolute; left: -0.8rem; color: var(--green); }}
+.know-research::before {{ content: "\\1F50D"; }}
+.know-history::before {{ content: "\\1F4DC"; }}
+
+/* Action section */
+.action-list {{ list-style: none; padding-left: 1rem; }}
+.action-item {{ position: relative; font-size: 0.85rem; padding: 0.3rem 0; }}
+.action-item::before {{ content: "\\2794"; position: absolute; left: -1rem; color: var(--accent); }}
+
 .section-agreed .scan-label {{ color: var(--green); }}
 .section-disagree .scan-label {{ color: var(--red); }}
 .section-watch .scan-label {{ color: var(--blue); }}

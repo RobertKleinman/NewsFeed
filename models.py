@@ -104,7 +104,7 @@ class ClaimSet:
 @dataclass
 class ComparisonResult:
     """Output of cross-source comparison."""
-    comparisons: Dict[str, str] = field(default_factory=dict)  # model → text
+    comparisons: Dict[str, str] = field(default_factory=dict)  # model -> text
     contention_level: str = "straight_news"  # straight_news or contested
     agreed_facts_summary: str = ""
     has_real_disputes: bool = False
@@ -120,8 +120,34 @@ class InvestigationResult:
 
 @dataclass
 class TopicCard:
-    """The final card for one story."""
+    """The final card for one story — restructured around reader questions."""
     title: str = ""
+
+    # WHY THIS MATTERS
+    why_matters: str = ""  # 2-3 sentences: direct impact, world-shaping, cultural gravity
+
+    # WHAT'S HAPPENING
+    whats_happening: str = ""  # concrete situation right now
+
+    # HOW IT'S BEING USED (only when contested)
+    spin_positions: List[Dict] = field(default_factory=list)
+    # Each: {"position": str, "who": str, "key_claim": str, "verified": str}
+    spin_predictions: List[Dict] = field(default_factory=list)
+    # Each: {"prediction": str, "confidence": "likely"|"speculative"}
+
+    # WHAT YOU NEED TO KNOW
+    key_facts: List[str] = field(default_factory=list)  # from coverage
+    context: List[str] = field(default_factory=list)  # from research, labeled
+    history: List[str] = field(default_factory=list)  # historical context
+    unknowns: List[Dict] = field(default_factory=list)  # Q&A: {"q": str, "a": str}
+
+    # BIGGER PICTURE
+    bigger_picture: str = ""  # where this is heading, second/third order effects
+
+    # WHAT YOU CAN DO (only when applicable)
+    actions: List[str] = field(default_factory=list)
+
+    # === Legacy fields (kept for backward compat during transition) ===
     what_happened: str = ""
     so_what: str = ""
     agreed_facts: List[str] = field(default_factory=list)
@@ -132,6 +158,7 @@ class TopicCard:
     key_unknowns: List[Dict] = field(default_factory=list)
     predictions: List[Dict] = field(default_factory=list)
     notable_details: List[str] = field(default_factory=list)
+
     # Metadata
     card_mode: str = "straight_news"  # straight_news or contested
     depth_tier: str = "standard"  # brief, standard, deep
@@ -171,7 +198,7 @@ class StepReport:
         if self.llm_calls > 0:
             pct = int(100 * self.llm_successes / self.llm_calls)
             success_rate = " ({}% success)".format(pct)
-        return "{}: {} in → {} out | {} LLM calls{}{}".format(
+        return "{}: {} in -> {} out | {} LLM calls{}{}".format(
             self.step_name, self.items_in, self.items_out,
             self.llm_calls, success_rate,
             " | " + "; ".join(self.notes) if self.notes else "")

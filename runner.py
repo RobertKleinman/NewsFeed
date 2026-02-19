@@ -21,7 +21,7 @@ from pathlib import Path
 
 from config import get_active_sources, get_active_topics, load_query_pack, LLM_CONFIGS
 import llm as llm_caller
-from pipeline import (fetch, triage, cluster, select, perspectives,
+from pipeline import (fetch, triage, cluster, arc_merge, select, perspectives,
                       extract, compare, investigate, write, enrich,
                       synthesize, quickscan, validate, publish)
 
@@ -187,6 +187,10 @@ def main():
     # Step 3: Cluster (mechanical + LLM review)
     clusters, cluster_report = cluster.run(relevant)
     all_reports.append(cluster_report)
+
+    # Step 3b: Story Arc Merge (combine related events into single stories)
+    clusters, arc_report = arc_merge.run(clusters)
+    all_reports.append(arc_report)
 
     # Step 4: Select (importance rating + materiality cutoff)
     ranked_stories, select_report = select.run(clusters, topics)
