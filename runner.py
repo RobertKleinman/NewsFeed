@@ -23,7 +23,8 @@ from config import get_active_sources, get_active_topics, load_query_pack, LLM_C
 import llm as llm_caller
 from pipeline import (fetch, triage, cluster, arc_merge, select, perspectives,
                       extract, compare, investigate, write, enrich,
-                      synthesize, quickscan, validate, publish, card_dedup)
+                      synthesize, quickscan, validate, publish, card_dedup,
+                      predictions)
 
 
 def process_brief(ranked_story, story_num, total):
@@ -234,6 +235,10 @@ def main():
     topic_cards, dedup_report = card_dedup.run(topic_cards)
     all_reports.append(dedup_report)
 
+    # Predictions — cross-story intelligence forecasting
+    preds_data, preds_report = predictions.run(topic_cards)
+    all_reports.append(preds_report)
+
     # Enrich
     enrich_report = enrich.run(topic_cards)
     all_reports.append(enrich_report)
@@ -252,7 +257,7 @@ def main():
 
     # Publish
     run_time = int(time.time() - start_time)
-    html = publish.run(topic_cards, synth, qscan, all_reports, run_time, quality)
+    html = publish.run(topic_cards, synth, qscan, all_reports, run_time, quality, preds_data)
 
     output_dir = Path("output")
     output_dir.mkdir(exist_ok=True)

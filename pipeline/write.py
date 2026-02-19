@@ -108,7 +108,7 @@ def _write_brief(card, cluster, writer_id, report):
 # ── STANDARD ──────────────────────────────────────────────────────────────
 
 def _write_standard(card, cluster, sources, comparison, writer_id, report):
-    """Standard card: situation + facts + context + unknowns + bigger picture."""
+    """Standard card: situation + facts + context + unknowns + spin + bigger picture."""
     context = _build_context(cluster, comparison)
     contention = comparison.contention_level if comparison else "straight_news"
     card.card_mode = contention
@@ -125,6 +125,56 @@ def _write_standard(card, cluster, sources, comparison, writer_id, report):
     if result and isinstance(result, dict):
         card.whats_happening = result.get("whats_happening", "")
         card.why_matters = result.get("why_matters", "")
+
+    # HOW IT'S BEING USED — ask LLM directly whether spin exists
+    # Don't rely on compare step's contention detection
+    spin = _call(writer_id, context,
+        """Analyze whether different groups are framing this story to serve different agendas.
+
+THIS IS NOT about minor editorial differences. Only return positions if there are GENUINELY COMPETING POLITICAL AGENDAS at play — groups using this story to advance opposing goals.
+
+Examples of real spin:
+- Israel/Palestine: pro-Israel sources frame actions as security; critics frame them as occupation
+- Climate policy: supporters frame repeal as economic freedom; opponents frame as environmental destruction
+- Military action: hawks frame as necessary deterrence; doves frame as dangerous escalation
+
+Examples that are NOT spin (do not return positions for these):
+- A natural disaster reported from different angles
+- A court sentencing reported by different outlets with same framing
+- Different levels of detail in coverage
+
+Return JSON:
+{{
+  "is_contested": true or false,
+  "positions": [
+    {{
+      "position": "One-line description of this side's stance",
+      "who": "Who holds this position (be specific: 'Israeli government officials', not 'one side')",
+      "key_claim": "The main factual claim they use to support their position",
+      "verified": "Verified / Partially verified / Unverified — with brief explanation"
+    }}
+  ],
+  "watch_for": [
+    {{
+      "prediction": "How this story will likely be used or spun going forward. Be specific.",
+      "confidence": "likely or speculative"
+    }}
+  ]
+}}
+
+If this story is NOT being used to push competing agendas: {{"is_contested": false, "positions": [], "watch_for": []}}
+2-3 positions max. 2-3 watch_for max.""",
+        "json_object", report, max_tokens=2500)
+
+    if spin and isinstance(spin, dict):
+        is_contested = spin.get("is_contested", False)
+        positions = spin.get("positions", [])
+        if is_contested and positions and isinstance(positions, list) and len(positions) >= 2:
+            card.spin_positions = positions
+            card.card_mode = "contested"
+            watch = spin.get("watch_for", [])
+            if watch and isinstance(watch, list):
+                card.spin_predictions = watch
 
     # WHAT YOU NEED TO KNOW: key facts
     summary_so_far = (card.whats_happening + " " + card.why_matters)[:300]
@@ -167,47 +217,11 @@ Connect to broader trends when relevant. Be specific.""",
 # ── DEEP ──────────────────────────────────────────────────────────────────
 
 def _write_deep(card, cluster, sources, comparison, investigation, writer_id, report):
-    """Deep card: full analysis including spin detection and investigation."""
-    # Start with standard content
+    """Deep card: full analysis including investigation and per-card predictions."""
+    # Standard content (includes spin detection)
     _write_standard(card, cluster, sources, comparison, writer_id, report)
 
     context = _build_context(cluster, comparison)
-    contention = comparison.contention_level if comparison else "straight_news"
-
-    # HOW IT'S BEING USED (only when compare step detected real contention)
-    if contention == "contested":
-        spin = _call(writer_id, context,
-            """Analyze how different groups are framing this story to serve their agenda.
-Return JSON:
-{{
-  "positions": [
-    {{
-      "position": "One-line description of this side's stance",
-      "who": "Who holds this position (specific: 'Israeli government officials', not just 'one side')",
-      "key_claim": "The main factual claim they use to support their position",
-      "verified": "Verified / Partially verified / Unverified — with brief explanation"
-    }}
-  ],
-  "watch_for": [
-    {{
-      "prediction": "How this story will likely be used or spun going forward. Be specific: who will use it, how, for what purpose.",
-      "confidence": "likely or speculative"
-    }}
-  ]
-}}
-Only include positions where there are genuinely different agendas at play.
-2-3 positions max. 2-3 watch_for predictions max.
-If this story isn't being used to push competing agendas, return {{"positions": [], "watch_for": []}}""",
-            "json_object", report, max_tokens=2500)
-
-        if spin and isinstance(spin, dict):
-            positions = spin.get("positions", [])
-            if positions and isinstance(positions, list):
-                card.spin_positions = positions
-                card.card_mode = "contested"
-            watch = spin.get("watch_for", [])
-            if watch and isinstance(watch, list):
-                card.spin_predictions = watch
 
     # Add investigation findings to WHAT YOU NEED TO KNOW
     if investigation and investigation.adds_value:

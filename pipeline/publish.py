@@ -15,7 +15,7 @@ import llm as llm_caller
 from config import TOPICS, LLM_CONFIGS
 
 
-def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_review=None):
+def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_review=None, predictions_data=None):
     """Generate HTML. Returns html string."""
     # Convert TopicCard objects to dicts if needed
     card_dicts = []
@@ -51,6 +51,7 @@ def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_revie
 
     quickscan_html = _render_quickscan(quickscan_data)
     synthesis_html = _render_synthesis(synthesis)
+    predictions_html = _render_predictions(predictions_data or {})
     filter_buttons = _render_filters()
     run_report_html = _render_run_report(reports, run_time)
     review_panel_html = _render_review_panel(quality_review)
@@ -63,6 +64,7 @@ def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_revie
         llms=llms_used,
         quickscan=quickscan_html,
         synthesis=synthesis_html,
+        predictions=predictions_html,
         filters=filter_buttons,
         stories=stories_html,
         run_report=run_report_html,
@@ -532,6 +534,91 @@ def _render_filters():
     return html
 
 
+def _render_predictions(data):
+    """Render What's Coming predictions section."""
+    if not data:
+        return ""
+
+    cross = data.get("cross_story", [])
+    near = data.get("near_term", [])
+    medium = data.get("medium_term", [])
+    titles = data.get("story_titles", {})
+
+    if not cross and not near and not medium:
+        return ""
+
+    html = ""
+
+    # Cross-story predictions (most valuable)
+    if cross:
+        items = ""
+        for p in cross[:3]:
+            if isinstance(p, dict):
+                pred = _esc(p.get("prediction", ""))
+                conf = p.get("confidence", "possible")
+                disconfirm = _esc(p.get("disconfirm", ""))
+                stories = p.get("stories", [])
+                timeframe = p.get("timeframe", "this_week")
+
+                conf_class = "pred-" + conf
+                tf_class = "badge-" + timeframe.replace("_", "-")
+
+                # Map story numbers to titles
+                story_refs = ""
+                if stories:
+                    refs = []
+                    for s in stories[:3]:
+                        title = titles.get(str(s), "Story {}".format(s))
+                        refs.append('<a href="#topic-card-{}" class="pred-story-ref">{}</a>'.format(
+                            s - 1, _esc(title[:40])))
+                    story_refs = '<div class="pred-stories">Connects: {}</div>'.format(" + ".join(refs))
+
+                disconfirm_html = ""
+                if disconfirm:
+                    disconfirm_html = '<div class="pred-disconfirm">Would be wrong if: {}</div>'.format(disconfirm)
+
+                items += '<div class="pred-item {cc}"><span class="pred-badge {tc}">{tf}</span> <span class="pred-conf-badge">{conf}</span> <span class="pred-text">{pred}</span>{stories}{dis}</div>'.format(
+                    cc=conf_class, tc=tf_class, tf=timeframe.replace("_", " ").upper(),
+                    conf=conf.upper(), pred=pred, stories=story_refs, dis=disconfirm_html)
+        if items:
+            html += '<div class="pred-category"><div class="pred-category-label">Cross-Story Predictions</div>{}</div>'.format(items)
+
+    # Near-term predictions
+    if near:
+        items = ""
+        for p in near[:3]:
+            if isinstance(p, dict):
+                pred = _esc(p.get("prediction", ""))
+                conf = p.get("confidence", "likely")
+                disconfirm = _esc(p.get("disconfirm", ""))
+                conf_class = "pred-" + conf
+                dis_html = '<div class="pred-disconfirm">Would be wrong if: {}</div>'.format(disconfirm) if disconfirm else ""
+                items += '<div class="pred-item {cc}"><span class="pred-badge badge-48-hours">48 HOURS</span> <span class="pred-conf-badge">{conf}</span> <span class="pred-text">{pred}</span>{dis}</div>'.format(
+                    cc=conf_class, conf=conf.upper(), pred=pred, dis=dis_html)
+        if items:
+            html += '<div class="pred-category"><div class="pred-category-label">Next 48 Hours</div>{}</div>'.format(items)
+
+    # Medium-term predictions
+    if medium:
+        items = ""
+        for p in medium[:3]:
+            if isinstance(p, dict):
+                pred = _esc(p.get("prediction", ""))
+                conf = p.get("confidence", "possible")
+                disconfirm = _esc(p.get("disconfirm", ""))
+                timeframe = p.get("timeframe", "this_week")
+                conf_class = "pred-" + conf
+                tf_class = "badge-" + timeframe.replace("_", "-")
+                dis_html = '<div class="pred-disconfirm">Would be wrong if: {}</div>'.format(disconfirm) if disconfirm else ""
+                items += '<div class="pred-item {cc}"><span class="pred-badge {tc}">{tf}</span> <span class="pred-conf-badge">{conf}</span> <span class="pred-text">{pred}</span>{dis}</div>'.format(
+                    cc=conf_class, tc=tf_class, tf=timeframe.replace("_", " ").upper(),
+                    conf=conf.upper(), pred=pred, dis=dis_html)
+        if items:
+            html += '<div class="pred-category"><div class="pred-category-label">This Week / This Month</div>{}</div>'.format(items)
+
+    return html
+
+
 def _render_run_report(reports, run_time):
     lines = []
     total_llm = 0
@@ -676,6 +763,27 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .synthesis-toggle:hover {{ color: var(--text); }}
 .synthesis-box {{ background: var(--card-bg); border-left: 3px solid var(--accent); border-radius: 8px; padding: 1.5rem; margin-top: 0.5rem; }}
 .synthesis-box h2 {{ font-family: 'Newsreader', serif; color: var(--accent); font-size: 1.3rem; margin-bottom: 1rem; }}
+
+/* Predictions section */
+.predictions-expand {{ margin-bottom: 1.5rem; }}
+.predictions-toggle {{ font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--purple); cursor: pointer; padding: 0.5rem 0; font-weight: 600; }}
+.predictions-box {{ background: var(--card-bg); border-left: 3px solid var(--purple); border-radius: 8px; padding: 1.2rem; margin-top: 0.5rem; }}
+.pred-category {{ margin-bottom: 1rem; }}
+.pred-category-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--purple); font-weight: 700; margin-bottom: 0.5rem; }}
+.pred-item {{ padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.03); border-radius: 6px; margin-bottom: 0.5rem; font-size: 0.88rem; line-height: 1.6; }}
+.pred-badge {{ font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 0.1rem 0.35rem; border-radius: 3px; margin-right: 0.3rem; }}
+.badge-48-hours {{ background: var(--red); color: #fff; }}
+.badge-this-week {{ background: var(--accent); color: #000; }}
+.badge-this-month {{ background: var(--blue); color: #fff; }}
+.pred-conf-badge {{ font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; padding: 0.1rem 0.3rem; border-radius: 3px; margin-right: 0.4rem; border: 1px solid var(--border); color: var(--muted); }}
+.pred-likely .pred-conf-badge {{ border-color: var(--green); color: var(--green); }}
+.pred-possible .pred-conf-badge {{ border-color: var(--accent); color: var(--accent); }}
+.pred-speculative .pred-conf-badge {{ border-color: var(--muted); color: var(--muted); }}
+.pred-text {{ color: var(--text); }}
+.pred-stories {{ font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }}
+.pred-story-ref {{ color: var(--purple); text-decoration: none; }}
+.pred-story-ref:hover {{ text-decoration: underline; }}
+.pred-disconfirm {{ font-size: 0.75rem; color: var(--slate); margin-top: 0.2rem; font-style: italic; }}
 .synth-section {{ margin-bottom: 1rem; padding: 0.8rem; background: var(--section-bg); border-radius: 6px; }}
 .synth-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.4rem; font-weight: 600; }}
 .synth-disagree .synth-label {{ color: var(--red); }}
@@ -929,6 +1037,13 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 <div class="synthesis-box">
     <h2>Executive Synthesis</h2>
     {synthesis}
+</div>
+</details>
+
+<details class="predictions-expand" open>
+<summary class="predictions-toggle">What's Coming (Predictions)</summary>
+<div class="predictions-box">
+    {predictions}
 </div>
 </details>
 
