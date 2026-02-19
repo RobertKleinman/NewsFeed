@@ -88,12 +88,12 @@ def _lines_to_items(text):
 
 
 def _render_card(card, card_index=0):
-    # Importance dot (color-coded, matches quickscan)
-    importance = card.get("importance", 3)
+    # Importance dot — color based on depth tier (which is percentile-based)
     importance_reason = _esc(card.get("importance_reason", ""))
-    if importance >= 4:
+    tier = card.get("depth_tier", "standard")
+    if tier == "deep":
         importance_html = '<span class="importance-dot dot-red" title="{}"></span>'.format(importance_reason)
-    elif importance >= 3:
+    elif tier == "standard":
         importance_html = '<span class="importance-dot dot-yellow" title="{}"></span>'.format(importance_reason)
     else:
         importance_html = '<span class="importance-dot dot-green" title="{}"></span>'.format(importance_reason)
@@ -414,12 +414,12 @@ def _render_quickscan(data):
             icon=topic_info.get("icon", ""), name=topic_info.get("name", topic_id))
 
         for story in stories:
-            # Color dot based on importance level instead of consensus
-            importance = story.get("importance", 3)
+            # Color dot based on depth tier (percentile-based)
             card_mode = story.get("card_mode", "straight_news")
-            if importance >= 4:
+            tier = story.get("depth_tier", "standard")
+            if tier == "deep":
                 dot = '<span class="importance-dot dot-red" title="High importance"></span>'
-            elif importance >= 3:
+            elif tier == "standard":
                 dot = '<span class="importance-dot dot-yellow" title="Notable"></span>'
             else:
                 dot = '<span class="importance-dot dot-green" title="Background"></span>'
@@ -683,7 +683,7 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .synth-section p {{ font-size: 0.9rem; margin-bottom: 0.5rem; }}
 
 /* Filters */
-.filter-bar {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }}
+.filter-bar {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.8rem 0; border-bottom: 1px solid var(--border); }}
 .filter-btn {{ background: var(--card-bg); color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 0.3rem 0.8rem; font-size: 0.78rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }}
 .filter-btn.active {{ background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }}
 
@@ -795,8 +795,8 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .scan-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; font-weight: 600; }}
 
 /* New card section styles */
-.card-section {{ margin-bottom: 1rem; padding: 0.8rem 1rem; background: var(--section-bg); border-radius: 8px; border-left: 3px solid var(--border); }}
-.section-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 700; }}
+.card-section {{ margin-bottom: 1.2rem; padding: 0.9rem 1.1rem; background: var(--section-bg); border-radius: 8px; border-left: 3px solid var(--border); }}
+.section-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; font-weight: 700; }}
 .section-why {{ border-left-color: var(--accent); }}
 .section-why .section-label {{ color: var(--accent); }}
 .section-whats {{ border-left-color: var(--blue); }}
@@ -948,7 +948,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {{
         btn.classList.add('active');
         const f = btn.dataset.filter;
         document.querySelectorAll('.story-card').forEach(c => {{
-            c.style.display = (f === 'all' || c.dataset.topics.includes(f)) ? '' : 'none';
+            c.style.display = (f === 'all' || c.dataset.topics.split(' ').includes(f)) ? '' : 'none';
         }});
     }});
 }});

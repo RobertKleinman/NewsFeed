@@ -174,8 +174,8 @@ def _write_deep(card, cluster, sources, comparison, investigation, writer_id, re
     context = _build_context(cluster, comparison)
     contention = comparison.contention_level if comparison else "straight_news"
 
-    # HOW IT'S BEING USED (only when contested or politically significant)
-    if contention == "contested" or _is_politically_significant(cluster):
+    # HOW IT'S BEING USED (only when compare step detected real contention)
+    if contention == "contested":
         spin = _call(writer_id, context,
             """Analyze how different groups are framing this story to serve their agenda.
 Return JSON:

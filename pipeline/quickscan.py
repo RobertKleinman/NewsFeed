@@ -82,18 +82,43 @@ CRITICAL RULES:
         report.llm_failures += 1
         qs = _fallback(ranked)
 
-    # Map indices to original card positions
-    for i, s in enumerate(qs.get("top_stories", [])):
-        if i < len(ranked):
-            s["card_index"] = ranked[i]._original_index
-            s["topic"] = ranked[i].topics[0] if ranked[i].topics else "general"
-            s["importance"] = ranked[i].importance
-            s["card_mode"] = ranked[i].card_mode
+    # Map quickscan stories to actual cards by matching headlines
+    for s in qs.get("top_stories", []):
+        qs_headline = s.get("headline", "").lower().strip()
+        best_match = None
+        best_score = 0
+        for card in ranked[:15]:
+            # Compare by word overlap between quickscan headline and card title
+            card_words = set(card.title.lower().split())
+            qs_words = set(qs_headline.split())
+            if not card_words or not qs_words:
+                continue
+            overlap = len(card_words & qs_words) / max(len(card_words | qs_words), 1)
+            if overlap > best_score:
+                best_score = overlap
+                best_match = card
+        if best_match and best_score > 0.3:
+            s["card_index"] = best_match._original_index
+            s["topic"] = best_match.topics[0] if best_match.topics else "general"
+            s["importance"] = best_match.importance
+            s["card_mode"] = best_match.card_mode
+            s["depth_tier"] = best_match.depth_tier
         else:
-            s["card_index"] = i
-            s["topic"] = "general"
-            s["importance"] = 3
-            s["card_mode"] = "straight_news"
+            # Fallback: try positional match
+            rank = s.get("rank", 0)
+            idx = rank - 1 if isinstance(rank, int) and 0 < rank <= len(ranked) else 0
+            if idx < len(ranked):
+                s["card_index"] = ranked[idx]._original_index
+                s["topic"] = ranked[idx].topics[0] if ranked[idx].topics else "general"
+                s["importance"] = ranked[idx].importance
+                s["card_mode"] = ranked[idx].card_mode
+                s["depth_tier"] = ranked[idx].depth_tier
+            else:
+                s["card_index"] = 0
+                s["topic"] = "general"
+                s["importance"] = 3
+                s["card_mode"] = "straight_news"
+                s["depth_tier"] = "standard"
 
     return qs, report
 
@@ -125,5 +150,6 @@ def _fallback(ranked):
             "topic": c.topics[0] if c.topics else "general",
             "importance": c.importance,
             "card_mode": c.card_mode,
+            "depth_tier": c.depth_tier,
         })
     return {"top_stories": stories, "key_tensions": [], "watch_list": []}

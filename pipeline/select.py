@@ -183,28 +183,43 @@ def _soft_diversity(ranked, topics):
 
 
 def _assign_tiers(ranked):
-    """Assign depth tiers based on importance stars and source count."""
-    from config import DEPTH_THRESHOLDS
-    for r in ranked:
-        stars = r.stars
+    """Assign depth tiers using relative distribution, not fixed thresholds.
+    
+    Target distribution for a healthy briefing:
+      Top ~25% = deep (full investigation)
+      Middle ~50% = standard (compare + write)
+      Bottom ~25% = brief (summary only)
+    
+    Single-source stories cap at standard regardless.
+    """
+    if not ranked:
+        return ranked
+
+    n = len(ranked)
+    # Stories are already sorted by importance_score descending
+    deep_cutoff = max(1, int(n * 0.25))     # top 25%
+    standard_cutoff = max(deep_cutoff + 1, int(n * 0.75))  # next 50%
+    # rest = brief
+
+    for i, r in enumerate(ranked):
         source_count = r.cluster.size
 
-        # Single-source stories can't meaningfully compare perspectives
-        # Cap them at standard tier max (no investigation)
+        # Single-source: brief always
         if source_count <= 1:
             r.depth_tier = "brief"
+        # Two sources: standard max
         elif source_count <= 2:
-            # Two sources — standard at most
-            if stars >= DEPTH_THRESHOLDS["standard"]:
+            if i < standard_cutoff:
                 r.depth_tier = "standard"
             else:
                 r.depth_tier = "brief"
+        # 3+ sources: full tier range
         else:
-            # 3+ sources — full tier based on importance
-            if stars >= DEPTH_THRESHOLDS["deep"]:
+            if i < deep_cutoff:
                 r.depth_tier = "deep"
-            elif stars >= DEPTH_THRESHOLDS["standard"]:
+            elif i < standard_cutoff:
                 r.depth_tier = "standard"
             else:
                 r.depth_tier = "brief"
+
     return ranked
