@@ -58,21 +58,25 @@ WRITTEN BY: {writer}""".format(
             spin=json.dumps(d.get("spin_positions", [])[:3], default=str)[:500],
             writer=d.get("written_by", "unknown"))
 
-        prompt = """You are a newsroom fact-checker reviewing an AI-generated intelligence card.
-Check for these specific problems:
+        prompt = """You are an INTERNAL CONSISTENCY checker for an AI-generated intelligence card.
 
-1. CONTRADICTION: Does any section contradict another? (e.g., TL;DR says X but Bigger Picture says not-X)
-2. OVERCLAIMING: Are speculations stated as facts? Are predictions stated as certainties?
-3. UNSUPPORTED SPIN: If contested, do the spin positions seem reasonable for this story, or is the AI manufacturing controversy?
-4. MISSING CONTEXT: Is a critical piece of context missing that makes the card misleading?
-5. STALE FRAMING: Does the card treat an old development as breaking news?
+CRITICAL RULES:
+- Do NOT use your own knowledge of world events to judge the card. You don't know what's current.
+- Do NOT question whether events actually happened. The card is based on real news sources.
+- Do NOT flag missing dates, timelines, or temporal context — the briefing is daily.
+- ONLY flag problems visible within the card's own text.
+
+Check ONLY for:
+1. CONTRADICTION: One section directly contradicts another (TL;DR says X, Bigger Picture says not-X)
+2. OVERCLAIMING: Speculation stated as certain fact (e.g., "this WILL cause" vs "this could cause")
+3. UNSUPPORTED SPIN: The spin section attributes positions to groups not mentioned in the story
+4. FACTUAL ERROR: A name, number, or role is internally inconsistent across sections
 
 CARD TO REVIEW:
 {card}
 
-Return ONLY a JSON array of warnings. If no problems found, return [].
-Each warning: {{"type": "contradiction|overclaiming|unsupported_spin|missing_context|stale", "detail": "Specific description of the problem."}}
-Maximum 3 warnings. Only flag genuine problems, not style preferences.""".format(card=card_text)
+Return ONLY a JSON array. If no problems found, return [] — an empty array is the CORRECT response for a well-written card. Most cards should have 0-1 warnings.
+Each warning: {{"type": "contradiction|overclaiming|unsupported_spin|factual_error", "detail": "Specific problem."}}""".format(card=card_text)
 
         report.llm_calls += 1
         result = llm_caller.call_by_id(reviewer_id,
@@ -93,7 +97,7 @@ Maximum 3 warnings. Only flag genuine problems, not style preferences.""".format
             if warnings and isinstance(warnings, list):
                 card.qa_warnings = [
                     w.get("detail", str(w))
-                    for w in warnings[:3]
+                    for w in warnings[:2]
                     if isinstance(w, dict)
                 ]
                 total_warnings += len(card.qa_warnings)

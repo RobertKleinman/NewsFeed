@@ -21,6 +21,7 @@ from pathlib import Path
 
 from config import get_active_sources, get_active_topics, load_query_pack, LLM_CONFIGS
 import llm as llm_caller
+import card_store
 from pipeline import (fetch, syndication, triage, cluster, arc_merge, select,
                       perspectives, extract, compare, investigate, write,
                       enrich, synthesize, quickscan, validate, publish,
@@ -149,7 +150,20 @@ def process_deep(ranked_story, story_num, total):
 def main():
     parser = argparse.ArgumentParser(description="Global Intelligence Briefing v3")
     parser.add_argument("--config", help="Path to query pack JSON", default=None)
+    parser.add_argument("--refresh", action="store_true",
+                        help="Lightweight refresh: only process new stories, merge into existing briefing")
     args = parser.parse_args()
+
+    # Refresh mode — delegate to refresh module
+    if args.refresh:
+        from refresh import run_refresh
+        pack = load_query_pack(args.config)
+        result = run_refresh(pack)
+        if result is None:
+            print("Refresh failed or no previous data — falling back to full run")
+            # Fall through to full run below
+        else:
+            sys.exit(0)
 
     start_time = time.time()
     print("=" * 70)
@@ -276,7 +290,10 @@ def main():
     (output_dir / "index.html").write_text(html, encoding="utf-8")
     print("\nBriefing: output/index.html")
 
-    # Cache data
+    # Save to card store for cross-run state
+    card_store.save_run(topic_cards, run_time, mode="full")
+
+    # Also save flat cache for backward compat
     cache = {
         "date": datetime.now(timezone.utc).isoformat(),
         "runtime_seconds": run_time,

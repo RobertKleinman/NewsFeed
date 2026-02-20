@@ -2,12 +2,28 @@ name: Global Briefing
 
 on:
   schedule:
-    - cron: '0 11 * * *'   # 6 AM Eastern
-    - cron: '0 22 * * *'   # 5 PM Eastern
-  workflow_dispatch:         # Manual trigger
+    - cron: '0 11 * * *'    # 6:00 AM Eastern (full run)
+    - cron: '0 13 * * *'    # 8:00 AM Eastern (refresh)
+    - cron: '0 15 * * *'    # 10:00 AM Eastern (refresh)
+    - cron: '0 17 * * *'    # 12:00 PM Eastern (refresh)
+    - cron: '0 19 * * *'    # 2:00 PM Eastern (refresh)
+    - cron: '0 21 * * *'    # 4:00 PM Eastern (refresh)
+    - cron: '0 23 * * *'    # 6:00 PM Eastern (refresh)
+    - cron: '0 1 * * *'     # 8:00 PM Eastern (refresh)
+    - cron: '0 3 * * *'     # 10:00 PM Eastern (refresh)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - refresh
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -29,15 +45,50 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Determine run mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "mode=${{ github.event.inputs.mode }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 11 * * *" ]; then
+            echo "mode=full" >> $GITHUB_OUTPUT
+          else
+            echo "mode=refresh" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run briefing pipeline
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-        run: python runner.py
+        run: |
+          MODE="${{ steps.mode.outputs.mode }}"
+          echo "Running in $MODE mode"
+          if [ "$MODE" = "refresh" ]; then
+            # Refresh with fallback to full run
+            python runner.py --refresh || python runner.py
+          else
+            python runner.py
+          fi
 
-      - name: Upload artifact
+      - name: Verify output exists
+        run: |
+          if [ ! -f output/index.html ]; then
+            echo "ERROR: No output generated"
+            exit 1
+          fi
+          echo "Output size: $(wc -c < output/index.html) bytes"
+
+      - name: Commit card history to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output/card_history.json output/briefing_data.json || true
+          git diff --cached --quiet || git commit -m "Update card history [${{ steps.mode.outputs.mode }}]"
+          git push || true
+
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: output

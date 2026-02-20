@@ -96,11 +96,11 @@ def _render_card(card, card_index=0):
     importance_reason = _esc(card.get("importance_reason", ""))
     tier = card.get("depth_tier", "standard")
     if tier == "deep":
-        importance_html = '<span class="importance-dot dot-red" title="{}"></span>'.format(importance_reason)
+        importance_html = '<span class="importance-dot dot-red" title="{}" aria-label="High importance" role="img"></span>'.format(importance_reason)
     elif tier == "standard":
-        importance_html = '<span class="importance-dot dot-yellow" title="{}"></span>'.format(importance_reason)
+        importance_html = '<span class="importance-dot dot-yellow" title="{}" aria-label="Standard importance" role="img"></span>'.format(importance_reason)
     else:
-        importance_html = '<span class="importance-dot dot-green" title="{}"></span>'.format(importance_reason)
+        importance_html = '<span class="importance-dot dot-green" title="{}" aria-label="Brief" role="img"></span>'.format(importance_reason)
 
     # Card mode badge — only show for contested stories
     card_mode = card.get("card_mode", "straight_news")
@@ -896,6 +896,7 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 
 /* Filters */
 .filter-bar {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; padding: 0.8rem 0; }}
+@media (max-width: 600px) {{ .filter-bar {{ flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 0.5rem; }} .filter-btn {{ white-space: nowrap; flex-shrink: 0; }} }}
 .filter-btn {{ background: var(--card-bg); color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 0.3rem 0.8rem; font-size: 0.78rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }}
 .filter-btn.active {{ background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }}
 
@@ -1175,6 +1176,7 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 <div class="masthead">
     <h1>Global Intelligence Briefing</h1>
     <div class="meta">{date} | {num_stories} stories | Models: {llms}</div>
+    <div class="meta" style="font-size: 0.75rem; margin-top: 0.2rem;">Updated every 2 hours · Runtime: {runtime}s</div>
 </div>
 
 {action_layer}
