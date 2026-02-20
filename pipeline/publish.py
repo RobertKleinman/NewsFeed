@@ -314,17 +314,44 @@ def _render_card(card, card_index=0):
     elif tier == "brief":
         tier_html = '<span class="tier-badge tier-brief">BRIEF</span>'
 
+    # Editorial analysis
+    editorial_html = ""
+    editorial_text = card.get("editorial", "")
+    if editorial_text:
+        writer_model = _esc(card.get("editorial_writer", ""))
+        editor_model = _esc(card.get("editorial_editor", ""))
+        rounds = card.get("editorial_rounds", 0)
+        meta = "Written by {} · Edited by {} · {} revision rounds".format(
+            writer_model, editor_model, rounds) if writer_model else ""
+
+        # Convert paragraphs
+        paras = editorial_text.strip().split("\n\n")
+        body = "".join("<p>{}</p>".format(_esc(p.strip()).replace("\n", "<br>")) for p in paras if p.strip())
+
+        editorial_html = """
+        <div class="card-section section-editorial">
+            <div class="section-label">Editorial Analysis</div>
+            <div class="editorial-meta">{meta}</div>
+            <div class="editorial-body">{body}</div>
+            <div class="editorial-disclaimer">This is analytical opinion, not reported fact. It represents one interpretation of the available evidence.</div>
+        </div>""".format(meta=meta, body=body)
+
     # Build the expandable detail sections (everything after why + whats)
     card_details = ""
-    if spin_html or know_html or bigger_html or action_html:
+    if spin_html or know_html or bigger_html or action_html or editorial_html:
         card_details = """
-        <details class="card-expand">
-            <summary class="card-expand-summary">Full Analysis</summary>
+        <details class="card-expand"{open_attr}>
+            <summary class="card-expand-summary">{expand_label}</summary>
             {spin}
             {know}
             {bigger}
             {actions}
-        </details>""".format(spin=spin_html, know=know_html, bigger=bigger_html, actions=action_html)
+            {editorial}
+        </details>""".format(
+            spin=spin_html, know=know_html, bigger=bigger_html,
+            actions=action_html, editorial=editorial_html,
+            open_attr=' open' if editorial_html else '',
+            expand_label='Full Analysis + Editorial' if editorial_html else 'Full Analysis')
 
     # Source profile line (M5)
     src_count = card.get("source_count", 0)
@@ -1081,6 +1108,12 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 
 /* Contested reason */
 .contested-reason {{ font-size: 0.78rem; color: var(--red); font-style: italic; margin: 0.2rem 0 0.4rem 0; }}
+
+/* Editorial Analysis */
+.section-editorial {{ border-left: 3px solid var(--purple); }}
+.editorial-meta {{ font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 0.8rem; }}
+.editorial-body p {{ font-size: 0.92rem; line-height: 1.7; margin-bottom: 0.8rem; color: var(--text); }}
+.editorial-disclaimer {{ font-size: 0.7rem; color: var(--muted); font-style: italic; margin-top: 0.8rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }}
 
 /* QA Warnings */
 .qa-warnings {{ margin-top: 0.5rem; padding: 0.5rem 0.8rem; background: rgba(239,68,68,0.05); border-radius: 6px; border-left: 3px solid var(--red); }}

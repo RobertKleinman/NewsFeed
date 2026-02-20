@@ -25,7 +25,8 @@ import card_store
 from pipeline import (fetch, syndication, triage, cluster, arc_merge, select,
                       perspectives, extract, compare, investigate, write,
                       enrich, synthesize, quickscan, validate, publish,
-                      card_dedup, predictions, qa_review, action_layer)
+                      card_dedup, predictions, qa_review, action_layer,
+                      editorial)
 
 
 def process_brief(ranked_story, story_num, total):
@@ -260,6 +261,10 @@ def main():
     # QA Review — semantic quality check
     qa_report = qa_review.run(topic_cards)
     all_reports.append(qa_report)
+
+    # Editorial — deep analytical essays on top 1-2 stories
+    editorial_report = editorial.run(topic_cards)
+    all_reports.append(editorial_report)
 
     # Enrich
     enrich_report = enrich.run(topic_cards)

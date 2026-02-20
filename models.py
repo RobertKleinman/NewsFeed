@@ -150,6 +150,12 @@ class TopicCard:
     # WHAT YOU CAN DO (only when applicable)
     actions: List[str] = field(default_factory=list)
 
+    # EDITORIAL ANALYSIS (deep analysis of motivations, reality behind events)
+    editorial: str = ""  # the editorial text
+    editorial_writer: str = ""  # which LLM wrote it
+    editorial_editor: str = ""  # which LLM edited it
+    editorial_rounds: int = 0  # how many revision rounds
+
     # === Legacy fields (kept for backward compat during transition) ===
     what_happened: str = ""
     so_what: str = ""
