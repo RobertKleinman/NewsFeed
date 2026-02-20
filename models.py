@@ -20,6 +20,9 @@ class Article:
     # Set by triage
     topics: List[str] = field(default_factory=list)
     relevance_score: float = 0.0
+    # Set by syndication detection
+    wire_origin: Optional[str] = None  # e.g., "AP", "Reuters" or None
+    is_independent: bool = True  # False if republished wire content
 
     def source_label(self):
         return "{} ({}, {})".format(self.source_name, self.source_region, self.source_bias)
@@ -161,16 +164,20 @@ class TopicCard:
 
     # Metadata
     card_mode: str = "straight_news"  # straight_news or contested
+    contested_reason: str = ""  # 1-sentence explanation of why contested
     depth_tier: str = "standard"  # brief, standard, deep
     importance: int = 3  # 1-5 stars
     importance_reason: str = ""
     topics: List[str] = field(default_factory=list)
     source_count: int = 0
+    independent_count: int = 0  # sources with original reporting (not wire republishers)
+    region_count: int = 0  # number of distinct geographic regions
     sources: List[Dict] = field(default_factory=list)
     missing_perspectives: List[str] = field(default_factory=list)
     comparisons: Dict[str, str] = field(default_factory=dict)
     investigation_raw: str = ""
     written_by: str = ""
+    qa_warnings: List[str] = field(default_factory=list)  # from QA reviewer
     # Enrichment (computed, no LLM)
     political_balance: str = ""
     geo_diversity: int = 0

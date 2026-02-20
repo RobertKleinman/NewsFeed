@@ -21,10 +21,10 @@ from pathlib import Path
 
 from config import get_active_sources, get_active_topics, load_query_pack, LLM_CONFIGS
 import llm as llm_caller
-from pipeline import (fetch, triage, cluster, arc_merge, select, perspectives,
-                      extract, compare, investigate, write, enrich,
-                      synthesize, quickscan, validate, publish, card_dedup,
-                      predictions)
+from pipeline import (fetch, syndication, triage, cluster, arc_merge, select,
+                      perspectives, extract, compare, investigate, write,
+                      enrich, synthesize, quickscan, validate, publish,
+                      card_dedup, predictions, qa_review, action_layer)
 
 
 def process_brief(ranked_story, story_num, total):
@@ -178,6 +178,10 @@ def main():
         print("No articles fetched")
         sys.exit(1)
 
+    # Step 1b: Syndication Detection
+    articles, synd_report = syndication.run(articles)
+    all_reports.append(synd_report)
+
     # Step 2: Triage (LLM-based)
     relevant, triage_report = triage.run(articles, topics)
     all_reports.append(triage_report)
@@ -239,6 +243,10 @@ def main():
     preds_data, preds_report = predictions.run(topic_cards)
     all_reports.append(preds_report)
 
+    # QA Review — semantic quality check
+    qa_report = qa_review.run(topic_cards)
+    all_reports.append(qa_report)
+
     # Enrich
     enrich_report = enrich.run(topic_cards)
     all_reports.append(enrich_report)
@@ -251,13 +259,17 @@ def main():
     qscan, qscan_report = quickscan.run(topic_cards)
     all_reports.append(qscan_report)
 
+    # Action Layer
+    action_data, action_report = action_layer.run(topic_cards)
+    all_reports.append(action_report)
+
     # Validate
     quality, validate_report = validate.run(topic_cards)
     all_reports.append(validate_report)
 
     # Publish
     run_time = int(time.time() - start_time)
-    html = publish.run(topic_cards, synth, qscan, all_reports, run_time, quality, preds_data)
+    html = publish.run(topic_cards, synth, qscan, all_reports, run_time, quality, preds_data, action_data)
 
     output_dir = Path("output")
     output_dir.mkdir(exist_ok=True)

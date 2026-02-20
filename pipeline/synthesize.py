@@ -22,11 +22,29 @@ def run(topic_cards):
             card.what_happened[:200]))
 
     prompt = """Write the executive synthesis for today's intelligence briefing.
-Plain text, no markdown, no bold, no bullets.
+Return ONLY valid JSON with this exact structure:
 
-THEMES: 2-3 biggest themes connecting today's stories. 2-3 sentences each.
-NOTABLE DISAGREEMENTS: Where did sources most sharply diverge? 1-2 paragraphs.
-LOOKING AHEAD: 3-4 specific things to watch in coming days.
+{{
+  "action_calls": [
+    "One-sentence call to action or key decision point for today.",
+    "Another action call.",
+    "Third action call."
+  ],
+  "risks": [
+    "One-sentence risk or threat to watch.",
+    "Another risk.",
+    "Third risk."
+  ],
+  "watch_items": [
+    "One-sentence item to monitor in coming days.",
+    "Another watch item.",
+    "Third watch item."
+  ],
+  "themes": "2-3 sentences connecting today's biggest themes across stories.",
+  "disagreements": "1-2 sentences on where sources most sharply diverged today."
+}}
+
+3 items per bucket, each one sentence max. Be specific and concrete.
 
 STORIES:
 """ + "\n\n".join(summaries)

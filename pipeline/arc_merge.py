@@ -53,6 +53,8 @@ def run(clusters):
     for llm_id in available[:3]:
         proposals = _get_merge_proposals(llm_id, cluster_block, len(clusters), report)
         if proposals:
+            for p in proposals:
+                p["voter"] = llm_id
             all_proposals.extend(proposals)
             voters_used += 1
 
@@ -63,9 +65,9 @@ def run(clusters):
 
     print("    {} merge proposals from {} voters".format(len(all_proposals), voters_used))
 
-    # Deduplicate and validate proposals — a merge happens if ANY voter suggests it
-    # (aggressive merging — we'd rather merge too much than too little)
-    merge_groups = _consolidate_proposals(all_proposals, len(clusters))
+    # Deduplicate and validate proposals — require 2+ voters for a merge
+    # (prevents single hallucinating model from collapsing distinct events)
+    merge_groups = _consolidate_proposals(all_proposals, len(clusters), min_votes=2)
 
     if not merge_groups:
         report.items_out = len(clusters)
@@ -185,9 +187,41 @@ If no merges needed: {{"merges": []}}""".format(n=num_clusters, clusters=cluster
         return []
 
 
-def _consolidate_proposals(proposals, num_clusters):
-    """Merge overlapping proposals into final groups using union-find."""
-    # Union-Find to handle overlapping proposals
+def _consolidate_proposals(proposals, num_clusters, min_votes=2):
+    """Merge overlapping proposals using vote counting + union-find.
+    
+    Only merges pairs that were proposed by min_votes or more voters.
+    Caps merge groups at 8 clusters to prevent vague mega-stories.
+    """
+    # Count votes for each proposed pair
+    pair_votes = {}  # (min_idx, max_idx) -> vote count
+    pair_titles = {}  # (min_idx, max_idx) -> best title
+
+    for prop in proposals:
+        indices = prop["indices"]
+        title = prop.get("title", "")
+        # Register a vote for every pair in this proposal
+        for i in range(len(indices)):
+            for j in range(i + 1, len(indices)):
+                pair = (min(indices[i], indices[j]), max(indices[i], indices[j]))
+                pair_votes[pair] = pair_votes.get(pair, 0) + 1
+                if title and pair not in pair_titles:
+                    pair_titles[pair] = title
+
+    # Filter to pairs with enough votes
+    valid_pairs = {pair for pair, count in pair_votes.items() if count >= min_votes}
+
+    if not valid_pairs:
+        # Fallback: if only 1 voter responded, accept single-voter proposals
+        # (can't get 2 votes if only 1 model returned results)
+        total_voters = len(set(str(p.get("voter", "")) for p in proposals if "voter" in p))
+        if total_voters <= 1:
+            valid_pairs = set(pair_votes.keys())
+
+    if not valid_pairs:
+        return []
+
+    # Union-Find on valid pairs only
     parent = list(range(num_clusters))
 
     def find(x):
@@ -201,21 +235,14 @@ def _consolidate_proposals(proposals, num_clusters):
         if ra != rb:
             parent[ra] = rb
 
-    # Title tracking — prefer the title from the largest proposal
     best_titles = {}
 
-    for prop in proposals:
-        indices = prop["indices"]
-        title = prop.get("title", "")
-
-        # Union all indices in this proposal
-        for i in range(1, len(indices)):
-            union(indices[0], indices[i])
-
-        # Track best title
-        root = find(indices[0])
-        if root not in best_titles or len(indices) > len(best_titles[root].get("indices", [])):
-            best_titles[root] = {"title": title, "indices": indices}
+    for (a, b) in valid_pairs:
+        union(a, b)
+        title = pair_titles.get((a, b), "")
+        root = find(a)
+        if title and root not in best_titles:
+            best_titles[root] = title
 
     # Collect groups
     groups_by_root = {}
@@ -225,14 +252,17 @@ def _consolidate_proposals(proposals, num_clusters):
             groups_by_root[root] = set()
         groups_by_root[root].add(i)
 
-    # Only return groups with 2+ members (actual merges)
+    # Only return groups with 2+ members, capped at 8 members
     result = []
     for root, members in groups_by_root.items():
         if len(members) >= 2:
-            title = best_titles.get(root, {}).get("title", "")
+            capped = sorted(members)[:8]  # Cap at 8 to prevent mega-stories
+            title = best_titles.get(root, "")
             result.append({
-                "indices": sorted(members),
+                "indices": capped,
                 "title": title,
             })
+            if len(members) > 8:
+                print("    WARNING: Capped merge group from {} to 8 clusters".format(len(members)))
 
     return result

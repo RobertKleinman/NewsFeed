@@ -60,6 +60,14 @@ def run(topic_cards):
             base = s.get("region", "").split("-")[0]
             regions.add(REGION_GROUPS.get(base, "Other"))
         card.geo_diversity = len(regions)
+        card.region_count = len(regions)
+
+        # Independent source count (from syndication detection)
+        independent = 0
+        for s in sources:
+            if s.get("is_independent", True):
+                independent += 1
+        card.independent_count = independent if independent > 0 else card.source_count
 
         # Coverage depth
         has_disputes = bool(card.disputes)

@@ -15,7 +15,7 @@ import llm as llm_caller
 from config import TOPICS, LLM_CONFIGS
 
 
-def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_review=None, predictions_data=None):
+def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_review=None, predictions_data=None, action_data=None):
     """Generate HTML. Returns html string."""
     # Convert TopicCard objects to dicts if needed
     card_dicts = []
@@ -52,6 +52,7 @@ def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_revie
     quickscan_html = _render_quickscan(quickscan_data)
     synthesis_html = _render_synthesis(synthesis)
     predictions_html = _render_predictions(predictions_data or {})
+    action_html_top = _render_action_layer(action_data or [])
     filter_buttons = _render_filters()
     run_report_html = _render_run_report(reports, run_time)
     review_panel_html = _render_review_panel(quality_review)
@@ -62,6 +63,7 @@ def run(topic_cards, synthesis, quickscan_data, reports, run_time, quality_revie
         date=now,
         num_stories=len(topic_cards),
         llms=llms_used,
+        action_layer=action_html_top,
         quickscan=quickscan_html,
         synthesis=synthesis_html,
         predictions=predictions_html,
@@ -324,15 +326,40 @@ def _render_card(card, card_index=0):
             {actions}
         </details>""".format(spin=spin_html, know=know_html, bigger=bigger_html, actions=action_html)
 
+    # Source profile line (M5)
+    src_count = card.get("source_count", 0)
+    indep_count = card.get("independent_count", src_count)
+    region_count = card.get("region_count", 0)
+    if indep_count < src_count:
+        source_profile = '<span>{} independent sources ({} total)</span>'.format(indep_count, src_count)
+    else:
+        source_profile = '<span>{} sources</span>'.format(src_count)
+    if region_count > 1:
+        source_profile += '<span>{} regions</span>'.format(region_count)
+    source_profile += '<span>{} perspectives</span>'.format(card.get("perspectives_used", 0))
+
+    # Contested reason (P0-6)
+    contested_reason_html = ""
+    contested_reason = card.get("contested_reason", "")
+    if contested_reason and card.get("card_mode") == "contested":
+        contested_reason_html = '<div class="contested-reason">{}</div>'.format(_esc(contested_reason))
+
+    # QA warnings (P1-2)
+    qa_html = ""
+    qa_warnings = card.get("qa_warnings", [])
+    if qa_warnings:
+        warning_items = "".join('<div class="qa-warning">⚠️ {}</div>'.format(_esc(w)) for w in qa_warnings[:3])
+        qa_html = '<div class="qa-warnings">{}</div>'.format(warning_items)
+
     return """
     <article class="story-card" id="topic-card-{card_idx}" data-topics="{topic_ids}">
         <div class="card-header">
             <div class="topic-tags">{importance} {mode} {tier} {tags}</div>
             <h2 class="story-title">{title}</h2>
             {tldr}
+            {contested_reason}
             <div class="story-meta">
-                <span>{src_count} sources</span>
-                <span>{persp_count} perspectives</span>
+                {source_profile}
             </div>
             {spectrum}
         </div>
@@ -341,6 +368,8 @@ def _render_card(card, card_index=0):
         {whats}
 
         {card_details}
+
+        {qa}
 
         <details class="detail-expand">
             <summary>Full Sources & Research</summary>
@@ -356,13 +385,13 @@ def _render_card(card, card_index=0):
         tags=topic_tags,
         title=card.get("title", ""),
         tldr=tldr_html,
-        src_count=card.get("source_count", 0),
-        persp_count=card.get("perspectives_used", 0),
+        contested_reason=contested_reason_html,
+        source_profile=source_profile,
         spectrum=spectrum_html,
-        pills=source_pills,
         why=why_html,
         whats=whats_html,
         card_details=card_details,
+        qa=qa_html,
         collapsed=collapsed_content,
         writer=writer_html)
 
@@ -510,12 +539,56 @@ def _render_synthesis(synthesis):
     if not synthesis:
         return ""
 
-    # Try to parse sections
+    # Try JSON format first (new bucketed structure)
+    import json as _json
+    import re as _re
+    try:
+        if isinstance(synthesis, str):
+            cleaned = _re.sub(r'```json\s*', '', synthesis)
+            cleaned = _re.sub(r'```\s*', '', cleaned).strip()
+            m = _re.search(r'\{.*\}', cleaned, _re.DOTALL)
+            data = _json.loads(m.group() if m else cleaned)
+        else:
+            data = synthesis
+
+        html = ""
+
+        # Action Calls bucket
+        calls = data.get("action_calls", [])
+        if calls:
+            items = "".join('<li class="synth-item synth-call">{}</li>'.format(_esc(c)) for c in calls[:3])
+            html += '<div class="synth-bucket"><div class="synth-bucket-label">🎯 Action Calls</div><ul class="synth-list">{}</ul></div>'.format(items)
+
+        # Risks bucket
+        risks = data.get("risks", [])
+        if risks:
+            items = "".join('<li class="synth-item synth-risk">{}</li>'.format(_esc(r)) for r in risks[:3])
+            html += '<div class="synth-bucket"><div class="synth-bucket-label">⚠️ Risks</div><ul class="synth-list">{}</ul></div>'.format(items)
+
+        # Watch Items bucket
+        watch = data.get("watch_items", [])
+        if watch:
+            items = "".join('<li class="synth-item synth-watch">{}</li>'.format(_esc(w)) for w in watch[:3])
+            html += '<div class="synth-bucket"><div class="synth-bucket-label">👁️ Watch</div><ul class="synth-list">{}</ul></div>'.format(items)
+
+        # Themes + Disagreements as prose below buckets
+        themes = data.get("themes", "")
+        disagree = data.get("disagreements", "")
+        if themes:
+            html += '<div class="synth-section"><div class="synth-label">Themes</div><p>{}</p></div>'.format(_esc(themes))
+        if disagree:
+            html += '<div class="synth-section synth-disagree"><div class="synth-label">Disagreements</div><p>{}</p></div>'.format(_esc(disagree))
+
+        if html:
+            return html
+    except (ValueError, AttributeError, KeyError):
+        pass
+
+    # Fallback: old text-based format
     sections = {}
     for label in ["THEMES:", "NOTABLE DISAGREEMENTS:", "LOOKING AHEAD:"]:
         if label in synthesis:
             start = synthesis.index(label) + len(label)
-            # Find end
             end = len(synthesis)
             for next_label in ["THEMES:", "NOTABLE DISAGREEMENTS:", "LOOKING AHEAD:"]:
                 if next_label != label and next_label in synthesis[start:]:
@@ -538,7 +611,6 @@ def _render_synthesis(synthesis):
                 html += '<div class="synth-section synth-ahead"><div class="synth-label">Looking Ahead</div><ul class="scan-list">{}</ul></div>'.format(items)
         return html
 
-    # Fallback: plain paragraphs
     escaped = _esc(synthesis)
     return "<p>{}</p>".format(escaped.replace("\n\n", "</p><p>").replace("\n", "<br>"))
 
@@ -549,6 +621,21 @@ def _render_filters():
         html += '<button class="filter-btn" data-filter="{}">{} {}</button>'.format(
             tid, info["icon"], info["name"])
     return html
+
+
+def _render_action_layer(actions):
+    """Render 'If you only do 1 thing today' section."""
+    if not actions:
+        return ""
+    items = ""
+    for a in actions[:3]:
+        if isinstance(a, dict):
+            action_text = _esc(a.get("action", ""))
+            card_idx = a.get("card_index", 0)
+            items += '<a href="#topic-card-{}" class="action-item">{}</a>'.format(card_idx, action_text)
+    if not items:
+        return ""
+    return '<div class="action-layer"><div class="action-layer-label">If you only do 1 thing today</div>{}</div>'.format(items)
 
 
 def _render_predictions(data):
@@ -984,6 +1071,29 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 /* TL;DR */
 .card-tldr {{ font-size: 0.92rem; color: var(--accent); margin: 0.3rem 0 0.5rem 0; line-height: 1.5; }}
 
+/* Action Layer */
+.action-layer {{ background: linear-gradient(135deg, rgba(234,179,8,0.08), rgba(234,179,8,0.03)); border: 1px solid rgba(234,179,8,0.2); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; }}
+.action-layer-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); font-weight: 700; margin-bottom: 0.5rem; }}
+.action-item {{ display: block; color: var(--text); text-decoration: none; font-size: 0.88rem; padding: 0.3rem 0; line-height: 1.5; }}
+.action-item:hover {{ color: var(--accent); }}
+.action-item::before {{ content: '→ '; color: var(--accent); }}
+
+/* Contested reason */
+.contested-reason {{ font-size: 0.78rem; color: var(--red); font-style: italic; margin: 0.2rem 0 0.4rem 0; }}
+
+/* QA Warnings */
+.qa-warnings {{ margin-top: 0.5rem; padding: 0.5rem 0.8rem; background: rgba(239,68,68,0.05); border-radius: 6px; border-left: 3px solid var(--red); }}
+.qa-warning {{ font-size: 0.78rem; color: var(--red); line-height: 1.5; margin-bottom: 0.2rem; }}
+
+/* Synthesis buckets */
+.synth-bucket {{ margin-bottom: 0.8rem; }}
+.synth-bucket-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 700; margin-bottom: 0.3rem; }}
+.synth-list {{ list-style: none; padding: 0; margin: 0; }}
+.synth-item {{ font-size: 0.88rem; padding: 0.25rem 0; line-height: 1.5; }}
+.synth-call {{ color: var(--accent); }}
+.synth-risk {{ color: var(--red); }}
+.synth-watch {{ color: var(--blue); }}
+
 /* Card collapse — Full Analysis toggle */
 .card-expand {{ margin-top: 0.3rem; }}
 .card-expand-summary {{ font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--purple); cursor: pointer; padding: 0.5rem 0; font-weight: 600; letter-spacing: 0.03em; }}
@@ -1066,6 +1176,8 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
     <h1>Global Intelligence Briefing</h1>
     <div class="meta">{date} | {num_stories} stories | Models: {llms}</div>
 </div>
+
+{action_layer}
 
 {quickscan}
 

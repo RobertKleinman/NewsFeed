@@ -146,6 +146,7 @@ Examples that are NOT spin (do not return positions for these):
 Return JSON:
 {{
   "is_contested": true or false,
+  "contested_reason": "One sentence explaining WHY this is contested. E.g., 'Framing of military action differs between US administration supporters and critics.'",
   "positions": [
     {{
       "position": "One-line description of this side's stance",
@@ -162,7 +163,7 @@ Return JSON:
   ]
 }}
 
-If this story is NOT being used to push competing agendas: {{"is_contested": false, "positions": [], "watch_for": []}}
+If this story is NOT being used to push competing agendas: {{"is_contested": false, "contested_reason": "", "positions": [], "watch_for": []}}
 2-3 positions max. 2-3 watch_for max.""",
         "json_object", report, max_tokens=2500)
 
@@ -172,6 +173,7 @@ If this story is NOT being used to push competing agendas: {{"is_contested": fal
         if is_contested and positions and isinstance(positions, list) and len(positions) >= 2:
             card.spin_positions = positions
             card.card_mode = "contested"
+            card.contested_reason = spin.get("contested_reason", "")
             watch = spin.get("watch_for", [])
             if watch and isinstance(watch, list):
                 card.spin_predictions = watch
