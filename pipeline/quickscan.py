@@ -46,19 +46,17 @@ JSON structure:
     {{
       "rank": 1,
       "headline": "FULL headline — never truncate, use the complete title",
-      "one_liner": "One COMPLETE sentence: what happened.",
-      "why_care": "One COMPLETE sentence: why this matters to the reader."
+      "one_liner": "MAX 15 WORDS. What happened in one punchy line.",
+      "why_care": "MAX 15 WORDS. Why the reader should care."
     }}
   ]
 }}
 
 CRITICAL RULES:
-- EVERY field must be a COMPLETE sentence ending with a period. NEVER truncate.
-- headline: use the FULL story title. Do not shorten.
-- one_liner: complete sentence explaining what happened.
-- why_care: complete sentence explaining why the reader should care about this.
-- 3-4 key_tensions, 3-4 watch_list, ALL stories in top_stories.
-- If a sentence would be too long, make it shorter but COMPLETE.""".format(
+- headline: use the FULL story title.
+- one_liner: ONE SHORT sentence, MAX 15 words. Be punchy. Example: "Trump gave Iran 10 days to agree to a nuclear deal or face strikes."
+- why_care: ONE SHORT sentence, MAX 15 words. Example: "Could trigger military conflict disrupting global oil markets."
+- 3-4 key_tensions, 3-4 watch_list, ALL stories in top_stories.""".format(
         b="\n\n".join(briefs))
 
     available = llm_caller.get_available_llms()

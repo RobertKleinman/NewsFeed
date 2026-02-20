@@ -295,6 +295,15 @@ def _render_card(card, card_index=0):
     if written_by:
         writer_html = '<div class="written-by">Card written by {}</div>'.format(written_by)
 
+    # TL;DR — single bold sentence
+    tldr_html = ""
+    # Use why_matters as TL;DR source, take just the first sentence
+    tldr_source = card.get("why_matters", card.get("so_what", ""))
+    if tldr_source:
+        first_sentence = tldr_source.split(".")[0].strip()
+        if first_sentence and len(first_sentence) > 20:
+            tldr_html = '<div class="card-tldr"><strong>{}</strong></div>'.format(_esc(first_sentence + "."))
+
     # Tier badge
     tier = card.get("depth_tier", "standard")
     tier_html = ""
@@ -303,25 +312,35 @@ def _render_card(card, card_index=0):
     elif tier == "brief":
         tier_html = '<span class="tier-badge tier-brief">BRIEF</span>'
 
+    # Build the expandable detail sections (everything after why + whats)
+    card_details = ""
+    if spin_html or know_html or bigger_html or action_html:
+        card_details = """
+        <details class="card-expand">
+            <summary class="card-expand-summary">Full Analysis</summary>
+            {spin}
+            {know}
+            {bigger}
+            {actions}
+        </details>""".format(spin=spin_html, know=know_html, bigger=bigger_html, actions=action_html)
+
     return """
     <article class="story-card" id="topic-card-{card_idx}" data-topics="{topic_ids}">
         <div class="card-header">
             <div class="topic-tags">{importance} {mode} {tier} {tags}</div>
             <h2 class="story-title">{title}</h2>
+            {tldr}
             <div class="story-meta">
                 <span>{src_count} sources</span>
                 <span>{persp_count} perspectives</span>
             </div>
             {spectrum}
         </div>
-        <div class="sources-row">{pills}</div>
 
         {why}
         {whats}
-        {spin}
-        {know}
-        {bigger}
-        {actions}
+
+        {card_details}
 
         <details class="detail-expand">
             <summary>Full Sources & Research</summary>
@@ -336,16 +355,14 @@ def _render_card(card, card_index=0):
         tier=tier_html,
         tags=topic_tags,
         title=card.get("title", ""),
+        tldr=tldr_html,
         src_count=card.get("source_count", 0),
         persp_count=card.get("perspectives_used", 0),
         spectrum=spectrum_html,
         pills=source_pills,
         why=why_html,
         whats=whats_html,
-        spin=spin_html,
-        know=know_html,
-        bigger=bigger_html,
-        actions=action_html,
+        card_details=card_details,
         collapsed=collapsed_content,
         writer=writer_html)
 
@@ -791,7 +808,7 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .synth-section p {{ font-size: 0.9rem; margin-bottom: 0.5rem; }}
 
 /* Filters */
-.filter-bar {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.8rem 0; border-bottom: 1px solid var(--border); }}
+.filter-bar {{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; padding: 0.8rem 0; }}
 .filter-btn {{ background: var(--card-bg); color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 0.3rem 0.8rem; font-size: 0.78rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }}
 .filter-btn.active {{ background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }}
 
@@ -963,6 +980,26 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .detail-expand {{ margin-top: 0.8rem; border-top: 1px solid var(--border); }}
 .detail-expand summary {{ font-size: 0.85rem; color: var(--muted); cursor: pointer; padding: 0.6rem 0; font-weight: 500; }}
 .detail-expand summary:hover {{ color: var(--text); }}
+
+/* TL;DR */
+.card-tldr {{ font-size: 0.92rem; color: var(--accent); margin: 0.3rem 0 0.5rem 0; line-height: 1.5; }}
+
+/* Card collapse — Full Analysis toggle */
+.card-expand {{ margin-top: 0.3rem; }}
+.card-expand-summary {{ font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--purple); cursor: pointer; padding: 0.5rem 0; font-weight: 600; letter-spacing: 0.03em; }}
+.card-expand-summary:hover {{ color: var(--accent); }}
+.card-expand-summary::marker {{ color: var(--purple); }}
+
+/* Epistemic heatmap mode */
+.heatmap-mode .verified-yes {{ opacity: 0.3; }}
+.heatmap-mode .verified-partial {{ box-shadow: 0 0 8px rgba(234, 179, 8, 0.5); background: rgba(234, 179, 8, 0.08); }}
+.heatmap-mode .verified-no {{ box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); background: rgba(239, 68, 68, 0.1); }}
+.heatmap-mode .mode-contested {{ box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }}
+.heatmap-mode .spin-position {{ border-left: 3px solid var(--red); padding-left: 0.6rem; }}
+.heatmap-mode .pred-disconfirm {{ background: rgba(239, 68, 68, 0.08); padding: 0.2rem 0.4rem; border-radius: 4px; }}
+.heatmap-btn {{ font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding: 0.3rem 0.7rem; background: transparent; border: 1px solid var(--purple); color: var(--purple); border-radius: 4px; cursor: pointer; margin-left: 0.5rem; }}
+.heatmap-btn.active {{ background: var(--purple); color: #000; }}
+.heatmap-btn:hover {{ background: var(--purple); color: #000; }}
 .detail-section {{ margin-top: 0.8rem; padding: 0.8rem; background: var(--section-bg); border-radius: 6px; }}
 .detail-label {{ font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; font-weight: 600; }}
 .section-framing .detail-label {{ color: var(--purple); }}
@@ -1047,7 +1084,7 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 </div>
 </details>
 
-<div class="filter-bar">{filters}</div>
+<div class="filter-bar">{filters}<button class="heatmap-btn" id="heatmap-toggle" title="Highlight uncertain claims">🔍 Uncertainty</button></div>
 
 {stories}
 
@@ -1057,6 +1094,10 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 {review_panel}
 
 <script>
+// Filter buttons with URL state
+const params = new URLSearchParams(window.location.search);
+const initialFilter = params.get('filter') || 'all';
+
 document.querySelectorAll('.filter-btn').forEach(btn => {{
     btn.addEventListener('click', () => {{
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -1065,6 +1106,45 @@ document.querySelectorAll('.filter-btn').forEach(btn => {{
         document.querySelectorAll('.story-card').forEach(c => {{
             c.style.display = (f === 'all' || c.dataset.topics.split(' ').includes(f)) ? '' : 'none';
         }});
+        // URL state management
+        const url = new URL(window.location);
+        if (f === 'all') {{ url.searchParams.delete('filter'); }}
+        else {{ url.searchParams.set('filter', f); }}
+        history.replaceState(null, '', url);
+    }});
+    // Apply initial filter from URL
+    if (btn.dataset.filter === initialFilter) {{
+        btn.click();
+    }}
+}});
+
+// Epistemic heatmap toggle
+document.getElementById('heatmap-toggle').addEventListener('click', function() {{
+    document.body.classList.toggle('heatmap-mode');
+    this.classList.toggle('active');
+    // When heatmap is on, expand all cards so uncertain content is visible
+    if (document.body.classList.contains('heatmap-mode')) {{
+        document.querySelectorAll('.card-expand').forEach(d => d.open = true);
+    }}
+}});
+
+// Hash navigation — open card details when clicking quickscan links
+if (window.location.hash) {{
+    const target = document.querySelector(window.location.hash);
+    if (target) {{
+        const expand = target.querySelector('.card-expand');
+        if (expand) expand.open = true;
+        setTimeout(() => target.scrollIntoView({{behavior: 'smooth'}}), 100);
+    }}
+}}
+document.querySelectorAll('a[href^="#topic-card"]').forEach(a => {{
+    a.addEventListener('click', (e) => {{
+        const hash = a.getAttribute('href').replace(/.*#/, '#');
+        const target = document.querySelector(hash);
+        if (target) {{
+            const expand = target.querySelector('.card-expand');
+            if (expand) expand.open = true;
+        }}
     }});
 }});
 </script>

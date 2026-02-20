@@ -187,14 +187,14 @@ Return: ["fact 1.", "fact 2."]""".format(summary=summary_so_far),
     if facts:
         card.key_facts = facts
 
-    # WHAT YOU NEED TO KNOW: unknowns (Q&A)
+    # WHAT YOU NEED TO KNOW: unknowns (Q&A) — capped at 3
     unknowns = _call(writer_id, context,
-        """Identify 2-3 important questions this coverage does NOT answer.
+        """Identify 2-3 important questions this coverage does NOT answer. Maximum 3.
 Return JSON: [{{"q": "Important unanswered question?", "a": "What we know so far, or 'Not yet reported.' if nothing."}}]
 Focus on gaps that would change how a reader understands this story.""",
         "json_array", report)
     if unknowns:
-        card.unknowns = unknowns
+        card.unknowns = unknowns[:3]
 
     # BIGGER PICTURE
     bigger = _call(writer_id, context,
