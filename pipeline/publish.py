@@ -124,7 +124,7 @@ def _render_card(card, card_index=0):
                 parts.append('<span class="spectrum-item"><span class="spectrum-label">{}</span> {}</span>'.format(
                     stype.replace("_", " ").title(), count))
         if parts:
-            spectrum_html = '<div class="coverage-spectrum">Coverage: {}'.format(" ".join(parts))
+            spectrum_html = '<div class="coverage-spectrum analyst-only">Coverage: {}'.format(" ".join(parts))
             # Add enrichment badges
             balance = card.get("_political_balance", "")
             depth = card.get("_coverage_depth", "")
@@ -295,7 +295,7 @@ def _render_card(card, card_index=0):
     written_by = card.get("written_by", "")
     writer_html = ""
     if written_by:
-        writer_html = '<div class="written-by">Card written by {}</div>'.format(written_by)
+        writer_html = '<div class="written-by analyst-only">Card written by {}</div>'.format(written_by)
 
     # TL;DR — single bold sentence
     tldr_html = ""
@@ -376,7 +376,7 @@ def _render_card(card, card_index=0):
     qa_warnings = card.get("qa_warnings", [])
     if qa_warnings:
         warning_items = "".join('<div class="qa-warning">⚠️ {}</div>'.format(_esc(w)) for w in qa_warnings[:2])
-        qa_html = '<div class="qa-warnings">{}</div>'.format(warning_items)
+        qa_html = '<div class="qa-warnings analyst-only">{}</div>'.format(warning_items)
 
     return """
     <article class="story-card" id="topic-card-{card_idx}" data-topics="{topic_ids}">
@@ -400,6 +400,7 @@ def _render_card(card, card_index=0):
 
         <details class="detail-expand">
             <summary>Full Sources & Research</summary>
+            <div class="source-pills analyst-only">{source_pills}</div>
             {collapsed}
             {writer}
         </details>
@@ -420,7 +421,8 @@ def _render_card(card, card_index=0):
         card_details=card_details,
         qa=qa_html,
         collapsed=collapsed_content,
-        writer=writer_html)
+        writer=writer_html,
+        source_pills=source_pills)
 
 
 def _render_perspective_grid(card):
@@ -769,7 +771,11 @@ def _render_run_report(reports, run_time):
 def _render_review_panel(quality_review):
     """Render hidden quality review panel with copy button."""
     if not quality_review or not quality_review.get("reviews"):
-        return '<div class="review-panel" id="review-panel" style="display:none"><div class="review-header">Quality review not available</div></div>'
+        return ""
+
+    summary_text = str(quality_review.get("summary", "")).strip()
+    if summary_text.lower() == "quality review not available":
+        return ""
 
     summary = quality_review.get("summary", "")
     errors = quality_review.get("error_count", 0)
@@ -816,7 +822,7 @@ def _render_review_panel(quality_review):
         copy_lines.append("")
     copy_text = "\n".join(copy_lines)
 
-    return """<div class="review-panel" id="review-panel" style="display:none">
+    return """<div class="analyst-only"><button onclick="var p=document.getElementById('review-panel');p.style.display=p.style.display==='none'?'block':'none'" class="review-toggle-btn">Quality Review</button><div class="review-panel" id="review-panel" style="display:none">
         <div class="review-header">
             <span class="review-badge {badge_class}">{errors}E {warnings}W {notes}N</span>
             Quality Review: {summary}
@@ -826,7 +832,7 @@ def _render_review_panel(quality_review):
             <button onclick="navigator.clipboard.writeText(document.getElementById('review-copy-text').textContent).then(function(){{this.textContent='Copied!'}}.bind(this))" class="review-copy-btn">Copy Review for Chat</button>
             <pre id="review-copy-text" class="review-copy-text">{copy_text}</pre>
         </div>
-    </div>""".format(
+    </div></div>""".format(
         badge_class=badge_class, errors=errors, warnings=warnings, notes=notes,
         summary=_esc(summary), cards=cards_html, copy_text=_esc(copy_text))
 
@@ -853,6 +859,14 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 .masthead {{ text-align: center; padding: 2rem 0 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }}
 .masthead h1 {{ font-family: 'Newsreader', serif; font-size: 2rem; color: var(--accent); }}
 .masthead .meta {{ font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }}
+
+.mode-toggle {{ display: inline-flex; gap: 0.4rem; align-items: center; justify-content: center; margin-top: 0.9rem; }}
+.mode-btn {{ background: var(--card-bg); color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 0.28rem 0.8rem; font-size: 0.75rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }}
+.mode-btn.active {{ background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }}
+.analyst-only {{}}
+.why-today {{ display: none; }}
+.why-today-label {{ font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }}
+body.mode-brief .analyst-only {{ display: none !important; }}
 
 /* Quickscan */
 .quickscan {{ background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid var(--accent); border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem; }}
@@ -1205,11 +1219,15 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 }}
 </style>
 </head>
-<body>
+<body class="mode-brief">
 <div class="masthead">
     <h1>Global Intelligence Briefing</h1>
     <div class="meta">{date} | {num_stories} stories | Models: {llms}</div>
     <div class="meta" style="font-size: 0.75rem; margin-top: 0.2rem;">Updated every 2 hours · Runtime: {runtime}s</div>
+    <div class="mode-toggle" role="group" aria-label="View mode">
+        <button class="mode-btn active" id="mode-brief-btn" type="button">Morning Brief</button>
+        <button class="mode-btn" id="mode-analyst-btn" type="button">Analyst View</button>
+    </div>
 </div>
 
 {action_layer}
@@ -1237,7 +1255,6 @@ body {{ font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--
 
 <div class="run-report">{run_report}</div>
 
-<button onclick="var p=document.getElementById('review-panel');p.style.display=p.style.display==='none'?'block':'none'" class="review-toggle-btn">Quality Review</button>
 {review_panel}
 
 <script>
@@ -1294,6 +1311,45 @@ document.querySelectorAll('a[href^="#topic-card"]').forEach(a => {{
         }}
     }});
 }});
+
+// Brief/Analyst mode toggle (additive)
+(function () {{
+    const briefBtn = document.getElementById('mode-brief-btn');
+    const analystBtn = document.getElementById('mode-analyst-btn');
+    if (!briefBtn || !analystBtn) return;
+
+    function applyMode(mode) {{
+        if (mode === 'analyst') {{
+            document.body.classList.remove('mode-brief');
+            document.body.classList.add('mode-analyst');
+            briefBtn.classList.remove('active');
+            analystBtn.classList.add('active');
+        }} else {{
+            document.body.classList.remove('mode-analyst');
+            document.body.classList.add('mode-brief');
+            analystBtn.classList.remove('active');
+            briefBtn.classList.add('active');
+        }}
+    }}
+
+    briefBtn.addEventListener('click', function() {{
+        applyMode('brief');
+        try {{ localStorage.setItem('gib-view-mode', 'brief'); }} catch (e) {{}}
+    }});
+
+    analystBtn.addEventListener('click', function() {{
+        applyMode('analyst');
+        try {{ localStorage.setItem('gib-view-mode', 'analyst'); }} catch (e) {{}}
+    }});
+
+    let savedMode = 'brief';
+    try {{
+        const storedMode = localStorage.getItem('gib-view-mode');
+        if (storedMode === 'brief' || storedMode === 'analyst') savedMode = storedMode;
+    }} catch (e) {{}}
+    applyMode(savedMode);
+}})();
+
 </script>
 </body>
 </html>"""
