@@ -375,7 +375,7 @@ def _render_card(card, card_index=0):
     qa_html = ""
     qa_warnings = card.get("qa_warnings", [])
     if qa_warnings:
-        warning_items = "".join('<div class="qa-warning">⚠️ {}</div>'.format(_esc(w)) for w in qa_warnings[:3])
+        warning_items = "".join('<div class="qa-warning">⚠️ {}</div>'.format(_esc(w)) for w in qa_warnings[:2])
         qa_html = '<div class="qa-warnings">{}</div>'.format(warning_items)
 
     return """
