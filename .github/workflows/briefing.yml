@@ -2,15 +2,7 @@ name: Global Briefing
 
 on:
   schedule:
-    - cron: '0 11 * * *'    # 6:00 AM Eastern (full run)
-    - cron: '0 13 * * *'    # 8:00 AM Eastern (refresh)
-    - cron: '0 15 * * *'    # 10:00 AM Eastern (refresh)
-    - cron: '0 17 * * *'    # 12:00 PM Eastern (refresh)
-    - cron: '0 19 * * *'    # 2:00 PM Eastern (refresh)
-    - cron: '0 21 * * *'    # 4:00 PM Eastern (refresh)
-    - cron: '0 23 * * *'    # 6:00 PM Eastern (refresh)
-    - cron: '0 1 * * *'     # 8:00 PM Eastern (refresh)
-    - cron: '0 3 * * *'     # 10:00 PM Eastern (refresh)
+    - cron: '0 11 * * *'    # 6:00 AM Eastern (daily full run)
   workflow_dispatch:
     inputs:
       mode:
@@ -50,10 +42,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "mode=${{ github.event.inputs.mode }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event.schedule }}" = "0 11 * * *" ]; then
-            echo "mode=full" >> $GITHUB_OUTPUT
           else
-            echo "mode=refresh" >> $GITHUB_OUTPUT
+            echo "mode=full" >> $GITHUB_OUTPUT
           fi
 
       - name: Run briefing pipeline
