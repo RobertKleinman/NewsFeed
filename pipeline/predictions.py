@@ -71,7 +71,8 @@ Return JSON:
       "prediction": "Specific prediction connecting multiple stories.",
       "stories": [3, 8],
       "confidence": "possible",
-      "disconfirm": "What would prove this wrong.",
+      "disconfirming_signal": "Concrete observable signal that would prove this wrong.",
+      "disconfirm": "Backward-compatible alias of disconfirming_signal.",
       "timeframe": "this_week"
     }}
   ],
@@ -80,7 +81,8 @@ Return JSON:
       "prediction": "What happens in the next 48 hours.",
       "stories": [1],
       "confidence": "likely",
-      "disconfirm": "What would prove this wrong.",
+      "disconfirming_signal": "Concrete observable signal that would prove this wrong.",
+      "disconfirm": "Backward-compatible alias of disconfirming_signal.",
       "timeframe": "48_hours"
     }}
   ],
@@ -89,7 +91,8 @@ Return JSON:
       "prediction": "This week or this month development.",
       "stories": [2, 5],
       "confidence": "possible",
-      "disconfirm": "What would prove this wrong.",
+      "disconfirming_signal": "Concrete observable signal that would prove this wrong.",
+      "disconfirm": "Backward-compatible alias of disconfirming_signal.",
       "timeframe": "this_month"
     }}
   ]
@@ -99,7 +102,7 @@ RULES:
 - 2-3 predictions per category max.
 - Cross-story predictions MUST reference 2+ stories.
 - Be SPECIFIC — not "tensions may rise" but "Saudi Arabia will likely call an emergency GCC meeting."
-- Disconfirming signals should be concrete and observable.
+- Disconfirming signals are REQUIRED for every prediction, concrete, and observable.
 - If you can't make a strong cross-story prediction, say why.""".format(
         cards="\n\n".join(card_briefs))
 
@@ -125,6 +128,20 @@ RULES:
         report.llm_successes += 1
 
         # Validate and clean predictions
+        # Require disconfirming signal and normalize aliases
+        for category in ["cross_story", "near_term", "medium_term"]:
+            filtered = []
+            for pred in data.get(category, []):
+                if not isinstance(pred, dict):
+                    continue
+                signal = pred.get("disconfirming_signal") or pred.get("disconfirm")
+                if not isinstance(signal, str) or not signal.strip():
+                    continue
+                pred["disconfirming_signal"] = signal.strip()
+                pred["disconfirm"] = signal.strip()
+                filtered.append(pred)
+            data[category] = filtered[:3]
+
         for category in ["cross_story", "near_term", "medium_term"]:
             preds = data.get(category, [])
             if not isinstance(preds, list):

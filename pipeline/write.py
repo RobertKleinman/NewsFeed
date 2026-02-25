@@ -93,13 +93,15 @@ def _write_brief(card, cluster, writer_id, report):
         """Write two sections. Return JSON:
 {{
   "whats_happening": "2-3 sentences. What is concretely happening right now. Who did what, where, when. No analysis.",
-  "why_matters": "1-2 sentences. Why should someone care? Cover: direct impact on people's lives OR world-shaping significance OR cultural gravity (everyone will be talking about this). Be specific, not generic."
+  "why_matters": "1-2 sentences. Why should someone care? Cover: direct impact on people's lives OR world-shaping significance OR cultural gravity (everyone will be talking about this). Be specific, not generic.",
+  "why_today": "1 sentence. Why this is urgent or decision-relevant today. Concrete trigger or timing only."
 }}""",
         "json_object", report)
 
     if result and isinstance(result, dict):
         card.whats_happening = result.get("whats_happening", "")
         card.why_matters = result.get("why_matters", "")
+        card.why_today = result.get("why_today", "")
     else:
         card.whats_happening = cluster.lead_title
     card.card_mode = "brief"
@@ -118,13 +120,15 @@ def _write_standard(card, cluster, sources, comparison, writer_id, report):
         """Write two sections. Return JSON:
 {{
   "whats_happening": "2-4 sentences. Concrete situation right now. Who did what, where, when. Current state of play. Draw from all sources. No analysis — just what's happening.",
-  "why_matters": "2-3 sentences. Why should someone care about this? Address whichever apply: (1) Direct impact — does this affect people's money, rights, safety, or daily life? (2) World-shaping — is this changing power dynamics, could it lead to conflict, is it a turning point? (3) Cultural gravity — will everyone be talking about this, will it shape opinions and decisions? Be specific and concrete, not generic."
+  "why_matters": "2-3 sentences. Why should someone care about this? Address whichever apply: (1) Direct impact — does this affect people's money, rights, safety, or daily life? (2) World-shaping — is this changing power dynamics, could it lead to conflict, is it a turning point? (3) Cultural gravity — will everyone be talking about this, will it shape opinions and decisions? Be specific and concrete, not generic.",
+  "why_today": "1 sentence. Why this matters specifically today (deadline, vote, markets open, expected move, immediate risk)."
 }}""",
         "json_object", report)
 
     if result and isinstance(result, dict):
         card.whats_happening = result.get("whats_happening", "")
         card.why_matters = result.get("why_matters", "")
+        card.why_today = result.get("why_today", "")
 
     # HOW IT'S BEING USED — ask LLM directly whether spin exists
     # Don't rely on compare step's contention detection
@@ -240,7 +244,8 @@ Return JSON:
   "research_context": ["Important context from research that readers need. Label each as coming from research.", "Another piece of context."],
   "historical_context": ["Relevant historical background that helps understand this story."],
   "unknowns_answered": [{{"q": "Question the coverage left open", "a": "What investigation found."}}],
-  "actions": ["Concrete action the reader could take based on this story. Only include if genuinely actionable."]
+  "actions": ["Concrete action the reader could take based on this story. Only include if genuinely actionable."],
+  "why_today": "Optional one-line urgency update for today only; empty string if no new urgency."
 }}
 Be concise. 2-3 items max per field. Empty arrays are fine if nothing fits.""",
             "json_object", report, max_tokens=2500)
@@ -265,6 +270,10 @@ Be concise. 2-3 items max per field. Empty arrays are fine if nothing fits.""",
             actions = extras.get("actions", [])
             if actions and isinstance(actions, list):
                 card.actions = [a for a in actions if a.strip()]
+
+            why_today = extras.get("why_today", "")
+            if isinstance(why_today, str) and why_today.strip():
+                card.why_today = why_today.strip()
 
     elif investigation:
         card.investigation_raw = investigation.raw_text
