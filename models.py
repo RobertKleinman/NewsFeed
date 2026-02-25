@@ -128,6 +128,7 @@ class TopicCard:
 
     # WHY THIS MATTERS
     why_matters: str = ""  # 2-3 sentences: direct impact, world-shaping, cultural gravity
+    why_today: str = ""  # one-line urgency hook for the day
 
     # WHAT'S HAPPENING
     whats_happening: str = ""  # concrete situation right now
