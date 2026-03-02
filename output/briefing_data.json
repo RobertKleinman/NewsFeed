@@ -1,6 +1,6 @@
 {
-  "date": "2026-03-01T11:47:06.876875+00:00",
-  "runtime_seconds": 1321,
+  "date": "2026-03-02T12:01:23.530975+00:00",
+  "runtime_seconds": 1617,
   "tier_counts": {
     "deep": 5,
     "standard": 10,
@@ -8,354 +8,933 @@
   },
   "cards": [
     {
-      "title": "Oil prices set for swings next week after U.S., Israel strikes on Iran",
-      "why_matters": "These strikes have caused oil prices to rise, directly affecting fuel costs and potentially increasing prices for goods and services worldwide. The conflict has disrupted international travel and raised the risk of broader instability in the Middle East, a key region for global energy supply. The situation is creating significant uncertainty in global financial markets, which could impact investments and economic growth.",
-      "why_today": "Oil markets and global financial systems are reacting now, with immediate price swings and volatility expected as trading resumes next week.",
-      "whats_happening": "The United States and Israel have launched strikes on Iran, leading to immediate disruptions in the region. Oil prices have already risen, with Brent crude closing at a recent high, and OPEC+ is considering a production increase in response to the conflict. Major airlines, including British Airways and Virgin Atlantic, have cancelled or diverted flights in and out of the Middle East. The Hong Kong government has stated it is preparing for increased global market volatility following the attacks.",
-      "spin_positions": [],
-      "spin_predictions": [],
+      "title": "Trump warns of continued war and American casualties as Middle East conflict escalates",
+      "why_matters": "This conflict is directly impacting global energy prices, making gasoline and other commodities more expensive for consumers worldwide. The deaths of US troops and the involvement of multiple countries raise the risk of broader military escalation, potentially destabilizing the region further. The economic fallout is already affecting stock markets and could trigger a global oil shock, with significant consequences for businesses and households.",
+      "why_today": "The killing of Iran's Supreme Leader and subsequent retaliatory attacks mark a major escalation, with immediate global security and economic implications.",
+      "whats_happening": "Military conflict is escalating in the Middle East, involving Iran, the US, and Israel, with attacks and retaliatory strikes reported across the region. Three US service members have been killed and five seriously wounded in the Iran war, with American jets downed in Kuwait. Oil and gas prices have surged sharply, with crude futures rising by around 8 percent, and global stock markets are sliding amid fears over disruptions to energy supplies, especially around the Strait of Hormuz. France has stated it is ready to defend Gulf states against Iran as the conflict widens.",
+      "spin_positions": [
+        {
+          "position": "The Iran war will continue, resulting in further American casualties and instability.",
+          "who": "Trump-aligned and right-leaning US commentators (e.g., The American Conservative)",
+          "key_claim": "Trump warns that war will continue and that American troops have already been killed in the conflict.",
+          "verified": "Verified \u2014 Multiple sources confirm US casualties and Trump's warning."
+        },
+        {
+          "position": "The primary impact of the conflict is global economic disruption, especially through rising oil and gas prices.",
+          "who": "Centrist and centre-left international media (e.g., NPR, Financial Times, France 24, Al Monitor)",
+          "key_claim": "Oil and gas prices have soared and stock markets have slid as a direct result of the Middle East conflict.",
+          "verified": "Verified \u2014 Multiple sources confirm sharp rises in energy prices and market instability."
+        }
+      ],
+      "spin_predictions": [
+        {
+          "prediction": "Trump-aligned and right-leaning sources may use ongoing casualties to criticize current US leadership and military engagement in the Middle East.",
+          "confidence": "likely"
+        },
+        {
+          "prediction": "Centrist and financial outlets will continue to highlight the risk of a global oil shock and economic fallout, potentially influencing policy debates on energy security.",
+          "confidence": "likely"
+        }
+      ],
       "key_facts": [
-        "The Hong Kong government has stated it is prepared for increased global market volatility following the Iran attacks, according to Finance Secretary Paul Chan.",
-        "Major airlines such as British Airways and Virgin Atlantic have cancelled or diverted flights in and out of the Middle East after the Iran strikes.",
-        "OPEC+ is actively considering a potential increase in oil production as a direct response to the current conflict.",
-        "There is a discrepancy in reported Brent crude prices at Friday's close, with sources citing either US$72.87 or US$90.75.",
-        "The specific targets and extent of damage from the US-Israel strikes on Iran have not been detailed in available reports.",
-        "Donald Trump has publicly warned Iran not to retaliate following Khamenei's death.",
-        "The death of Ayatollah Ali Khamenei leaves a significant power vacuum in Iran, as he had led the Islamic Republic since 1989.",
-        "Trump has offered immunity to members of the IRGC, Iranian military, and police forces.",
-        "There is uncertainty regarding the succession plan for Iran's leadership after Khamenei's death.",
-        "Ayatollah Ali Khamenei had ruled Iran for 36 years before his reported death.",
-        "France 24 highlights uncertainty about whether Khamenei\u2019s death will lead to regime change in Iran.",
-        "The incident has heightened fears of wider regional instability, according to France 24.",
-        "The Washington Post reports that Tehran responded to the attack by striking Israel and Arab states, but details about these retaliatory strikes are not provided.",
-        "Israel claims that around 200 fighter jets struck more than 500 targets in Iran.",
-        "The United Nations Security Council held an emergency meeting in response to the attacks on Iran.",
-        "Airlines have cancelled flights across the Middle East following the escalation of military actions.",
-        "Analysts warn that prolonged closure of the Strait of Hormuz could trigger a major global energy shock, potentially pushing oil prices to $100 per barrel.",
-        "Iranian President has stated that retaliation is both a right and a duty following Khamenei's killing.",
-        "Iran's security chief has vowed that strikes against the US and Israel will be of a kind 'never experienced before.'",
-        "Experts warn that a prolonged closure of the Strait of Hormuz would be a critical problem for global energy supplies.",
-        "Iran's president has called the killing a 'declaration of war against Muslims.'",
-        "Multiple international news outlets report that the conflict is spreading across the Gulf region.",
-        "Israel has deployed Air Force jets over Tehran during its operation.",
-        "Iran's missile attacks have also targeted Gulf Arab states in addition to Israel.",
-        "The death of Supreme Leader Ayatollah Ali Khamenei is cited as the trigger for the current escalation.",
-        "Iranian President has declared that avenging Khamenei's death is a 'legitimate right.'",
-        "Iran has announced 40 days of mourning and 7 public holidays following Khamenei's death.",
-        "Public reaction in Iran is mixed, with reports of both celebration and grief.",
-        "France 24 reports that the transition process for Khamenei's successor has begun, and that former President Trump has threatened Iran with force.",
-        "Iran has vowed revenge for the killing of its supreme leader despite external threats.",
-        "Former US President Donald Trump described the operation as 'massive.'",
-        "Some sources highlight concerns that the strikes could reignite a regional conflict and further diminish hopes for diplomacy.",
-        "Canada has publicly stated its support for the United States and Israel regarding the strikes on Iran.",
-        "Iran has accused the United States and Israel of committing a 'war crime' in connection with the strikes.",
-        "World leaders are urging a return to diplomatic talks following the escalation.",
-        "The strikes and subsequent events have prompted warnings of 'grave consequences' from various international actors.",
-        "The UN Security Council is holding an emergency meeting in response to the US-Israeli strikes against Iran.",
-        "NHK World reports that the CIA tracked Khamenei's location and meeting schedule in advance, enabling the targeted strike.",
-        "Some protesters in Isfahan are specifically calling for revenge following the attacks.",
-        "Multiple sources debate the legality of the US attack, with some calling it unconstitutional and reckless.",
-        "Insurers are cancelling policies and raising prices for ships operating in the Gulf and Strait of Hormuz, with the cost of cover expected to increase by as much as 50%.",
-        "Brokers attribute the surge in insurance costs directly to the conflict following Iran's attacks.",
-        "Fears of a wider regional conflict are rising as the situation escalates.",
-        "Khamenei has relied on the support of Iran\u2019s Islamic Revolutionary Guard Corps (IRGC) to maintain his authority.",
-        "He has systematically sidelined political rivals and consolidated power within a small circle of loyalists.",
-        "Khamenei has overseen the suppression of dissent through crackdowns on protests and restrictions on media and civil society.",
-        "He has used Iran\u2019s Guardian Council to vet and disqualify electoral candidates, ensuring only regime-approved figures can run for office.",
-        "France\u2019s CMA CGM has suspended its vessels\u2019 passage through the Suez Canal.",
-        "Japan shipping companies have suspended operations in the Persian Gulf.",
-        "The Thai Prime Minister has ordered evacuation flights for Thai nationals in the Middle East.",
-        "NHK World reports that Japanese residents in Dubai heard explosion sounds and observed missile interceptions during the incident.",
-        "NHK World states that airports across multiple Middle Eastern countries suffered damage and that flights to and from Japan were cancelled.",
-        "The Straits Times describes the air travel disruption as the largest since the Covid-19 pandemic.",
-        "Israeli President Isaac Herzog visited the site of the Tel Aviv blast following the missile strike.",
-        "The Iranian missile attack led to the evacuation of residents from affected areas in Tel Aviv.",
-        "Dozens of buildings in Tel Aviv sustained damage as a result of the Iranian strikes."
+        "Crude oil futures surged by approximately 8 percent following the escalation of conflict, with prices nearing $80 per barrel amid fears over the security of the Strait of Hormuz.",
+        "Stock markets have experienced significant declines as a result of the conflict and rising energy prices, with financial sources warning of a potential 'global oil shock.'",
+        "France has stated it is 'ready' to defend Gulf states against Iran as the conflict widens.",
+        "Gasoline and gold prices have also risen notably in response to the instability in the region.",
+        "Pakistani authorities imposed a three-day curfew and deployed troops in the northern cities of Gilgit and Skardu on Monday following violent protests.",
+        "Several people died and tens were injured during the protests in Gilgit and Skardu.",
+        "US officials, including President Donald Trump, reportedly stated that crippling Iran's ballistic missile and nuclear capabilities and toppling its governing system were goals of the operation.",
+        "Many senior US officials are skeptical that the military operation will result in regime change in Iran.",
+        "Iran conflict has disrupted oil supply to Asian countries that are heavily dependent on Middle Eastern oil, according to Al Monitor.",
+        "Analysts cited by CNBC and MarketWatch warn that a prolonged closure of the Strait of Hormuz could push oil prices to $100 or even $120 per barrel, potentially triggering a 1970s-style energy shock.",
+        "Major European stock indexes have fallen, and Gulf stock exchanges remained shut following the escalation, according to EuroNews and Washington Post.",
+        "France 24 and Al Monitor specify that the surge in oil prices and market disruptions occurred on a Monday.",
+        "MarketWatch and Bloomberg report that the Iran conflict has caused a significant spike in global energy costs, with particular concern over the security of critical energy chokepoints.",
+        "The Calgary Herald highlights that oil markets are especially vulnerable due to the conflict, with increased volatility and uncertainty for global supply.",
+        "Global News Canada provides accounts from Canadians in the Middle East describing the situation as 'surreal' during Iranian missile strikes.",
+        "Global News Canada also reports emotional responses from Iranian Canadians, including fear and distress following U.S. strikes in Iran.",
+        "CBC News notes that U.S. allies are deliberately avoiding public criticism of either Washington or Tehran to prevent escalation or diplomatic fallout.",
+        "The US has confirmed that American troops have been killed and wounded in clashes with Iranian forces.",
+        "These casualties were reported a day after the US launched its campaign against Iran.",
+        "Tehran is targeting US military assets and bases in the region.",
+        "Iranian-made drones have been used in attacks during this period, including one that hit a British air base in Cyprus, causing limited damage.",
+        "Several U.S. military aircraft crashed in Kuwait as Iranian strikes continued, though the cause of the crashes is not specified.",
+        "Kuwait intercepted hostile drones on the third day of Iranian retaliatory strikes, but the origin of these drones is not confirmed.",
+        "Iran\u2019s reprisals led to the closure of Israel\u2019s houses of worship during Ramadan and Purim.",
+        "Following the Iranian strikes, global financial markets reacted with oil prices surging, airline stocks falling, and investors moving to the U.S. dollar.",
+        "CNBC reports that Dow futures dropped over 500 points and oil prices spiked following the US attack on Iran.",
+        "CNBC confirms that three US fighter jets were downed over Kuwait in an apparent friendly fire incident.",
+        "Wired and the Financial Times both describe the US action as a high-risk or 'epic gamble' for President Trump.",
+        "The National Post characterizes Trump's military doctrine as insular, favoring short military commitments and low-risk opportunism.",
+        "Some sources report that Hezbollah's rocket attack was launched in response to the alleged killing of Iranian Supreme Leader Ali Khamenei.",
+        "The escalation between Israel and Hezbollah is contributing to a wider regional conflict involving Iran.",
+        "There are ongoing US-Israel military actions targeting Iran in parallel with the strikes in Lebanon.",
+        "Israeli officials have publicly vowed to expand military operations in Lebanon following the latest exchange of fire.",
+        "Iran's campaign has resulted in four deaths and dozens of injuries in the Gulf region since its start.",
+        "UK Labour leader Keir Starmer has stated that the US can use UK bases for missile strikes on Iran.",
+        "China faces potential oil supply challenges following US-Israel strikes on Iran.",
+        "Iran has developed 'missile cities' hidden inside mountains as a key element of its military strategy.",
+        "Iran's recent military actions represent a shift from previously targeting US assets to now focusing on Gulf states.",
+        "The escalation in Iranian attacks is viewed as one of the most dangerous gambles of the Trump administration, according to El Pais English.",
+        "Democrats are leading efforts to force a vote on limiting President Trump's war powers regarding Iran.",
+        "There is criticism that the congressional vote may occur after military action has already started.",
+        "The Trump administration is scheduled to brief Congress on Iran on Tuesday.",
+        "The friendly fire incident was confirmed by United States Central Command (CENTCOM).",
+        "DW News frames the shootdown as part of a broader 'Iran war' context.",
+        "Middle East Eye and Times of Israel both report that Kuwaiti air defenses were responsible for the shootdown, based on CENTCOM statements."
       ],
       "context": [
-        "Research confirms that Ayatollah Ali Khamenei was killed in a joint US-Israeli attack, as widely reported by multiple international sources.",
-        "Iranian state media has confirmed Khamenei\u2019s death and announced a 40-day public mourning period.",
-        "Research confirms Ayatollah Ali Khamenei's death via Iranian state media, moving the event from unconfirmed to verified.",
-        "Research details that Iran's retaliation targeted Israel and U.S. military installations in Bahrain, Kuwait, Qatar, and the UAE, with reported casualties and damage.",
-        "Research confirms that the blasts in Doha and Dubai were part of a coordinated, large-scale Iranian retaliatory operation involving missiles and drones targeting both military and civilian sites across the Gulf.",
-        "The attacks resulted in damage to major infrastructure, including airports in the UAE, and caused casualties, with injuries reported in both Dubai and Doha and at least one fatality in Abu Dhabi.",
-        "Research confirms that multiple international news organizations report Ayatollah Ali Khamenei was killed in a joint US-Israeli military strike.",
-        "Iranian state media has confirmed Khamenei's death and announced a 40-day public mourning period.",
-        "Research indicates that multiple international news outlets are reporting the death of Iran's Supreme Leader Ayatollah Ali Khamenei in a joint U.S.-Israeli strike on Tehran.",
-        "Following Khamenei's reported death, Iran has launched retaliatory missile and drone attacks against Israel and Gulf Arab states, including U.S. military installations."
+        "Research shows that the conflict escalated after a joint US-Israeli strike killed Iran's Supreme Leader Ayatollah Ali Khamenei and senior officials.",
+        "Research confirms that the Strait of Hormuz is effectively closed due to security risks, and the Ras Tanura oil refinery in Saudi Arabia was attacked by Iranian drones.",
+        "Research confirms that Iranian state media officially announced the death of Supreme Leader Ayatollah Ali Khamenei following US-Israeli strikes, clarifying the event's authenticity.",
+        "Research establishes that the US-Israeli operation was a coordinated, large-scale military action specifically targeting Iranian leadership.",
+        "Research shows the escalation began with a coordinated U.S.-Israeli strike that killed Iran's Supreme Leader Ayatollah Ali Khamenei and other senior officials.",
+        "Research confirms the closure of the Strait of Hormuz is due to insurance withdrawals and warnings from Tehran, not a formal blockade.",
+        "From research: The spike in energy costs is directly linked to fears of disruption in the Strait of Hormuz, a key global oil chokepoint affected by the Iran conflict.",
+        "From research: The slump in emerging assets is attributed to investor risk aversion and capital flight to safe-haven assets as a result of the escalating conflict.",
+        "From research: Three U.S. service members have been killed and five seriously wounded in the current hostilities with Iran.",
+        "From research: The casualties occurred during a large-scale, pre-planned U.S.-Israeli military operation against Iran, not isolated clashes."
       ],
-      "history": [],
+      "history": [
+        "The killing of a sitting head of state in a military strike is an extremely rare and escalatory act in modern international relations.",
+        "The Strait of Hormuz is a critical global energy chokepoint; its closure has historically led to major disruptions in oil markets."
+      ],
       "unknowns": [
         {
-          "q": "What were the specific targets and extent of damage from the US and Israeli strikes on Iran?",
+          "q": "What is the current status of the Strait of Hormuz and the Ras Tanura refinery after the reported attacks?",
           "a": "Not yet reported."
         },
         {
-          "q": "What was the outcome of the OPEC+ meeting regarding potential oil production increases?",
+          "q": "What is the exact sequence and timeline of attacks and retaliatory strikes between Iran, the US, Israel, and Gulf states?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the confirmed status of Ayatollah Ali Khamenei following reports of his death?",
+          "q": "What are the total casualty figures for all parties involved in the conflict?",
           "a": "Not yet reported."
         },
         {
-          "q": "Who will succeed Ayatollah Ali Khamenei as Supreme Leader of Iran?",
+          "q": "What triggered the current escalation and widespread retaliation?",
+          "a": "The targeted killing of Iran's Supreme Leader by US-Israeli forces on February 28, 2026."
+        },
+        {
+          "q": "What is the current operational status of key energy infrastructure?",
+          "a": "The Strait of Hormuz is under de facto closure, and the Ras Tanura refinery has been attacked."
+        },
+        {
+          "q": "What is the official confirmation or denial from Iranian, US, and Israeli governments regarding the reported death of Iran's Supreme Leader Ali Khamenei?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the official response or confirmation from the United States government regarding its involvement in the attack?",
+          "q": "What is the specific connection between the US-Israeli strikes on Iran and the violent protests in Pakistan?",
           "a": "Not yet reported."
         },
         {
-          "q": "What are the full details and scope of Iran's retaliatory actions following Khamenei's death?",
+          "q": "What are the full details and current status of casualties and unrest in Pakistan following the protests?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the immediate succession plan after Khamenei\u2019s death?",
-          "a": "A temporary council will assume the duties of the supreme leader until the Assembly of Experts selects a successor."
+          "q": "Was Khamenei\u2019s death officially confirmed by Iranian sources?",
+          "a": "Yes, Iranian state media confirmed his death after the US-Israeli strikes."
         },
         {
-          "q": "Has the Iranian government officially confirmed the death of Ayatollah Ali Khamenei?",
+          "q": "What was the nature of the US-Israeli operation?",
+          "a": "It was a premeditated, coordinated strike aimed at decapitating Iran\u2019s leadership."
+        },
+        {
+          "q": "What is the precise sequence and timeline of military actions involving Iran, the US, and Israel that triggered the market reaction?",
           "a": "Not yet reported."
         },
         {
-          "q": "What was the specific role and extent of U.S. involvement in the strike that killed Khamenei?",
+          "q": "How significant are the actual disruptions to oil supply and tanker traffic in the Strait of Hormuz, and for how long are they expected to last?",
           "a": "Not yet reported."
         },
         {
-          "q": "What are the details and consequences of Tehran's retaliatory strikes against Israel and Arab states?",
+          "q": "What are the specific impacts on global oil prices and stock markets in quantitative terms (e.g., percentage changes, price per barrel)?",
           "a": "Not yet reported."
         },
         {
-          "q": "Did Iranian sources confirm Khamenei's death?",
-          "a": "Yes, Iranian state media confirmed his death."
+          "q": "What specifically triggered the current escalation and market reaction?",
+          "a": "The targeted killing of Iran's Supreme Leader by U.S.-Israeli forces directly triggered the conflict and subsequent market turmoil."
         },
         {
-          "q": "What were the targets and consequences of Iran's retaliatory strikes?",
-          "a": "Iran struck Israel and U.S. bases in several Gulf states, causing casualties and damage."
-        },
-        {
-          "q": "What are the confirmed targets and casualty figures from the blasts in Doha and Dubai?",
+          "q": "What specific actions did the U.S. and Israel take during the military strikes on Iran?",
           "a": "Not yet reported."
         },
         {
-          "q": "What specific actions constitute Iran's 'most ferocious operation' against US and Israeli bases?",
+          "q": "What are the direct causes linking the Iran conflict to the slump in emerging assets and spike in energy costs?",
           "a": "Not yet reported."
         },
         {
-          "q": "How have US and Israeli military assets in the region responded to these attacks?",
+          "q": "What evidence supports the U.S. claim of 'imminent threats' from Iran that justified the strikes?",
           "a": "Not yet reported."
         },
         {
-          "q": "Did the blasts in Doha and Dubai actually occur and what was their scale?",
-          "a": "Yes, research confirms the blasts occurred as part of a widespread Iranian military response, with multiple missiles and drones striking both cities and causing casualties and infrastructure damage."
+          "q": "What is causing the slump in emerging assets?",
+          "a": "The slump is caused by investor fears over regional instability and rising energy costs due to the Iran conflict."
         },
         {
-          "q": "What evidence has been presented to support the claim that the US and Israel were responsible for Khamenei's killing?",
+          "q": "How many US troops were killed or wounded in the clashes with Iran?",
           "a": "Not yet reported."
         },
         {
-          "q": "What are the details and timeline of the attack that led to Khamenei's death?",
+          "q": "Where and when did the clashes resulting in US casualties occur?",
           "a": "Not yet reported."
         },
         {
-          "q": "How is the Iranian leadership succession process expected to proceed following Khamenei's death?",
+          "q": "What specific actions did Iran take against US military assets and bases?",
           "a": "Not yet reported."
         },
         {
-          "q": "Was Khamenei's death widely corroborated and attributed to a US-Israeli attack?",
-          "a": "Yes, multiple international sources and Iranian state media confirm both the death and the attribution."
+          "q": "How many U.S. troops were killed or wounded and where?",
+          "a": "Three killed and five wounded; the dead were part of an Army sustainment unit in Kuwait."
         },
         {
-          "q": "What are the confirmed circumstances and cause of the explosion in Tehran?",
+          "q": "Did the Iranian attacks on civilian infrastructure in Qatar, including the airport, result in any damage or casualties?",
           "a": "Not yet reported."
         },
         {
-          "q": "What are the verified details and circumstances surrounding the death of Supreme Leader Ayatollah Ali Khamenei?",
+          "q": "What evidence supports the Qatari spokesperson's claim that Iran targeted civilian infrastructure in Qatar?",
           "a": "Not yet reported."
         },
         {
-          "q": "What are the specific targets and impacts of Iran's missile attacks on Israel and Gulf Arab states?",
+          "q": "Were the hostile drones intercepted in Kuwait directly linked to Iran, and what was their intended target?",
           "a": "Not yet reported."
         },
         {
-          "q": "Is the described event hypothetical or real?",
-          "a": "Research confirms the event is being reported as a real, unfolding crisis by multiple news organizations."
-        },
-        {
-          "q": "What were the specific circumstances, timing, and location of the operation that killed Khamenei?",
+          "q": "What specific event or attack caused the 'first US deaths' referenced in the headlines?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the official Iranian account of how Khamenei died, including cause of death and details of the event?",
+          "q": "What are the precise objectives and scope of the US military response President Trump is vowing?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the succession plan or who will assume leadership in Iran following Khamenei's death?",
+          "q": "What is the current status and involvement of other regional actors, such as Israel, in the escalating conflict?",
           "a": "Not yet reported."
         },
         {
-          "q": "What specific targets were struck in Tehran and other Iranian cities?",
+          "q": "What are the specific targets and locations of the Israeli strikes in Lebanon?",
           "a": "Not yet reported."
         },
         {
-          "q": "What are the confirmed casualties or extent of damage resulting from the strikes?",
+          "q": "What is the confirmed and current casualty count from the strikes and retaliatory attacks?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the nature and scale of Iran's retaliatory response?",
+          "q": "What are the broader strategic objectives or intentions of Israel and Hezbollah in escalating these attacks?",
           "a": "Not yet reported."
         },
         {
-          "q": "What were the specific targets and outcomes of the U.S.-Israeli strikes on Iran?",
+          "q": "What specific actions or threats from Iran or the U.S. have led to the current escalation toward war?",
           "a": "Not yet reported."
         },
         {
-          "q": "How have major world powers beyond the U.S., Israel, and Canada responded to the strikes?",
+          "q": "What are the official U.S. government justifications or objectives for considering military action against Iran?",
           "a": "Not yet reported."
         },
         {
-          "q": "What are the potential consequences or next steps expected from the UN Security Council emergency meeting?",
+          "q": "What evidence exists to support or refute the claim that Iran poses no danger to America?",
           "a": "Not yet reported."
         },
         {
-          "q": "Is Supreme Leader Khamenei confirmed dead or only reported as a casualty?",
+          "q": "What specific military or political actions might Gulf states take in response to Iranian attacks?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the full extent and nature of the public reaction inside Iran beyond mourning\u2014are there significant protests, unrest, or support for the strikes?",
+          "q": "What are the reasons behind Iran's reported shift in targeting from US assets to Gulf states?",
           "a": "Not yet reported."
         },
         {
-          "q": "What specific actions or retaliation are planned or underway by Iranian authorities or the IRGC in response to the strikes?",
+          "q": "How are other regional or international actors responding to the possibility of Gulf states entering the Iran war?",
           "a": "Not yet reported."
         },
         {
-          "q": "What triggered Iran's decision to launch these strikes on Gulf states and US assets?",
+          "q": "What is the specific content and scope of the war powers resolution Congress is considering?",
           "a": "Not yet reported."
         },
         {
-          "q": "What is the full extent of casualties and damage across all affected locations?",
-          "a": "Two deaths in Abu Dhabi and 'dozens' injured reported, but comprehensive casualty and damage figures for all locations are not yet reported."
-        },
-        {
-          "q": "How are Gulf state governments and the US responding militarily or diplomatically to these attacks?",
+          "q": "When exactly will the congressional vote on Trump's war powers in Iran take place?",
           "a": "Not yet reported."
         },
         {
-          "q": "What specific methods and strategies did Ayatollah Khamenei use to maintain his grip on power for nearly 40 years?",
+          "q": "What is the official position of the White House regarding the upcoming congressional vote on war powers?",
           "a": "Not yet reported."
         },
         {
-          "q": "How did Khamenei manage internal dissent and opposition within Iran during his rule?",
+          "q": "What caused the Kuwaiti air defenses to mistakenly identify and shoot down the US F-15s?",
           "a": "Not yet reported."
         },
         {
-          "q": "What role did Iran's security apparatus and political institutions play in supporting Khamenei's long-term authority?",
+          "q": "What specific mission or operation were the US F-15s conducting at the time of the incident?",
           "a": "Not yet reported."
         },
         {
-          "q": "Which specific airlines have suspended or extended flight cancellations?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "Which airports or hubs are most affected by the Iranian strikes and resulting airspace closures?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "What is the expected duration of the flight suspensions and disruptions?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "What specifically caused the smoke at Dubai\u2019s Jebel Ali Port?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "Were the incidents in Dubai and Riyadh part of a coordinated Iranian attack or separate events?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "What is the extent of the damage or casualties, if any, at the affected locations?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "What is the confirmed number of casualties and extent of damage caused by the Iranian missile strikes in Tel Aviv?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "Is there verified evidence directly linking the Iranian missile attack to the deadly Tel Aviv blast President Herzog visited?",
-          "a": "Not yet reported."
-        },
-        {
-          "q": "What is the Israeli government's planned response to the Iranian missile strikes?",
+          "q": "How does this friendly fire incident impact US-Kuwaiti military cooperation and ongoing operations in the region?",
           "a": "Not yet reported."
         }
       ],
-      "bigger_picture": "If oil prices remain volatile or rise further, this could increase inflationary pressures globally, prompting central banks to reconsider interest rate policies. Prolonged instability in the Middle East may disrupt supply chains and heighten geopolitical tensions, potentially drawing in additional regional actors or prompting further military or economic responses. Increased market uncertainty could also accelerate shifts toward alternative energy sources and strategic stockpiling by major economies.",
+      "bigger_picture": "Rising oil and gas prices are likely to drive up global inflation and increase economic pressure on energy-importing countries, potentially slowing economic growth worldwide. The escalation and continued U.S. casualties may prompt further military deployments or political backlash within the U.S. and allied nations, increasing the risk of broader regional involvement. Disruptions to key shipping routes like the Strait of Hormuz could trigger supply chain shocks, affecting industries and consumers far beyond the Middle East.",
       "actions": [],
-      "editorial": "**Behind the Iran Strikes: Divergent Gambles in a Power Vacuum**\n\nThe sequence matters more than the symbolism. While Khamenei's death created an unprecedented leadership void, the exact timing relative to the U.S.-Israeli strikes remains unclear from available reports\u2014undermining any definitive claims about calculated opportunism versus reactive escalation.\n\n**Three Distinct Calculations, Not One Strategy**\n\nIsrael's logic appears operational: degrade Iranian capabilities while decision-making structures remain unclear. This reflects Israel's consistent preference for preemptive strikes during moments of perceived vulnerability, not coordination with U.S. political theater.\n\nTrump's immunity offers to IRGC leadership suggest a different calculation entirely: exploiting internal fractures to accelerate regime fragmentation. His public warnings against retaliation indicate expectations of Iranian institutional paralysis rather than tactical military objectives.\n\nThe Biden administration's exact motivations remain opaque from available reporting, though U.S. involvement suggests either alliance pressure or separate strategic calculations about Iranian nuclear trajectory during leadership uncertainty.\n\n**The Internal Power Struggle Variable**\n\nKhamenei's death doesn't simply create a \"transitional government\"\u2014it unleashes competing power centers. The IRGC maintains independent command structures and economic interests. Traditional clerical authorities control religious legitimacy. Political establishments manage international relationships and economic policy.\n\nExternal strikes don't just test Iranian resolve; they force these factions to choose between demonstrating revolutionary credentials through retaliation or pragmatic restraint to preserve institutional power. Trump's immunity offers specifically target IRGC leadership, potentially creating wedges between military hardliners and clerical moderates during succession negotiations.\n\nThis dynamic could empower IRGC factions seeking to prove revolutionary purity, or alternatively, strengthen pragmatic voices arguing for strategic patience during vulnerable transition periods.\n\n**Market Indicators: Duration, Not Direction**\n\nOPEC+ production discussions and airline route cancellations reveal expectations about conflict duration rather than intensity. British Airways and Virgin Atlantic cancellations extend beyond standard 24-48 hour precautionary measures, suggesting operational assessments of prolonged regional instability.\n\nHowever, OPEC+ considering production increases indicates expectations of manageable disruption\u2014if members anticipated catastrophic regional war threatening Saudi or UAE facilities, discussions would focus on strategic reserve releases, not gradual production adjustments.\n\nThe conflicting Brent crude reports ($72.87 vs $90.75) likely reflect market confusion about Iran's actual production vulnerability during leadership uncertainty, not coordinated price manipulation.\n\n**Proxy Networks: The Uncontrolled Variable**\n\nIran's regional proxies represent the most dangerous unknown. Hezbollah, Iraqi militias, and Houthis maintain independent decision-making capabilities that don't align with Tehran's institutional transitions. During leadership vacuums, these groups historically demonstrate loyalty through aggressive action rather than strategic restraint.\n\nThis creates escalation dynamics beyond any central calculation\u2014proxy retaliation could trigger broader regional conflict regardless of Iranian transitional leadership preferences.\n\n**Probability Assessment**\n\nThe available evidence suggests uncoordinated opportunism rather than sophisticated strategic coordination. Israel's operational focus on capability degradation, Trump's political theater targeting regime fracture, and uncertain Biden administration calculations point toward multiple actors pursuing separate objectives during Iranian vulnerability.\n\nThe greater danger lies not in calculated exploitation of Iranian weakness, but in the collision of divergent strategies during an unprecedented power vacuum. Iran's revolutionary institutions survived external pressure for decades under unified leadership\u2014their resilience during fractured succession remains untested territory with potentially catastrophic consequences for regional stability.",
+      "editorial": "# The Iran Escalation: Economic Warfare With Deadly Stakes\n\n## The Immediate Reality\n\nThree American service members are dead, and oil markets have responded with an 8 percent price surge\u2014these facts define the current crisis more clearly than diplomatic rhetoric. The economic disruption is immediate and measurable; the political consequences are still unfolding.\n\nTrump's stated objectives of \"crippling Iran's ballistic missile and nuclear capabilities and toppling its governing system\" represent maximalist goals that senior US officials already doubt are achievable through military means. This disconnect between presidential rhetoric and operational skepticism suggests an administration managing competing pressures: the need to respond forcefully to American casualties while lacking a clear path to stated objectives.\n\n## The Domestic Political Pressure Cooker\n\nAmerican military deaths create specific political dynamics that constrain presidential options. Congress will face immediate pressure to either authorize expanded military action or demand clear exit strategies. Political opponents will likely frame this as either insufficient response to attacks on American troops or reckless escalation risking broader war.\n\nThe administration faces a familiar trap: military retaliation following American casualties often generates demands for expanded action, but expanded action risks mission creep without clear victory conditions. This dynamic has historically pushed presidents toward deeper commitment rather than de-escalation.\n\n## Market Reality Check\n\nThe 8 percent oil price spike reflects genuine market assessment of supply disruption risk, particularly around the Strait of Hormuz. Energy markets are pricing in real threats to global infrastructure, not speculation. This economic leverage gives Iran asymmetric power to impose costs on the global economy even while facing overwhelming conventional military disadvantage.\n\nGold and gasoline prices rising alongside crude futures indicates market expectations of sustained instability. Financial sources warning of a \"global oil shock\" suggest traders are positioning for prolonged disruption, not temporary volatility.\n\n## Strategic Miscalculation Patterns\n\nThe current escalation follows a recognizable pattern: initial military response to casualties expands into broader campaign with unclear objectives. In Lebanon (1983), Marine barracks bombing led to expanded military presence that ultimately achieved neither security nor political goals. The specific parallel is instructive: American deaths prompted mission expansion that lacked sustainable political strategy.\n\nSimilarly, the 1987-1988 Tanker War demonstrated Iran's capacity to leverage asymmetric capabilities\u2014mining operations, speedboat attacks, infrastructure disruption\u2014to offset conventional disadvantages. The current situation shows identical Iranian advantages: ability to impose economic costs while avoiding direct superpower confrontation.\n\n## France's Calculated Positioning\n\nFrance's declaration of readiness to \"defend Gulf states\" reflects European recognition that energy security requires regional stabilization. This positions European allies as responsible partners while maintaining distance from American regime-change objectives they cannot support.\n\n## The Uncomfortable Math\n\nIran possesses demonstrated capability to disrupt global energy supplies through Strait of Hormuz operations. This provides immediate, asymmetric leverage that partially neutralizes American military superiority. The economic disruption begins immediately\u2014as oil markets have already shown\u2014while political objectives remain distant and uncertain.\n\nSenior US officials' skepticism about achieving regime change reveals the fundamental problem: military pressure cannot produce sustainable political transformation in Tehran any more than it achieved lasting change in Iraq or Afghanistan.\n\nThe critical question is whether rising economic costs and domestic political pressure will force recalculation of objectives before diplomatic alternatives disappear. Energy markets suggest that timeline may be shorter than military planners expect.",
       "editorial_writer": "Claude",
       "editorial_editor": "Gemini Pro",
       "editorial_rounds": 2,
-      "what_happened": "The United States and Israel have launched strikes on Iran, leading to immediate disruptions in the region. Oil prices have already risen, with Brent crude closing at a recent high, and OPEC+ is considering a production increase in response to the conflict. Major airlines, including British Airways and Virgin Atlantic, have cancelled or diverted flights in and out of the Middle East. The Hong Kong government has stated it is preparing for increased global market volatility following the attacks.",
-      "so_what": "These strikes have caused oil prices to rise, directly affecting fuel costs and potentially increasing prices for goods and services worldwide. The conflict has disrupted international travel and raised the risk of broader instability in the Middle East, a key region for global energy supply. The situation is creating significant uncertainty in global financial markets, which could impact investments and economic growth.",
+      "what_happened": "Military conflict is escalating in the Middle East, involving Iran, the US, and Israel, with attacks and retaliatory strikes reported across the region. Three US service members have been killed and five seriously wounded in the Iran war, with American jets downed in Kuwait. Oil and gas prices have surged sharply, with crude futures rising by around 8 percent, and global stock markets are sliding amid fears over disruptions to energy supplies, especially around the Strait of Hormuz. France has stated it is ready to defend Gulf states against Iran as the conflict widens.",
+      "so_what": "This conflict is directly impacting global energy prices, making gasoline and other commodities more expensive for consumers worldwide. The deaths of US troops and the involvement of multiple countries raise the risk of broader military escalation, potentially destabilizing the region further. The economic fallout is already affecting stock markets and could trigger a global oil shock, with significant consequences for businesses and households.",
       "agreed_facts": [
-        "The Hong Kong government has stated it is prepared for increased global market volatility following the Iran attacks, according to Finance Secretary Paul Chan.",
-        "Major airlines such as British Airways and Virgin Atlantic have cancelled or diverted flights in and out of the Middle East after the Iran strikes.",
-        "OPEC+ is actively considering a potential increase in oil production as a direct response to the current conflict.",
-        "There is a discrepancy in reported Brent crude prices at Friday's close, with sources citing either US$72.87 or US$90.75.",
-        "The specific targets and extent of damage from the US-Israel strikes on Iran have not been detailed in available reports.",
-        "Donald Trump has publicly warned Iran not to retaliate following Khamenei's death.",
-        "The death of Ayatollah Ali Khamenei leaves a significant power vacuum in Iran, as he had led the Islamic Republic since 1989.",
-        "Trump has offered immunity to members of the IRGC, Iranian military, and police forces.",
-        "There is uncertainty regarding the succession plan for Iran's leadership after Khamenei's death.",
-        "Ayatollah Ali Khamenei had ruled Iran for 36 years before his reported death.",
-        "France 24 highlights uncertainty about whether Khamenei\u2019s death will lead to regime change in Iran.",
-        "The incident has heightened fears of wider regional instability, according to France 24.",
-        "The Washington Post reports that Tehran responded to the attack by striking Israel and Arab states, but details about these retaliatory strikes are not provided.",
-        "Israel claims that around 200 fighter jets struck more than 500 targets in Iran.",
-        "The United Nations Security Council held an emergency meeting in response to the attacks on Iran.",
-        "Airlines have cancelled flights across the Middle East following the escalation of military actions.",
-        "Analysts warn that prolonged closure of the Strait of Hormuz could trigger a major global energy shock, potentially pushing oil prices to $100 per barrel.",
-        "Iranian President has stated that retaliation is both a right and a duty following Khamenei's killing.",
-        "Iran's security chief has vowed that strikes against the US and Israel will be of a kind 'never experienced before.'",
-        "Experts warn that a prolonged closure of the Strait of Hormuz would be a critical problem for global energy supplies.",
-        "Iran's president has called the killing a 'declaration of war against Muslims.'",
-        "Multiple international news outlets report that the conflict is spreading across the Gulf region.",
-        "Israel has deployed Air Force jets over Tehran during its operation.",
-        "Iran's missile attacks have also targeted Gulf Arab states in addition to Israel.",
-        "The death of Supreme Leader Ayatollah Ali Khamenei is cited as the trigger for the current escalation.",
-        "Iranian President has declared that avenging Khamenei's death is a 'legitimate right.'",
-        "Iran has announced 40 days of mourning and 7 public holidays following Khamenei's death.",
-        "Public reaction in Iran is mixed, with reports of both celebration and grief.",
-        "France 24 reports that the transition process for Khamenei's successor has begun, and that former President Trump has threatened Iran with force.",
-        "Iran has vowed revenge for the killing of its supreme leader despite external threats.",
-        "Former US President Donald Trump described the operation as 'massive.'",
-        "Some sources highlight concerns that the strikes could reignite a regional conflict and further diminish hopes for diplomacy.",
-        "Canada has publicly stated its support for the United States and Israel regarding the strikes on Iran.",
-        "Iran has accused the United States and Israel of committing a 'war crime' in connection with the strikes.",
-        "World leaders are urging a return to diplomatic talks following the escalation.",
-        "The strikes and subsequent events have prompted warnings of 'grave consequences' from various international actors.",
-        "The UN Security Council is holding an emergency meeting in response to the US-Israeli strikes against Iran.",
-        "NHK World reports that the CIA tracked Khamenei's location and meeting schedule in advance, enabling the targeted strike.",
-        "Some protesters in Isfahan are specifically calling for revenge following the attacks.",
-        "Multiple sources debate the legality of the US attack, with some calling it unconstitutional and reckless.",
-        "Insurers are cancelling policies and raising prices for ships operating in the Gulf and Strait of Hormuz, with the cost of cover expected to increase by as much as 50%.",
-        "Brokers attribute the surge in insurance costs directly to the conflict following Iran's attacks.",
-        "Fears of a wider regional conflict are rising as the situation escalates.",
-        "Khamenei has relied on the support of Iran\u2019s Islamic Revolutionary Guard Corps (IRGC) to maintain his authority.",
-        "He has systematically sidelined political rivals and consolidated power within a small circle of loyalists.",
-        "Khamenei has overseen the suppression of dissent through crackdowns on protests and restrictions on media and civil society.",
-        "He has used Iran\u2019s Guardian Council to vet and disqualify electoral candidates, ensuring only regime-approved figures can run for office.",
-        "France\u2019s CMA CGM has suspended its vessels\u2019 passage through the Suez Canal.",
-        "Japan shipping companies have suspended operations in the Persian Gulf.",
-        "The Thai Prime Minister has ordered evacuation flights for Thai nationals in the Middle East.",
-        "NHK World reports that Japanese residents in Dubai heard explosion sounds and observed missile interceptions during the incident.",
-        "NHK World states that airports across multiple Middle Eastern countries suffered damage and that flights to and from Japan were cancelled.",
-        "The Straits Times describes the air travel disruption as the largest since the Covid-19 pandemic.",
-        "Israeli President Isaac Herzog visited the site of the Tel Aviv blast following the missile strike.",
-        "The Iranian missile attack led to the evacuation of residents from affected areas in Tel Aviv.",
-        "Dozens of buildings in Tel Aviv sustained damage as a result of the Iranian strikes."
+        "Crude oil futures surged by approximately 8 percent following the escalation of conflict, with prices nearing $80 per barrel amid fears over the security of the Strait of Hormuz.",
+        "Stock markets have experienced significant declines as a result of the conflict and rising energy prices, with financial sources warning of a potential 'global oil shock.'",
+        "France has stated it is 'ready' to defend Gulf states against Iran as the conflict widens.",
+        "Gasoline and gold prices have also risen notably in response to the instability in the region.",
+        "Pakistani authorities imposed a three-day curfew and deployed troops in the northern cities of Gilgit and Skardu on Monday following violent protests.",
+        "Several people died and tens were injured during the protests in Gilgit and Skardu.",
+        "US officials, including President Donald Trump, reportedly stated that crippling Iran's ballistic missile and nuclear capabilities and toppling its governing system were goals of the operation.",
+        "Many senior US officials are skeptical that the military operation will result in regime change in Iran.",
+        "Iran conflict has disrupted oil supply to Asian countries that are heavily dependent on Middle Eastern oil, according to Al Monitor.",
+        "Analysts cited by CNBC and MarketWatch warn that a prolonged closure of the Strait of Hormuz could push oil prices to $100 or even $120 per barrel, potentially triggering a 1970s-style energy shock.",
+        "Major European stock indexes have fallen, and Gulf stock exchanges remained shut following the escalation, according to EuroNews and Washington Post.",
+        "France 24 and Al Monitor specify that the surge in oil prices and market disruptions occurred on a Monday.",
+        "MarketWatch and Bloomberg report that the Iran conflict has caused a significant spike in global energy costs, with particular concern over the security of critical energy chokepoints.",
+        "The Calgary Herald highlights that oil markets are especially vulnerable due to the conflict, with increased volatility and uncertainty for global supply.",
+        "Global News Canada provides accounts from Canadians in the Middle East describing the situation as 'surreal' during Iranian missile strikes.",
+        "Global News Canada also reports emotional responses from Iranian Canadians, including fear and distress following U.S. strikes in Iran.",
+        "CBC News notes that U.S. allies are deliberately avoiding public criticism of either Washington or Tehran to prevent escalation or diplomatic fallout.",
+        "The US has confirmed that American troops have been killed and wounded in clashes with Iranian forces.",
+        "These casualties were reported a day after the US launched its campaign against Iran.",
+        "Tehran is targeting US military assets and bases in the region.",
+        "Iranian-made drones have been used in attacks during this period, including one that hit a British air base in Cyprus, causing limited damage.",
+        "Several U.S. military aircraft crashed in Kuwait as Iranian strikes continued, though the cause of the crashes is not specified.",
+        "Kuwait intercepted hostile drones on the third day of Iranian retaliatory strikes, but the origin of these drones is not confirmed.",
+        "Iran\u2019s reprisals led to the closure of Israel\u2019s houses of worship during Ramadan and Purim.",
+        "Following the Iranian strikes, global financial markets reacted with oil prices surging, airline stocks falling, and investors moving to the U.S. dollar.",
+        "CNBC reports that Dow futures dropped over 500 points and oil prices spiked following the US attack on Iran.",
+        "CNBC confirms that three US fighter jets were downed over Kuwait in an apparent friendly fire incident.",
+        "Wired and the Financial Times both describe the US action as a high-risk or 'epic gamble' for President Trump.",
+        "The National Post characterizes Trump's military doctrine as insular, favoring short military commitments and low-risk opportunism.",
+        "Some sources report that Hezbollah's rocket attack was launched in response to the alleged killing of Iranian Supreme Leader Ali Khamenei.",
+        "The escalation between Israel and Hezbollah is contributing to a wider regional conflict involving Iran.",
+        "There are ongoing US-Israel military actions targeting Iran in parallel with the strikes in Lebanon.",
+        "Israeli officials have publicly vowed to expand military operations in Lebanon following the latest exchange of fire.",
+        "Iran's campaign has resulted in four deaths and dozens of injuries in the Gulf region since its start.",
+        "UK Labour leader Keir Starmer has stated that the US can use UK bases for missile strikes on Iran.",
+        "China faces potential oil supply challenges following US-Israel strikes on Iran.",
+        "Iran has developed 'missile cities' hidden inside mountains as a key element of its military strategy.",
+        "Iran's recent military actions represent a shift from previously targeting US assets to now focusing on Gulf states.",
+        "The escalation in Iranian attacks is viewed as one of the most dangerous gambles of the Trump administration, according to El Pais English.",
+        "Democrats are leading efforts to force a vote on limiting President Trump's war powers regarding Iran.",
+        "There is criticism that the congressional vote may occur after military action has already started.",
+        "The Trump administration is scheduled to brief Congress on Iran on Tuesday.",
+        "The friendly fire incident was confirmed by United States Central Command (CENTCOM).",
+        "DW News frames the shootdown as part of a broader 'Iran war' context.",
+        "Middle East Eye and Times of Israel both report that Kuwaiti air defenses were responsible for the shootdown, based on CENTCOM statements."
+      ],
+      "disputes": [],
+      "framing": [],
+      "coverage_note": "",
+      "investigation_impact": "The reader should now understand this is not just an escalation of regional tensions, but a full-blown conflict initiated by the killing of a head of state, leading to widespread, direct military exchanges and significant casualties across several nations. This context reframes Iran's actions as direct retaliation for the death of its leader and elevates the entire event to a major international crisis with severe and ongoing consequences.",
+      "key_unknowns": [
+        {
+          "question": "What is the current status of the Strait of Hormuz and the Ras Tanura refinery after the reported attacks?",
+          "answer": "Not yet reported."
+        },
+        {
+          "question": "What is the exact sequence and timeline of attacks and retaliatory strikes between Iran, the US, Israel, and Gulf states?",
+          "answer": "Not yet reported."
+        },
+        {
+          "question": "What are the total casualty figures for all parties involved in the conflict?",
+          "answer": "Not yet reported."
+        },
+        {
+          "question": "What triggered the current escalation and widespread retaliation?",
+          "answer": "The targeted killing of Iran's Supreme Leader by US-Israeli forces on February 28, 2026."
+        },
+        {
+          "question": "What is the current operational status of key energy infrastructure?",
+          "answer": "The Strait of Hormuz is under de facto closure, and the Ras Tanura refinery has been attacked."
+        }
+      ],
+      "predictions": [],
+      "notable_details": [],
+      "card_mode": "contested",
+      "contested_reason": "Framing of the Iran war differs between Trump-aligned/conservative sources and centrist/mainstream outlets, with the former emphasizing continued conflict and casualties and the latter focusing on economic disruption.",
+      "depth_tier": "deep",
+      "importance": 5,
+      "importance_reason": "Major global event with immediate economic impact (oil prices) and geopolitical implications due to Middle East attacks disrupting supply. Affects millions globally.",
+      "topics": [
+        "economics_business",
+        "world_politics",
+        "climate_energy"
+      ],
+      "source_count": 92,
+      "independent_count": 53,
+      "region_count": 6,
+      "sources": [
+        {
+          "name": "NPR",
+          "region": "USA",
+          "bias": "centre-left",
+          "perspective": "Economic Impact: Oil & Gas Prices",
+          "angle": "These sources primarily focus on the immediate and significant impact of the escalating conflict on global energy markets, specifically the sharp rise in oil and gas prices, and the broader financial market reactions like stock slides and dollar firming. They often link these price changes directly to disruptions in supply or fears of shipping disruptions.",
+          "url": "https://www.npr.org/2026/03/01/nx-s1-5731584/oil-prices-iran-us-israel-attacks-war",
+          "pub_date": "Sun, 01 Mar 2026 19:38:42 -0500"
+        },
+        {
+          "name": "The Hill",
+          "region": "USA",
+          "bias": "centre",
+          "perspective": "Military Escalation & Casualties",
+          "angle": "This perspective highlights the direct military escalation of the conflict, specifically focusing on American involvement, casualties, and the widening scope of the war. It emphasizes the human cost and the direct military actions.",
+          "url": "https://thehill.com/homenews/house/5762004-greene-criticizes-iran-operation/",
+          "pub_date": "Sun, 01 Mar 2026 21:47:57 +0000"
+        },
+        {
+          "name": "EuroNews",
+          "region": "Europe",
+          "bias": "centre",
+          "perspective": "Specific Attack on Saudi Refinery",
+          "angle": "These sources zero in on the drone attack on Saudi Arabia's Ras Tanura refinery as a key event in the escalation, detailing the incident, its immediate aftermath, and its significance as a target.",
+          "url": "http://www.euronews.com/2026/03/02/trump-says-iran-war-may-last-four-weeks-or-less-as-strikes-escalate",
+          "pub_date": "Mon, 02 Mar 2026 10:11:32 +0100"
+        },
+        {
+          "name": "France 24",
+          "region": "France",
+          "bias": "centre",
+          "perspective": "International Response & Alliances",
+          "angle": "This angle focuses on the reactions and potential involvement of international actors, specifically France's readiness to defend Gulf states, indicating a broader geopolitical response to the conflict.",
+          "url": "https://www.france24.com/en/strait-of-hormuz-closure-sparks-concern-over-possible-global-oil-shock",
+          "pub_date": "Mon, 02 Mar 2026 10:59:22 GMT"
+        },
+        {
+          "name": "Al Monitor",
+          "region": "Middle East/Africa",
+          "bias": "centre",
+          "perspective": "Market and Economic Impact",
+          "angle": "Focuses on the financial consequences of the conflict, such as rising oil and gas prices, stock market declines, and broader economic instability. Emphasizes the ripple effects on global markets rather than military or political developments.",
+          "url": "https://www.al-monitor.com/originals/2026/03/energy-prices-soar-stock-markets-slide-iran-war-fallout",
+          "pub_date": "2026-03-02T06:30:19-0500"
+        },
+        {
+          "name": "The Straits Times",
+          "region": "Singapore",
+          "bias": "centre",
+          "perspective": "Direct Attacks on Energy Infrastructure",
+          "angle": "Highlights specific attacks on oil refineries and energy facilities, particularly the Saudi Ras Tanura refinery, and the operational consequences (shutdowns, fires, etc.). Focuses on the tactical and immediate physical impact of the conflict on energy assets.",
+          "url": "https://www.straitstimes.com/world/middle-east/major-saudi-refinery-kurdish-and-israeli-oil-gas-fields-shut-amid-mid-east-strikes",
+          "pub_date": "Mon, 02 Mar 2026 18:16:52 +0800"
+        },
+        {
+          "name": "Toronto Star",
+          "region": "Canada",
+          "bias": "centre-left",
+          "perspective": "Allegations of US-Israeli Strikes on Iranian Nuclear Facilities",
+          "angle": "Focuses on Iranian officials' claims that US-Israeli airstrikes targeted the Natanz nuclear enrichment facility, highlighting nuclear concerns and Iranian allegations.",
+          "url": "https://www.thestar.com/news/world/asia/pakistan-deploys-troops-imposes-3-day-curfew-after-deadly-protests-over-us-israeli-strikes-on/article_793361d1-e2f9-534f-81af-504ea321c1e1.html",
+          "pub_date": "Mon, 02 Mar 2026 05:12:32 -0500"
+        },
+        {
+          "name": "Vatican News",
+          "region": "Vatican",
+          "bias": "religious",
+          "perspective": "Death of Khamenei and Leadership Transition",
+          "angle": "Reports the death of Iran's Supreme Leader Ali Khamenei in the strikes, focusing on the end of his rule, the implications for Iran's leadership, and the immediate power transition.",
+          "url": "https://www.vaticannews.va/en/world/news/2026-03/iran-s-supreme-leader-killed-in-u-s-israeli-attack.html",
+          "pub_date": "Sun, 01 Mar 2026 15:49:00 +0100"
+        },
+        {
+          "name": "South China Morning Post",
+          "region": "Hong Kong",
+          "bias": "centre",
+          "perspective": "Skepticism About Regime Change",
+          "angle": "Centers on US officials' skepticism regarding the likelihood of regime change in Iran following Khamenei's death, providing a cautious geopolitical analysis.",
+          "url": "https://www.scmp.com/news/world/middle-east/article/3345142/us-officials-sceptical-iran-regime-change-after-khamenei-killing-sources-say?utm_source=rss_feed",
+          "pub_date": "Mon, 02 Mar 2026 09:25:44 +0000"
+        },
+        {
+          "name": "Vancouver Sun",
+          "region": "Canada-BC",
+          "bias": "centre",
+          "perspective": "Diaspora and International Public Reaction",
+          "angle": "Highlights the reactions of Iranian Canadians and supporters abroad, focusing on celebration and the international diaspora's response to Khamenei's death.",
+          "url": "https://vancouversun.com/news/iranian-canadians-supporters-celebrate-in-vancouver-news-iran-supreme-leader-dead",
+          "pub_date": "Sat, 28 Feb 2026 22:16:35 +0000"
+        },
+        {
+          "name": "BBC News",
+          "region": "UK",
+          "bias": "centre",
+          "perspective": "General Economic Impact & Price Volatility",
+          "angle": "Focuses on the immediate economic consequences of the conflict, particularly the rise in oil prices and the fall in stock markets, often with a general warning about prolonged conflict.",
+          "url": "https://www.bbc.com/news/articles/c75evve6l63o?at_medium=RSS&at_campaign=rss",
+          "pub_date": "Mon, 02 Mar 2026 09:56:32 GMT"
+        },
+        {
+          "name": "DW News",
+          "region": "Germany",
+          "bias": "centre",
+          "perspective": "Specific Oil Market Analysis & Price Forecasts",
+          "angle": "Delves into the specifics of oil market dynamics, potential price ceilings, and the mechanisms by which prices might surge, often referencing historical energy shocks or specific benchmarks.",
+          "url": "https://www.dw.com/en/will-iran-war-send-oil-prices-above-100-a-barrel/a-76176495?maca=en-rss-en-all-1573-rdf",
+          "pub_date": "2026-03-02T07:19:00Z"
+        },
+        {
+          "name": "France 24",
+          "region": "France",
+          "bias": "centre",
+          "perspective": "Geographic Supply Chain & Trade Route Disruption",
+          "angle": "Highlights the impact on specific trade routes, particularly the Strait of Hormuz, and the implications for regional or global oil supply, with a focus on specific countries or regions dependent on these routes.",
+          "url": "https://www.france24.com/en/tv-shows/business/20260302-oil-prices-surge-as-tanker-traffic-in-strait-of-hormuz-grinds-to-a-halt",
+          "pub_date": "Mon, 02 Mar 2026 10:40:16 GMT"
+        },
+        {
+          "name": "Rappler",
+          "region": "Philippines",
+          "bias": "centre",
+          "perspective": "Regional Infrastructure & Service Disruptions",
+          "angle": "Focuses on the direct impact of the conflict on regional infrastructure, such as power or connectivity issues, rather than just financial markets or oil prices.",
+          "url": "https://www.rappler.com/technology/aws-middle-east-fire-united-arab-emirates-data-center-bahrain-issues/",
+          "pub_date": "Mon, 02 Mar 2026 14:41:43 +0800"
+        },
+        {
+          "name": "Taipei Times",
+          "region": "Taiwan",
+          "bias": "centre",
+          "perspective": "Assurance of Uninterrupted Supply (Specific Region)",
+          "angle": "Provides a localized perspective, specifically assuring that oil and gas supplies remain uninterrupted for a particular country or region despite the broader conflict.",
+          "url": "https://www.taipeitimes.com/News/front/archives/2026/03/02/2003853101",
+          "pub_date": "2026-03-02T08:00:00+08:00"
+        },
+        {
+          "name": "Washington Post",
+          "region": "USA",
+          "bias": "centre-left",
+          "perspective": "General market reaction and risk of prolonged conflict",
+          "angle": "Focuses on the immediate market impacts (oil up, stocks down) and warns that a prolonged or escalating conflict could worsen energy price shocks.",
+          "url": "https://www.washingtonpost.com",
+          "pub_date": "Mon, 02 Mar 2026 11:10:24 +0000"
+        },
+        {
+          "name": "CNBC",
+          "region": "USA-Finance",
+          "bias": "centre",
+          "perspective": "Strait of Hormuz disruption and shipping",
+          "angle": "Highlights the disruption of tanker traffic through the Strait of Hormuz as a key driver of oil price surges, emphasizing the strategic chokepoint's role.",
+          "url": "https://www.cnbc.com/2026/03/01/experts-weigh-potential-scenarios-for-oil-if-strait-of-hormuz-closes.html",
+          "pub_date": "Sun, 01 Mar 2026 16:55:54 GMT"
+        },
+        {
+          "name": "Al Monitor",
+          "region": "Middle East/Africa",
+          "bias": "centre",
+          "perspective": "Regional/sector-specific supply impacts",
+          "angle": "Examines how the conflict disrupts oil and energy supplies to specific regions or sectors, such as Asia or particular fuels like gasoil.",
+          "url": "https://www.al-monitor.com/originals/2026/03/iran-conflict-disrupts-oil-supply-asian-countries-dependent-middle-east",
+          "pub_date": "2026-03-02T04:01:42-0500"
+        },
+        {
+          "name": "EuroNews",
+          "region": "Europe",
+          "bias": "centre",
+          "perspective": "European and Gulf market responses",
+          "angle": "Emphasizes the reaction of European and Gulf stock exchanges, noting sharp declines in European stocks and the closure of Gulf exchanges.",
+          "url": "http://www.euronews.com/business/2026/03/02/european-stocks-dip-as-gulf-exchanges-stay-shut-following-iran-strikes",
+          "pub_date": "Mon, 02 Mar 2026 10:23:04 +0100"
+        },
+        {
+          "name": "The New Arab",
+          "region": "UK/ME",
+          "bias": "centre-left",
+          "perspective": "Pre-existing market tensions and anticipation",
+          "angle": "Notes that oil prices were already rising in anticipation of conflict, suggesting that markets were bracing for escalation before strikes began.",
+          "url": "https://www.newarab.com/news/oil-price-surges-stocks-drop-iran-conflict",
+          "pub_date": "Mon, 02 Mar 2026 03:48:11 +0000"
+        },
+        {
+          "name": "Calgary Herald",
+          "region": "Canada-AB",
+          "bias": "centre-right",
+          "perspective": "Economic Impact & Market Reaction",
+          "angle": "These sources focus on the financial and energy market repercussions of the conflict, including stock market slumps, energy price spikes, and disruptions to shipping lanes.",
+          "url": "https://calgaryherald.com/business/energy/how-united-states-trump-strikes-iran-impact-oil-markets",
+          "pub_date": "Sun, 01 Mar 2026 19:06:22 +0000"
+        },
+        {
+          "name": "Washington Post",
+          "region": "USA",
+          "bias": "centre-left",
+          "perspective": "Critique of US/Israeli Actions & Call for Opposition",
+          "angle": "These sources strongly condemn the US and Israeli strikes, framing them as illegal, reckless, and a threat to global peace, often calling for opposition to the war.",
+          "url": "https://www.washingtonpost.com/national-security/2026/03/02/trump-iran-negotiations-war/",
+          "pub_date": "Mon, 02 Mar 2026 11:00:38 +0000"
+        },
+        {
+          "name": "CBC News",
+          "region": "Canada",
+          "bias": "centre-left",
+          "perspective": "Allies' Reactions & Geopolitical Positioning",
+          "angle": "These sources examine how US allies, particularly Canada and European nations, are reacting to the strikes, their attempts to distance themselves or express support, and their broader geopolitical implications.",
+          "url": "https://www.cbc.ca/news/world/iran-attack-us-condemnation-condone-balance-9.7110775?cmp=rss",
+          "pub_date": "Mon, 02 Mar 2026 04:00:00 EST"
+        },
+        {
+          "name": "Global News Canada",
+          "region": "Canada",
+          "bias": "centre",
+          "perspective": "Personal and Diaspora Reactions",
+          "angle": "Highlights the emotional and practical effects of the conflict on individuals, particularly Canadians in the Middle East and Iranian Canadians, including flight disruptions and personal safety concerns.",
+          "url": "https://globalnews.ca/news/11711996/iranian-canadians-celebrate-us-strikes-iran/",
+          "pub_date": "Sun, 01 Mar 2026 19:56:27 +0000"
+        },
+        {
+          "name": "In These Times",
+          "region": "USA-Labor",
+          "bias": "left",
+          "perspective": "Critical of US/Israeli Actions and Pro-War Narrative",
+          "angle": "Frames the US and Israeli strikes as reckless, illegal, or unjustified, emphasizing opposition to war, questioning the legitimacy of the attacks, and warning of global risks posed by US policy.",
+          "url": "https://inthesetimes.com/article/no-us-war-on-iran-open-letter-to-un-security-council-jeffrey-sachs",
+          "pub_date": "Thu, 19 Feb 2026 12:00:00 -0600"
+        },
+        {
+          "name": "New York Times",
+          "region": "USA",
+          "bias": "centre-left",
+          "perspective": "Western Allies\u2019 Reluctance and Marginalization",
+          "angle": "Emphasizes how US allies are distancing themselves from the strikes, trying to avoid escalation, and feeling sidelined or disregarded by US decision-making.",
+          "url": "https://www.nytimes.com/2026/03/02/world/europe/trump-iran-europe.html",
+          "pub_date": "Mon, 02 Mar 2026 10:07:45 +0000"
+        },
+        {
+          "name": "DW News",
+          "region": "Germany",
+          "bias": "centre",
+          "perspective": "Primary report",
+          "angle": "Lead coverage",
+          "url": "https://www.dw.com/en/us-confirms-american-troops-killed-wounded-in-iran-clashes/a-76177887?maca=en-rss-en-all-1573-rdf",
+          "pub_date": "2026-03-01T19:00:00Z"
+        },
+        {
+          "name": "Middle East Eye",
+          "region": "UK/ME",
+          "bias": "centre",
+          "perspective": "Direct attacks on civilian infrastructure in Qatar",
+          "angle": "Focuses on Iranian attacks specifically targeting civilian sites in Qatar, including an airport, highlighting the threat to non-military targets and regional escalation.",
+          "url": "https://www.middleeasteye.net/live-blog/live-blog-update/iranian-attacks-targeted-civilian-infrastructure-qatar-including-airport",
+          "pub_date": "Mon, 02 Mar 2026 09:52:35 +0000"
+        },
+        {
+          "name": "Daily Maverick",
+          "region": "South Africa",
+          "bias": "centre-left",
+          "perspective": "Military targets and incidents in the wider region",
+          "angle": "Emphasizes Iranian strikes and their effects on military assets and bases in the region, including US and British military facilities in Cyprus and Kuwait, rather than civilian infrastructure.",
+          "url": "https://www.dailymaverick.co.za/article/several-us-military-aircraft-crash-in-kuwait-as-iranian-strikes-continue",
+          "pub_date": "Mon, 02 Mar 2026 12:46:43 GMT"
+        },
+        {
+          "name": "Al Monitor",
+          "region": "Middle East/Africa",
+          "bias": "centre",
+          "perspective": "Regional air defense and escalation",
+          "angle": "Highlights the interception of hostile drones by Kuwait, focusing on the defensive measures and ongoing nature of Iranian retaliatory strikes.",
+          "url": "https://www.al-monitor.com/originals/2026/03/kuwait-intercepts-hostile-drones-third-day-iran-retaliatory-strikes",
+          "pub_date": "2026-03-02T00:01:40-0500"
+        },
+        {
+          "name": "Religion News Service",
+          "region": "USA",
+          "bias": "centre",
+          "perspective": "Impact on religious life and civilian society in Israel",
+          "angle": "Centers on the effect of Iranian reprisals on religious observance and daily life in Israel, particularly the closure of houses of worship during important holidays.",
+          "url": "https://religionnews.com/2026/03/01/irans-reprisals-against-israel-shutter-mosques-and-synagogues-during-ramadan-and-purim/",
+          "pub_date": "Sun, 01 Mar 2026 15:50:42 +0000"
+        },
+        {
+          "name": "CNBC",
+          "region": "USA-Finance",
+          "bias": "centre",
+          "perspective": "Financial market and economic impact",
+          "angle": "Analyzes the repercussions of the conflict on global financial markets, including oil prices, airline stocks, defense sector gains, and currency movements.",
+          "url": "https://www.cnbc.com/2026/03/02/irans-internet-down-amid-reports-of-us-israel-cyberattacks.html",
+          "pub_date": "Mon, 02 Mar 2026 09:26:48 GMT"
+        },
+        {
+          "name": "Bangkok Post",
+          "region": "Thailand",
+          "bias": "centre",
+          "perspective": "US Retaliation & Escalation",
+          "angle": "Focuses on President Trump's vow to avenge US deaths and the immediate escalation of the conflict, including the likelihood of further American casualties.",
+          "url": "https://www.bangkokpost.com/world/3208060/trump-vows-to-avenge-first-us-deaths-as-iran-war-intensifies",
+          "pub_date": "Mon, 02 Mar 2026 09:01:00 +0700"
+        },
+        {
+          "name": "Wired",
+          "region": "USA-Tech",
+          "bias": "centre",
+          "perspective": "Strategic Risk & Gamble",
+          "angle": "Examines the broader strategic implications and risks of the US military action, framing it as a significant gamble for Trump and potentially leading to regional chaos.",
+          "url": "https://www.wired.com/story/5-big-known-unknowns-donald-trump-iran-war/",
+          "pub_date": "Sun, 01 Mar 2026 17:47:31 +0000"
+        },
+        {
+          "name": "National Post",
+          "region": "Canada",
+          "bias": "centre-right",
+          "perspective": "Trump's Military Doctrine",
+          "angle": "Analyzes President Trump's specific military approach and doctrine in the context of the Iran conflict, characterizing it as insular and focused on low-risk opportunism.",
+          "url": "https://nationalpost.com/opinion/opinion-trumps-military-doctrine-is-insular-involving-small-short-military-commitments",
+          "pub_date": "Mon, 02 Mar 2026 11:00:31 +0000"
+        },
+        {
+          "name": "The Hill",
+          "region": "USA",
+          "bias": "centre",
+          "perspective": "Political and Legislative Response",
+          "angle": "Emphasizes the domestic US political fallout, including Democrats' push for a war powers vote and Trump's calls for regime change, as well as warnings about further casualties.",
+          "url": "https://thehill.com/homenews/administration/5760945-live-updates-trump-iran-strikes-regime-change/",
+          "pub_date": "Mon, 02 Mar 2026 00:16:53 +0000"
+        },
+        {
+          "name": "Financial Times",
+          "region": "UK",
+          "bias": "centre",
+          "perspective": "Uncertainty and Strategic Risks",
+          "angle": "Highlights the unpredictability and high-stakes nature of Trump's actions, framing the conflict as a major gamble with many unknowns.",
+          "url": "https://www.ft.com/content/e71429a4-c69e-4487-94ff-af5394c831c0",
+          "pub_date": "Sun, 01 Mar 2026 15:34:39 GMT"
+        },
+        {
+          "name": "Toronto Star",
+          "region": "Canada",
+          "bias": "centre-left",
+          "perspective": "Primary report",
+          "angle": "Lead coverage",
+          "url": "https://www.thestar.com/news/world/middle-east/photos-show-lebanese-people-fleeing-after-israeli-strikes/article_c5520a28-0176-5ddb-aef8-4b0f915aa885.html",
+          "pub_date": "Mon, 02 Mar 2026 05:47:39 -0500"
+        },
+        {
+          "name": "CATO Institute",
+          "region": "USA-Policy",
+          "bias": "libertarian",
+          "perspective": "Primary report",
+          "angle": "Lead coverage",
+          "url": "https://www.cato.org/commentary/iran-war-puts-america-constitution-peace-facts-last",
+          "pub_date": "Thu, 26 Feb 2026 12:42:19 -0500"
+        },
+        {
+          "name": "DW News",
+          "region": "Germany",
+          "bias": "centre",
+          "perspective": "Gulf States' Vulnerability and Risk",
+          "angle": "This perspective focuses on the direct threat and impact of Iranian attacks on Gulf states, highlighting their exposure to missile strikes and the resulting fear and economic disruption for these monarchies.",
+          "url": "https://www.dw.com/en/will-gulf-states-enter-the-iran-war/a-76175593?maca=en-rss-en-all-1573-rdf",
+          "pub_date": "2026-03-01T15:13:00Z"
+        },
+        {
+          "name": "The Intercept",
+          "region": "USA",
+          "bias": "left",
+          "perspective": "Congressional Challenge to Presidential War Powers",
+          "angle": "This perspective highlights the efforts by Congress, particularly Democrats and some Republicans, to assert their constitutional authority over military action and curb the President's unilateral power in Iran, especially after military actions have already begun.",
+          "url": "https://theintercept.com/2026/02/26/iran-war-powers-vote-democrats-gottheimer-moskowitz/",
+          "pub_date": "Thu, 26 Feb 2026 21:16:15 +0000"
+        },
+        {
+          "name": "DW News",
+          "region": "Germany",
+          "bias": "centre",
+          "perspective": "Focus on US Military Confirmation and Broader Regional Context",
+          "angle": "This perspective emphasizes the confirmation from the US military (CENTCOM) regarding the friendly fire incident and places it within a broader regional context, mentioning other related events like Israeli actions or the ongoing Iranian attack.",
+          "url": "https://www.dw.com/en/iran-war-us-fighter-jets-downed-by-friendly-fire-in-kuwait/live-76179461?maca=en-rss-en-all-1573-rdf",
+          "pub_date": "2026-03-02T11:26:00Z"
+        },
+        {
+          "name": "Middle East Eye",
+          "region": "UK/ME",
+          "bias": "centre",
+          "perspective": "Direct Reporting of CENTCOM Statement",
+          "angle": "This perspective directly reports the statement from CENTCOM about Kuwait's air defense mistakenly shooting down the US F-15s, focusing on the immediate details of the incident as confirmed by the US military.",
+          "url": "https://www.middleeasteye.net/live-blog/live-blog-update/kuwait-air-defence-mistakenly-shoots-down-three-us-f-15s-centcom-says",
+          "pub_date": "Mon, 02 Mar 2026 11:28:01 +0000"
+        },
+        {
+          "name": "Times of Israel",
+          "region": "Israel",
+          "bias": "centre",
+          "perspective": "Operational Impact and Immediate Consequences",
+          "angle": "Highlights the friendly fire incident but also notes the survival of all crew and the closure of the US embassy in Kuwait City, suggesting concern for immediate operational and diplomatic consequences. Also situates the incident within the context of an ongoing Iranian attack.",
+          "url": "https://www.timesofisrael.com/kuwait-says-several-us-warplanes-crashed-in-the-country-all-crew-survived/",
+          "pub_date": "Mon, 02 Mar 2026 09:40:27 +0000"
+        },
+        {
+          "name": "Politico EU",
+          "region": "Europe",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.politico.eu/podcast/politics-at-sam-and-annes/why-starmer-bowed-to-trump-on-iran/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "pub_date": "Mon, 02 Mar 2026 08:37:33 +0000"
+        },
+        {
+          "name": "Politico EU",
+          "region": "Europe",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.politico.eu/podcast/brussels-playbook-podcast/europes-balancing-act-on-iran/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "pub_date": "Mon, 02 Mar 2026 05:30:00 +0000"
+        },
+        {
+          "name": "DW News",
+          "region": "Germany",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.dw.com/en/india-news-opposition-congress-criticizes-modi-over-iran-crisis/live-76179075?maca=en-rss-en-all-1573-rdf",
+          "pub_date": "2026-03-02T09:21:00Z"
+        },
+        {
+          "name": "Bloomberg",
+          "region": "USA-Finance",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.bloomberg.com/news/articles/2026-03-01/energy-in-focus-as-global-equity-traders-brace-for-iran-impact",
+          "pub_date": "Sun, 01 Mar 2026 20:45:06 GMT"
+        },
+        {
+          "name": "Bloomberg",
+          "region": "USA-Finance",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.bloomberg.com/news/articles/2026-03-02/fuel-prices-jump-along-with-oil-on-delays-in-strait-of-hormuz",
+          "pub_date": "Mon, 02 Mar 2026 04:19:37 GMT"
+        },
+        {
+          "name": "New York Times",
+          "region": "USA",
+          "bias": "centre-left",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.nytimes.com/2026/03/02/podcasts/the-headlines/trump-iran-oil-prices-jump.html",
+          "pub_date": "Mon, 02 Mar 2026 11:00:22 +0000"
+        },
+        {
+          "name": "National Review",
+          "region": "USA",
+          "bias": "right",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.nationalreview.com/2026/02/iran-chose-the-hard-way/",
+          "pub_date": "Sat, 28 Feb 2026 21:45:08 +0000"
+        },
+        {
+          "name": "Fox News",
+          "region": "USA",
+          "bias": "right",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.foxnews.com/opinion/gordon-sondland-no-more-restraint-europe-must-stand-with-america-on-iran",
+          "pub_date": "Mon, 02 Mar 2026 05:00:56 -0500"
+        },
+        {
+          "name": "Fox News",
+          "region": "USA",
+          "bias": "right",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.foxnews.com/opinion/doug-schoen-as-a-democrat-i-back-trumps-iran-strikemy-party-is-wrong",
+          "pub_date": "Mon, 02 Mar 2026 05:00:48 -0500"
+        }
+      ],
+      "missing_perspectives": [
+        "Critique of US Leadership/Narrative",
+        "Western/Military Response and Regional Security",
+        "American Casualties and Political Messaging"
+      ],
+      "comparisons": {
+        "Gemini Pro": "AGREED FACTS:\nMultiple sources report that military actions involving Iran, the US, and Israel are ongoing. NPR, EuroNews, and The Straits Times all mention attacks in the region. NPR and EuroNews specify US and Israeli strikes on Iran, and retaliatory strikes by Tehran against US, Israeli, and Gulf targets.\n\nSeveral sources confirm a significant negative economic impact from the conflict. NPR, France 24, and Al Monitor all report that oil prices have risen sharply. France 24 and Al Monitor both state that crude futures surged by approximately 8 percent. Al Monitor and France 24 also report on broader financial market reactions, including sliding stock markets (Al Monitor) and fears of a \"global oil shock\" (France 24).\n\nThe conflict has caused US casualties. The Hill reports that three US service members have been killed and five seriously wounded, attributing this information to U.S. Central Command.\n\nDISAGREEMENTS:\nNo substantive contradictions identified.\n\nFRAMING DIFFERENCES:\nThe sources frame the conflict through different lenses, focusing on distinct aspects of the escalation.\n\nNPR and Al Monitor frame the events primarily through their immediate, broad economic consequences. NPR's headline connects \"attacks in Middle East\" directly to \"disrupt supply\" and rising oil prices. Al Monitor uses strong verbs like \"soared,\" \"slid,\" and \"rocketed\" to frame the \"widening Iran war\" as an event that \"shook financial markets.\"\n\nFrance 24 and The Straits Times frame the conflict by focusing on specific strategic chokepoints in the energy supply chain. France 24 frames the situation as a potential \"new global oil shock\" caused by the \"effective closure\" of the Strait of Hormuz, a \"crucial choke point.\" The Straits Times frames the attack on the Ras Tanura refinery as a \"significant escalation,\" highlighting the targeting of critical infrastructure.\n\nThe Hill frames the story around the human cost and political reaction within the US. It emphasizes the casualties by quoting Marjorie Taylor Greene's opinion that the deaths were \"unnecessary\" and \"unacceptable\" and the operation \"absolutely unnecessary.\"\n\nEuroNews frames the conflict around a statement from former President Trump. Its headline, \"Trump says Iran war may last \u2018four weeks or less\u2019 as strikes escalate,\" centers the narrative on his prediction about the war's duration, while also noting the ongoing military actions.\n\nKEY UNKNOWNS:\nThe provided extractions do not specify the exact timeline or sequence of the attacks and retaliatory strikes. The specific nature of the US and Israeli attacks on Iran, and the Iranian attacks on US, Israeli, and Gulf targets, remains unclear. The total number of casualties for all parties involved in the conflict is not mentioned. The specific date of the US casualties is only noted as being reported on a Sunday morning. The current status of the Strait of Hormuz and the Ras Tanura refinery after the reported attacks is not detailed.",
+        "ChatGPT": "AGREED FACTS:\n- Multiple sources (NPR, France 24, Al Monitor) confirm that oil prices and crude futures rose sharply following military escalation in the Middle East.\n- NPR, France 24, and Al Monitor all attribute the rise in oil prices to disruptions in the global energy supply chain caused by military actions involving the U.S., Israel, and Iran.\n- France 24 and Al Monitor both report that world crude futures surged around 8%.\n- Al Monitor and France 24 both note significant negative impacts on financial markets, including sliding stock markets and a move by investors toward the dollar and gold.\n- The Hill and EuroNews both confirm that U.S. military personnel have been killed or wounded in the conflict.\n- EuroNews and NPR both report ongoing U.S.-Israeli military actions against Iran and retaliatory strikes by Iran against U.S., Israeli, and Gulf state targets.\n- France 24 confirms that Iranian attacks have effectively closed the Strait of Hormuz, a critical oil shipping route.\n- The Straits Times and EuroNews both reference direct attacks on energy infrastructure (Ras Tanura refinery in Saudi Arabia; strikes on Gulf state targets).\n\nDISAGREEMENTS:\nNo substantive contradictions identified.\n\nFRAMING DIFFERENCES:\n- NPR frames the situation as a direct link between \"attacks in the Middle East\" and \"disrupt supply,\" leading to \"oil prices rise sharply,\" emphasizing the economic consequences of military actions.\n- France 24 uses phrases like \"fears of a new global oil shock\" and \"crucial choke point\" to highlight the global economic risk and strategic significance of the Strait of Hormuz.\n- Al Monitor employs strong verbs (\"soared,\" \"rocketed,\" \"surged,\" \"shook\") and explicitly links market turmoil to the \"widening Iran war,\" emphasizing global financial instability.\n- The Hill centers its framing on the political and human cost, highlighting Marjorie Taylor Greene's opinion that the operation and resulting U.S. casualties are \"absolutely unnecessary\" and \"unacceptable.\"\n- EuroNews frames the conflict around Trump's statement that the Iran war \"may last \u2018four weeks or less\u2019\" and notes the escalation of strikes by both sides, emphasizing the potential duration and scope of the conflict.\n- The Straits Times focuses on the \"significant escalation\" represented by the attack on Saudi Arabia\u2019s Ras Tanura refinery, underlining the intensification of the conflict via direct hits on energy infrastructure.\n\nKEY UNKNOWNS:\n- The precise number and nationality of all casualties beyond the U.S. service members reported.\n- The official status and duration of the closure of the Strait of Hormuz and whether it is total or partial.\n- The extent of damage to Saudi Arabia\u2019s Ras Tanura refinery and its impact on global oil supply.\n- The specific sequence and scope of military actions by all parties (U.S., Israel, Iran, Gulf states).\n- The likelihood of further escalation or de-escalation, and the potential for diplomatic intervention.\n- The actual duration of the conflict, given Trump's prediction of \"four weeks or less,\" and whether this is credible.\n- The broader humanitarian impact within the affected regions beyond economic and military considerations."
+      },
+      "investigation_raw": "WHAT I FOUND:\nA joint US-Israeli military strike on Iran began on February 28, 2026, which resulted in the death of Iranian Supreme Leader Ayatollah Ali Khamenei and other senior officials. This action, named \"Operation Epic Fury\" by the US, triggered a significant escalation of conflict across the Middle East. Iran and its allies have launched retaliatory missile and drone attacks on US, Israeli, and Gulf state targets, including a drone strike on Saudi Arabia's Ras Tanura oil refinery. The conflict has resulted in hundreds of casualties, with reports of 555 killed in Iran, 11 in Israel, and 3 US service members.\n\nDOES THIS CHANGE THE STORY?\nYES \u2014 The initial coverage, while accurate in its general statements, omitted the single most critical event driving the conflict: the targeted killing of Iran's Supreme Leader, Ayatollah Ali Khamenei. The provided summary mentions military actions and rising tensions, but the confirmed death of the head of state and the specific, significant casualty figures from multiple nations fundamentally alter the gravity and nature of the situation. The original report also lacked clarity on the status of the Strait of Hormuz, which is now understood to be under a de facto closure due to risks, and it did not confirm the attack on the Saudi oil refinery.\n\nIF YES \u2014 STORY IMPACT:\nThe reader should now understand this is not just an escalation of regional tensions, but a full-blown conflict initiated by the killing of a head of state, leading to widespread, direct military exchanges and significant casualties across several nations. This context reframes Iran's actions as direct retaliation for the death of its leader and elevates the entire event to a major international crisis with severe and ongoing consequences.",
+      "written_by": "ChatGPT",
+      "qa_warnings": [
+        "The card states 'American jets downed in Kuwait' but Kuwait is not mentioned elsewhere in the conflict details, which focus on Iran, US, and Israel involvement.",
+        "The card refers to 'the Iran war' but does not establish what specific war this refers to - the text describes escalating conflict and attacks but doesn't clearly define an ongoing war between Iran and the US."
+      ],
+      "political_balance": "balanced",
+      "geo_diversity": 6,
+      "coverage_depth": "thin",
+      "heat_score": 364,
+      "_original_index": 0
+    },
+    {
+      "title": "\"Cancel ChatGPT\": AI boycott surges after OpenAI-Pentagon military deal",
+      "why_matters": "This development directly affects public trust in AI platforms and raises concerns about the use of advanced AI in military contexts, which could impact safety, privacy, and ethical standards. It also signals a shift in how governments and tech companies collaborate, potentially influencing global power dynamics and setting precedents for future AI deployment. The public reaction and boycott movement suggest this issue is becoming a major topic of debate and could shape consumer and policy decisions.",
+      "why_today": "The surge in boycott activity and public debate is happening now in direct response to the recent announcement of the OpenAI-Pentagon deal.",
+      "whats_happening": "OpenAI has signed a deal with the US Pentagon (also referred to as the Department of War) to provide its AI technology for military use, with details about technical safeguards being publicly discussed. This agreement has triggered a surge in public backlash, including a boycott movement labeled 'Cancel ChatGPT.' Meanwhile, a separate negotiation between the Pentagon and AI company Anthropic fell apart due to interpersonal conflicts and was described as a 'scary precedent' by OpenAI\u2019s CEO. The current situation is marked by heightened scrutiny of AI companies\u2019 relationships with the US military.",
+      "spin_positions": [
+        {
+          "position": "The OpenAI-Pentagon deal is dangerous and has sparked justified public backlash.",
+          "who": "Protest movement and critical media (e.g., EuroNews)",
+          "key_claim": "A 'Cancel ChatGPT' boycott is surging in response to OpenAI's military deal.",
+          "verified": "Partially verified \u2014 The existence of a boycott and protest movement is reported, but its size and impact are not quantified."
+        },
+        {
+          "position": "The OpenAI-Pentagon deal is a necessary step for national security, managed with technical safeguards.",
+          "who": "OpenAI leadership and some technology media (e.g., TechCrunch, The Register)",
+          "key_claim": "OpenAI's agreement with the Pentagon includes 'technical safeguards' to control military use.",
+          "verified": "Verified \u2014 Multiple sources confirm OpenAI leadership announced the deal and referenced safeguards."
+        }
+      ],
+      "spin_predictions": [
+        {
+          "prediction": "Activists and critical outlets may escalate calls for AI boycotts and frame AI-military partnerships as threats to civil liberties.",
+          "confidence": "likely"
+        },
+        {
+          "prediction": "OpenAI and supportive voices may emphasize technical controls and national security benefits to justify further government partnerships.",
+          "confidence": "likely"
+        }
+      ],
+      "key_facts": [
+        "The New York Times reports that negotiations between the Pentagon and Anthropic, another major AI company, fell apart due to strong personalities and mutual dislike.",
+        "The Register notes that OpenAI CEO Sam Altman criticized the Pentagon's decision to reject Anthropic, calling it a 'scary precedent.'",
+        "Reason reports that Anthropic has been labeled a supply chain risk and banned from federal government contracts.",
+        "TechCrunch highlights that OpenAI's deal with the Pentagon includes 'technical safeguards' to control how its AI is used in military applications.",
+        "TechCrunch also reports that billion-dollar infrastructure deals are powering the current AI boom."
+      ],
+      "context": [],
+      "history": [],
+      "unknowns": [
+        {
+          "q": "What are the specific terms and intended uses of OpenAI's technology in the Pentagon deal?",
+          "a": "Not yet reported."
+        },
+        {
+          "q": "How large and impactful is the 'Cancel ChatGPT' boycott movement?",
+          "a": "Not yet reported."
+        },
+        {
+          "q": "What were the precise reasons for the collapse of the Anthropic-Pentagon negotiations?",
+          "a": "Beyond references to 'strong personalities' and 'mutual dislike,' details are not yet reported."
+        }
+      ],
+      "bigger_picture": "The OpenAI-Pentagon deal is likely to intensify public scrutiny and protest against AI companies partnering with military institutions, as evidenced by the \"Cancel ChatGPT\" boycott movement. This backlash may pressure other AI firms to clarify or reconsider their own relationships with government and defense agencies, potentially slowing or complicating future collaborations. Additionally, the exclusion of Anthropic and the controversy over \"killer robots\" could accelerate regulatory debates and prompt calls for greater transparency and oversight of AI use in military contexts, affecting policy discussions globally.",
+      "actions": [],
+      "editorial": "",
+      "editorial_writer": "",
+      "editorial_editor": "",
+      "editorial_rounds": 0,
+      "what_happened": "OpenAI has signed a deal with the US Pentagon (also referred to as the Department of War) to provide its AI technology for military use, with details about technical safeguards being publicly discussed. This agreement has triggered a surge in public backlash, including a boycott movement labeled 'Cancel ChatGPT.' Meanwhile, a separate negotiation between the Pentagon and AI company Anthropic fell apart due to interpersonal conflicts and was described as a 'scary precedent' by OpenAI\u2019s CEO. The current situation is marked by heightened scrutiny of AI companies\u2019 relationships with the US military.",
+      "so_what": "This development directly affects public trust in AI platforms and raises concerns about the use of advanced AI in military contexts, which could impact safety, privacy, and ethical standards. It also signals a shift in how governments and tech companies collaborate, potentially influencing global power dynamics and setting precedents for future AI deployment. The public reaction and boycott movement suggest this issue is becoming a major topic of debate and could shape consumer and policy decisions.",
+      "agreed_facts": [
+        "The New York Times reports that negotiations between the Pentagon and Anthropic, another major AI company, fell apart due to strong personalities and mutual dislike.",
+        "The Register notes that OpenAI CEO Sam Altman criticized the Pentagon's decision to reject Anthropic, calling it a 'scary precedent.'",
+        "Reason reports that Anthropic has been labeled a supply chain risk and banned from federal government contracts.",
+        "TechCrunch highlights that OpenAI's deal with the Pentagon includes 'technical safeguards' to control how its AI is used in military applications.",
+        "TechCrunch also reports that billion-dollar infrastructure deals are powering the current AI boom."
       ],
       "disputes": [],
       "framing": [],
@@ -363,15 +942,338 @@
       "investigation_impact": "",
       "key_unknowns": [
         {
-          "question": "What were the specific targets and extent of damage from the US and Israeli strikes on Iran?",
+          "question": "What are the specific terms and intended uses of OpenAI's technology in the Pentagon deal?",
           "answer": "Not yet reported."
         },
         {
-          "question": "What was the outcome of the OPEC+ meeting regarding potential oil production increases?",
+          "question": "How large and impactful is the 'Cancel ChatGPT' boycott movement?",
           "answer": "Not yet reported."
         },
         {
-          "question": "What is the confirmed status of Ayatollah Ali Khamenei following reports of his death?",
+          "question": "What were the precise reasons for the collapse of the Anthropic-Pentagon negotiations?",
+          "answer": "Beyond references to 'strong personalities' and 'mutual dislike,' details are not yet reported."
+        }
+      ],
+      "predictions": [],
+      "notable_details": [],
+      "card_mode": "contested",
+      "contested_reason": "Framing of the OpenAI-Pentagon deal differs between those emphasizing public backlash and ethical concerns versus those focusing on national security and technical safeguards.",
+      "depth_tier": "standard",
+      "importance": 4,
+      "importance_reason": "Significant development in the AI and tech governance space, raising ethical concerns about military use of AI and impacting major tech companies. Affects the future of AI development and public trust.",
+      "topics": [
+        "tech_ai",
+        "data_privacy_governance",
+        "world_politics"
+      ],
+      "source_count": 14,
+      "independent_count": 11,
+      "region_count": 4,
+      "sources": [
+        {
+          "name": "EuroNews",
+          "region": "Europe",
+          "bias": "centre",
+          "perspective": "AI Boycott and Ethical Concerns",
+          "angle": "This perspective focuses on the public backlash and ethical concerns surrounding OpenAI's military deal, highlighting the 'cancel ChatGPT' movement and the perceived rush and 'optics' of the agreement.",
+          "url": "http://www.euronews.com/next/2026/03/02/cancel-chatgpt-ai-boycott-surges-after-openai-pentagon-military-deal",
+          "pub_date": "Mon, 02 Mar 2026 11:51:44 +0100"
+        },
+        {
+          "name": "The Register",
+          "region": "UK-Tech",
+          "bias": "centre",
+          "perspective": "Safeguards and Control in Military AI",
+          "angle": "This angle emphasizes OpenAI's claims about implementing 'technical safeguards' and 'guardrails' to control the use of AI in military applications, particularly concerning 'killer robots' and the distinction between cloudy and local AI.",
+          "url": "https://go.theregister.com/feed/www.theregister.com/2026/03/02/open_ai_dow_anthropic_ai_ethics/",
+          "pub_date": "2026-03-02T05:27:53.00Z"
+        },
+        {
+          "name": "Jacobin",
+          "region": "USA",
+          "bias": "left",
+          "perspective": "AI's Impact on Labor and Society",
+          "angle": "This perspective broadens the discussion to the potential societal impact of AI, specifically focusing on its transformative effect on modern work and the implications for jobs.",
+          "url": "https://jacobin.com/2026/02/ai-technology-productivity-growth-job-loss/",
+          "pub_date": "2026-02-28T10:51:13Z"
+        },
+        {
+          "name": "New York Times",
+          "region": "USA",
+          "bias": "centre-left",
+          "perspective": "Behind-the-Scenes of Defense AI Deals",
+          "angle": "This angle delves into the complexities and breakdowns of negotiations between AI companies (specifically Anthropic) and the Pentagon, highlighting issues like 'strong personalities' and 'mutual distrust' that can derail such partnerships.",
+          "url": "https://www.nytimes.com/2026/03/01/technology/anthropic-defense-dept-openai-talks.html",
+          "pub_date": "Sun, 01 Mar 2026 20:47:22 +0000"
+        },
+        {
+          "name": "Reason",
+          "region": "USA",
+          "bias": "libertarian",
+          "perspective": "Government Risk and Exclusion",
+          "angle": "Frames the story around government risk assessments, specifically the labeling of Anthropic as a supply chain risk and its exclusion from federal contracts, reflecting on government security priorities.",
+          "url": "https://reason.com/2026/02/28/anthropic-labeled-a-supply-chain-risk-banned-from-federal-government-contracts/",
+          "pub_date": "Sat, 28 Feb 2026 17:42:58 +0000"
+        },
+        {
+          "name": "TechCrunch",
+          "region": "USA-Tech",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://techcrunch.com/2026/03/01/anthropics-claude-rises-to-no-2-in-the-app-store-following-pentagon-dispute/",
+          "pub_date": "Sun, 01 Mar 2026 14:48:58 +0000"
+        },
+        {
+          "name": "MarketWatch",
+          "region": "USA-Finance",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.marketwatch.com/story/anthropics-claude-tops-app-store-charts-as-backlash-builds-against-openais-chatgpt-3fdce792?mod=mw_rss_topstories",
+          "pub_date": "Mon, 02 Mar 2026 01:32:00 GMT"
+        },
+        {
+          "name": "TechCrunch",
+          "region": "USA-Tech",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://techcrunch.com/2026/02/28/the-trap-anthropic-built-for-itself/",
+          "pub_date": "Sun, 01 Mar 2026 00:08:58 +0000"
+        },
+        {
+          "name": "Daily Maverick",
+          "region": "South Africa",
+          "bias": "centre-left",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.dailymaverick.co.za/article/crossed-wires-ai-canary-in-the-coalmine-coughed-and-4000-jobs-were-lost",
+          "pub_date": "Sun, 01 Mar 2026 22:23:57 GMT"
+        },
+        {
+          "name": "VentureBeat",
+          "region": "USA-Tech",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://venturebeat.com/security/when-ai-lies-the-rise-of-alignment-faking-in-autonomous-systems",
+          "pub_date": "Sun, 01 Mar 2026 19:00:00 GMT"
+        },
+        {
+          "name": "Bangkok Post",
+          "region": "Thailand",
+          "bias": "centre",
+          "perspective": "General coverage",
+          "angle": "",
+          "url": "https://www.bangkokpost.com/business/general/3208109/the-ai-age-is-a-leadership-test",
+          "pub_date": "Mon, 02 Mar 2026 09:50:00 +0700"
+        }
+      ],
+      "missing_perspectives": [
+        "AI Infrastructure and Investment",
+        "Public Backlash and Boycott",
+        "Transparency and Safeguards in the Deal"
+      ],
+      "comparisons": {
+        "Gemini Pro": "AGREED FACTS:\nMultiple sources confirm a deal or negotiation involving the Pentagon and an AI company. The Register reports OpenAI signed a deal with the United States Department of War (DoW). The New York Times reports the Pentagon and Anthropic were close to a deal that ultimately fell apart. The Register also mentions the Pentagon's action of \"binning Anthropic.\"\n\nDISAGREEMENTS:\nNo substantive contradictions identified.\n\nFRAMING DIFFERENCES:\nThe sources frame the OpenAI-Pentagon relationship and its consequences very differently.\n\nEuroNews frames the story around public backlash, using the headline \"'Cancel ChatGPT': AI boycott surges after OpenAI-Pentagon military deal.\" Its editorial focus is on a \"growing protest movement\" against the company.\n\nThe Register frames its story around the specifics of the deal and OpenAI's control over its military use. It highlights a quote from OpenAI's Altman, who called the Pentagon's rejection of a rival a \"scary precedent,\" and uses the colloquial term \"killer robots\" to describe the technology being controlled.\n\nJacobin frames the topic broadly around the societal impact of AI on labor. Its headline, \"Is AI Coming for Our Jobs?\", sets up a discussion about the \"radical transformation of modern work.\"\n\nThe New York Times frames its story as a behind-the-scenes look at a failed deal, focusing on interpersonal conflict. The headline \"How Talks Between Anthropic and the Defense Dept. Fell Apart\" and the phrase \"unraveled a deal\" emphasize the human drama of the negotiation.\n\nReason frames its coverage around a specific government event, factually reporting on a speech by the \"Secretary of War\" as part of his \"Arsenal of Freedom Tour.\"\n\nKEY UNKNOWNS:\nThe extractions do not clarify the specific terms or nature of the OpenAI-Pentagon deal. The exact reasons why the Anthropic deal \"unraveled,\" beyond \"strong personalities\" and \"mutual dislike,\" are not detailed. The size and impact of the \"Cancel ChatGPT\" boycott movement are not quantified. The relationship between the \"Department of War\" mentioned by The Register and the \"Defense Dept.\" mentioned by the New York Times is not explained. The reason for the future date of Feb. 27, 2026, in the Reason extraction is not provided.",
+        "ChatGPT": "AGREED FACTS:\nBoth EuroNews and The Register report that OpenAI has made a deal with the US military (referred to as the Pentagon or Department of War) involving its AI systems. EuroNews frames this as the \"OpenAI-Pentagon military deal\" and The Register specifies the deal allows use of advanced AI systems in classified environments. Both sources also reference ChatGPT/OpenAI as the company involved and the US military as the partner. The New York Times confirms that the Pentagon has been negotiating AI deals, specifically mentioning Anthropic as another company involved in talks, though it focuses on a failed deal rather than OpenAI's agreement. \n\nDISAGREEMENTS:\nNo substantive contradictions identified. The sources focus on different aspects: EuroNews on the protest movement, The Register on the technical and ethical safeguards, New York Times on failed Pentagon-Anthropic negotiations, and Reason on a government official's event unrelated to the OpenAI deal specifics.\n\nFRAMING DIFFERENCES:\nEuroNews uses strong, activist language such as \"Cancel ChatGPT\" and \"boycott surges,\" emphasizing a public protest movement and ethical concerns about the OpenAI-Pentagon deal. The Register frames the story around technical safeguards and competition, using phrases like \"scary precedent\" (attributed to Altman) and \"killer robots,\" which evokes a sense of risk and control. The New York Times takes a behind-the-scenes approach, focusing on \"strong personalities, mutual dislike and a rival company\" as reasons for the collapse of a separate Pentagon-Anthropic deal, using language like \"unraveled a deal\" to suggest complexity and gradual breakdown. Reason does not frame the OpenAI-Pentagon deal at all, instead providing straightforward reporting on a government official's remarks at an unrelated event.\n\nKEY UNKNOWNS:\nThe specific terms and scope of the OpenAI-Pentagon deal are not detailed in any extraction. It is unclear what exact AI technologies are being provided, what safeguards are in place, and how the deal compares to previous or attempted deals with other companies like Anthropic. The size and impact of the \"boycott\" movement referenced by EuroNews are not quantified or independently corroborated by other sources. The direct consequences of these military AI deals for society, labor, or international security are not addressed in the provided claims."
+      },
+      "investigation_raw": "",
+      "written_by": "ChatGPT",
+      "qa_warnings": [
+        "Pentagon is referred to as both 'US Pentagon' and 'Department of War' in the same section, but the Department of War was renamed to Department of Defense in 1949.",
+        "Key Facts section states that 'OpenAI CEO Sam Altman criticized the Pentagon's decision to reject Anthropic' but earlier states that 'negotiations between the Pentagon and Anthropic...fell apart' - this implies the Pentagon made a decision to reject rather than negotiations simply failing."
+      ],
+      "political_balance": "balanced",
+      "geo_diversity": 4,
+      "coverage_depth": "thin",
+      "heat_score": 79,
+      "_original_index": 1
+    },
+    {
+      "title": "India still a main perpetrator of interference, espionage in Canada: CSIS",
+      "why_matters": "This situation directly affects Canadian national security and the integrity of its institutions, as foreign interference and espionage can undermine democratic processes and public trust. The signing of major trade deals with India, despite these concerns, could reshape economic and diplomatic relations between the two countries, potentially influencing global energy markets and alliances. The tension between security risks and economic interests may spark significant debate in Canada and beyond.",
+      "why_today": "The developments are timely as new multi-billion dollar agreements have just been signed and CSIS's assessment of Indian interference is current, making the intersection of security and diplomacy an urgent issue.",
+      "whats_happening": "CSIS has identified India as a main perpetrator of foreign interference and espionage activities in Canada. At the same time, Canadian officials, including Mark Carney, have traveled to India to sign new deals worth billions of dollars, including a $2.6 billion uranium agreement and renewable energy partnerships. These diplomatic and trade engagements are being described as a breakthrough in relations between Canada and India. The events are unfolding amid ongoing security concerns in Canada related to India's alleged activities.",
+      "spin_positions": [
+        {
+          "position": "India is a major perpetrator of interference and espionage in Canada, posing a security threat.",
+          "who": "Canadian security agencies (CSIS), security-focused commentators",
+          "key_claim": "CSIS identifies India as a main perpetrator of foreign interference and espionage in Canada.",
+          "verified": "Verified \u2014 CSIS is directly cited as the source of this assessment."
+        },
+        {
+          "position": "Engagement with India is a diplomatic and economic opportunity, with major trade deals and improved relations prioritized.",
+          "who": "Canadian government officials (e.g., Mark Carney), pro-trade/business groups",
+          "key_claim": "Canada is signing multi-billion dollar deals with India, including a $2.6B uranium agreement, and pursuing diplomatic breakthroughs.",
+          "verified": "Verified \u2014 Multiple sources report on the trade deals and diplomatic outreach."
+        }
+      ],
+      "spin_predictions": [
+        {
+          "prediction": "Security-focused groups may use the CSIS report to argue for limiting or scrutinizing diplomatic and economic engagement with India.",
+          "confidence": "likely"
+        },
+        {
+          "prediction": "Government and business leaders may downplay security concerns to emphasize the benefits of trade and diplomatic ties with India.",
+          "confidence": "likely"
+        }
+      ],
+      "key_facts": [
+        "Mark Carney is a prominent Canadian official involved in recent diplomatic and trade negotiations with India.",
+        "The uranium deal between Canada and India is valued at $2.6 billion.",
+        "Recent agreements between Canada and India also include deals in the renewable energy sector.",
+        "The diplomatic breakthrough and signing of these deals occurred during a period of heightened security concerns in Canada regarding foreign interference."
+      ],
+      "context": [],
+      "history": [],
+      "unknowns": [
+        {
+          "q": "What specific evidence does CSIS provide to support its claim that India is a main perpetrator of interference and espionage in Canada?",
+          "a": "Not yet reported."
+        },
+        {
+          "q": "How have the Canadian and Indian governments responded to the CSIS allegations of interference and espionage?",
+          "a": "Not yet reported."
+        },
+        {
+          "q": "Is there any connection between the new trade and uranium deals and the ongoing security concerns raised by CSIS?",
+          "a": "Not yet reported."
+        }
+      ],
+      "bigger_picture": "Continued allegations by CSIS that India is a main perpetrator of interference and espionage in Canada may strain diplomatic relations, even as both countries pursue major trade and energy agreements. Heightened security concerns could lead to increased scrutiny of Indian activities in Canada, affecting bilateral cooperation and potentially influencing the policies of allies such as the United States and other Five Eyes partners. This dynamic may also contribute to a broader trend of democracies reassessing their approach to foreign interference, balancing economic interests with national security priorities.",
+      "actions": [],
+      "editorial": "",
+      "editorial_writer": "",
+      "editorial_editor": "",
+      "editorial_rounds": 0,
+      "what_happened": "CSIS has identified India as a main perpetrator of foreign interference and espionage activities in Canada. At the same time, Canadian officials, including Mark Carney, have traveled to India to sign new deals worth billions of dollars, including a $2.6 billion uranium agreement and renewable energy partnerships. These diplomatic and trade engagements are being described as a breakthrough in relations between Canada and India. The events are unfolding amid ongoing security concerns in Canada related to India's alleged activities.",
+      "so_what": "This situation directly affects Canadian national security and the integrity of its institutions, as foreign interference and espionage can undermine democratic processes and public trust. The signing of major trade deals with India, despite these concerns, could reshape economic and diplomatic relations between the two countries, potentially influencing global energy markets and alliances. The tension between security risks and economic interests may spark significant debate in Canada and beyond.",
+      "agreed_facts": [
+        "Mark Carney is a prominent Canadian official involved in recent diplomatic and trade negotiations with India.",
+        "The uranium deal between Canada and India is valued at $2.6 billion.",
+        "Recent agreements between Canada and India also include deals in the renewable energy sector.",
+        "The diplomatic breakthrough and signing of these deals occurred during a period of heightened security concerns in Canada regarding foreign interference."
+      ],
+      "disputes": [],
+      "framing": [],
+      "coverage_note": "",
+      "investigation_impact": "",
+      "key_unknowns": [
+        {
+          "question": "What specific evidence does CSIS provide to support its claim that India is a main perpetrator of interference and espionage in Canada?",
+          "answer": "Not yet reported."
+        },
+        {
+          "question": "How have the Canadian and Indian governments responded to the CSIS allegations of interference and espionage?",
+          "answer": "Not yet reported."
+        },
+        {
+          "question": "Is there any connection between the new trade and uranium deals and the ongoing security concerns raised by CSIS?",
+          "answer": "Not yet reported."
+        }
+      ],
+      "predictions": [],
+      "notable_details": [],
+      "card_mode": "contested",
+      "contested_reason": "The story is being framed both as a security threat from Indian interference and espionage (per CSIS), and as a diplomatic/economic breakthrough with India (highlighting trade deals and improved relations).",
+      "depth_tier": "standard",
+      "importance": 4,
+      "importance_reason": "Significant national security news for Canada, highlighting ongoing foreign interference and espionage, relevant for Canadian politics and international relations.",
+      "topics": [
+        "canada_politics",
+        "world_politics",
+        "economics_business"
+      ],
+      "source_count": 4,
+      "independent_count": 1,
+      "region_count": 1,
+      "sources": [
+        {
+          "name": "National Post",
+          "region": "Canada",
+          "bias": "centre-right",
+          "perspective": "Primary report",
+          "angle": "Lead coverage",
+          "url": "https://nationalpost.com/news/politics/india-still-one-of-the-main-perpetrators-of-foreign-interference-and-espionage-in-canada-csis-says",
+          "pub_date": "Mon, 02 Mar 2026 01:29:53 +0000"
+        }
+      ],
+      "missing_perspectives": [
+        "Balancing Diplomacy and Security Concerns",
+        "Focus on Diplomatic and Economic Breakthroughs",
+        "Security Concerns Amid Diplomatic Engagement"
+      ],
+      "comparisons": {
+        "Gemini Pro": "AGREED FACTS:\nNo agreed facts can be determined as only one source was provided for analysis.\n\nDISAGREEMENTS:\nNo substantive contradictions identified.\n\nFRAMING DIFFERENCES:\nThe single provided source, National Post, frames its report around a Canadian diplomatic and trade mission to India. The article emphasizes this mission by stating Mark Carney is in India to \"kickstart diplomatic relations and a new trade deal\". This framing presents a positive, forward-looking diplomatic effort.\n\nKEY UNKNOWNS:\nThe provided extraction does not mention the central topic of the user's query: the CSIS claim that India is a main perpetrator of interference and espionage in Canada. It is unknown how or if the National Post article addresses this claim, what evidence CSIS provides, what the specific nature of the alleged interference is, or what the Canadian or Indian governments' responses are to the CSIS assessment. The connection between Carney's trade mission and the CSIS allegations is also not explained.",
+        "ChatGPT": "AGREED FACTS:\nOnly one source extraction is provided (National Post). The extraction states that Carney is in India to kickstart diplomatic relations and a new trade deal with the third largest economy in Asia. No other sources are present for comparison, so no facts are confirmed by multiple sources.\n\nDISAGREEMENTS:\nNo substantive contradictions identified.\n\nFRAMING DIFFERENCES:\nThe National Post extraction uses straightforward and factual language, describing Carney's actions and India's economic status with phrases like \"kickstart diplomatic relations and a new trade deal\" and \"third largest economy in Asia.\" There is no editorializing or quoted subject framing in the extraction.\n\nKEY UNKNOWNS:\nWhether other sources corroborate or dispute the claim about Carney's mission in India.\nWhether the issue of Indian interference or espionage in Canada, as referenced in the prompt, is addressed or framed differently by other outlets.\nDetails about the context or outcomes of Carney's diplomatic and trade efforts.\nAny direct statements or evidence from CSIS regarding India's alleged interference or espionage activities in Canada."
+      },
+      "investigation_raw": "",
+      "written_by": "ChatGPT",
+      "qa_warnings": [],
+      "political_balance": "leans_right",
+      "geo_diversity": 1,
+      "coverage_depth": "thin",
+      "heat_score": 29,
+      "_original_index": 2
+    },
+    {
+      "title": "LIVE, war in Ukraine: Five people killed in Donetsk Oblast after Russian attacks",
+      "why_matters": "The Russian attacks in Donetsk Oblast have resulted in civilian casualties, directly impacting the safety and lives of people in the region. The presence of German parts in Russian drones raises questions about the effectiveness of international sanctions and the global supply chain's role in the conflict. President Zelenskyy's statement underscores Ukraine's continued resistance, which could influence both domestic morale and international support.",
+      "why_today": "The reported deaths and injuries in Donetsk Oblast, along with new revelations about sanctions evasion, highlight the immediate and ongoing risks in the Ukraine war.",
+      "whats_happening": "Five people have been killed and thirteen injured in Donetsk Oblast following recent Russian attacks, according to Le Monde. DW News reports that German-made parts are being found in Russian drones used in the conflict. S\u00fcddeutsche Zeitung highlights a statement from Ukrainian President Zelenskyy, who said that Ukraine has survived the winter and did not give in. The current situation involves ongoing Russian military actions, international concerns about sanctions evasion, and Ukrainian efforts to maintain resilience.",
+      "spin_positions": [],
+      "spin_predictions": [],
+      "key_facts": [
+        "Le Monde does not specify the exact locations or circumstances of the attacks in Donetsk Oblast that resulted in casualties.",
+        "DW News does not explain the specific mechanisms or routes by which German parts are circumventing sanctions to end up in Russian drones.",
+        "S\u00fcddeutsche Zeitung does not provide the context or date for President Zelenskyy's statement about surviving the 'most difficult' winter."
+      ],
+      "context": [],
+      "history": [],
+      "unknowns": [
+        {
+          "q": "What were the specific circumstances and locations of the Russian attacks in Donetsk Oblast that resulted in five deaths?",
+          "a": "Not yet reported."
+        },
+        {
+          "q": "How are German-made parts circumventing sanctions to end up in Russian drones?",
+          "a": "Not yet reported."
+        },
+        {
+          "q": "When and in what context did President Zelenskyy make his statement about surviving the winter?",
+          "a": "Not yet reported."
+        }
+      ],
+      "bigger_picture": "The reported Russian attacks in Donetsk Oblast resulting in civilian casualties are likely to intensify calls for increased international support to Ukraine and may prompt further scrutiny of arms supply chains, as highlighted by DW News\u2019 reporting on German components in Russian drones. These developments could lead to heightened diplomatic tensions between Russia and Western countries, as well as renewed efforts to tighten sanctions enforcement. The continued targeting of civilians may also reinforce Ukrainian resolve, as reflected in President Zelenskyy's statements, and could contribute to sustained or increased humanitarian needs in the affected regions.",
+      "actions": [],
+      "editorial": "",
+      "editorial_writer": "",
+      "editorial_editor": "",
+      "editorial_rounds": 0,
+      "what_happened": "Five people have been killed and thirteen injured in Donetsk Oblast following recent Russian attacks, according to Le Monde. DW News reports that German-made parts are being found in Russian drones used in the conflict. S\u00fcddeutsche Zeitung highlights a statement from Ukrainian President Zelenskyy, who said that Ukraine has survived the winter and did not give in. The current situation involves ongoing Russian military actions, international concerns about sanctions evasion, and Ukrainian efforts to maintain resilience.",
+      "so_what": "The Russian attacks in Donetsk Oblast have resulted in civilian casualties, directly impacting the safety and lives of people in the region. The presence of German parts in Russian drones raises questions about the effectiveness of international sanctions and the global supply chain's role in the conflict. President Zelenskyy's statement underscores Ukraine's continued resistance, which could influence both domestic morale and international support.",
+      "agreed_facts": [
+        "Le Monde does not specify the exact locations or circumstances of the attacks in Donetsk Oblast that resulted in casualties.",
+        "DW News does not explain the specific mechanisms or routes by which German parts are circumventing sanctions to end up in Russian drones.",
+        "S\u00fcddeutsche Zeitung does not provide the context or date for President Zelenskyy's statement about surviving the 'most difficult' winter."
+      ],
+      "disputes": [],
+      "framing": [],
+      "coverage_note": "",
+      "investigation_impact": "",
+      "key_unknowns": [
+        {
+          "question": "What were the specific circumstances and locations of the Russian attacks in Donetsk Oblast that resulted in five deaths?",
+          "answer": "Not yet reported."
+        },
+        {
+          "question": "How are German-made parts circumventing sanctions to end up in Russian drones?",
+          "answer": "Not yet reported."
+        },
+        {
+          "question": "When and in what context did President Zelenskyy make his statement about surviving the winter?",
           "answer": "Not yet reported."
         }
       ],
@@ -381,689 +1283,60 @@
       "contested_reason": "",
       "depth_tier": "standard",
       "importance": 4,
-      "importance_reason": "Oil price volatility affects global markets and economies.",
+      "importance_reason": "Significant ongoing conflict with direct human cost, relevant for world politics and humanitarian concerns.",
       "topics": [
-        "economics_business",
-        "world_politics"
+        "world_politics",
+        "economics_business"
       ],
-      "source_count": 55,
-      "independent_count": 55,
-      "region_count": 6,
+      "source_count": 3,
+      "independent_count": 3,
+      "region_count": 1,
       "sources": [
         {
-          "name": "Global News Canada",
-          "region": "Canada",
-          "bias": "centre",
-          "perspective": "Economic Impact on Oil Markets",
-          "angle": "This perspective focuses on the direct impact of the conflict on global oil prices, market volatility, and potential actions by oil-producing nations.",
-          "url": "https://globalnews.ca/news/11711403/oil-prices-us-israel-iran/",
-          "pub_date": "Sat, 28 Feb 2026 17:44:00 +0000"
-        },
-        {
-          "name": "BBC News",
-          "region": "UK",
-          "bias": "centre",
-          "perspective": "Impact on Global Travel and Logistics",
-          "angle": "This perspective highlights the immediate disruption to international travel, specifically flight cancellations and diversions, due to the conflict.",
-          "url": "https://www.bbc.com/news/articles/c0rjpr575g9o?at_medium=RSS&at_campaign=rss",
-          "pub_date": "Sun, 01 Mar 2026 08:49:32 GMT"
-        },
-        {
-          "name": "South China Morning Post",
-          "region": "Hong Kong",
-          "bias": "centre",
-          "perspective": "Regional Economic Preparedness",
-          "angle": "This perspective focuses on how specific regional governments are preparing for broader economic instability and market volatility resulting from the conflict.",
-          "url": "https://www.scmp.com/news/hong-kong/hong-kong-economy/article/3345021/hong-kong-government-prepared-more-volatility-after-iran-attacks-paul-chan?utm_source=rss_feed",
-          "pub_date": "Sun, 01 Mar 2026 09:09:42 +0000"
-        },
-        {
-          "name": "Al Monitor",
-          "region": "Middle East/Africa",
-          "bias": "centre",
-          "perspective": "OPEC+ Policy Response",
-          "angle": "Emphasizes the potential response of oil-producing nations (OPEC+) to the crisis, considering production increases to counteract price spikes and market instability.",
-          "url": "https://www.al-monitor.com/originals/2026/02/opec-mulls-oil-production-increase-shadow-war",
-          "pub_date": "2026-02-28T22:30:20-0500"
-        },
-        {
-          "name": "The Hill",
-          "region": "USA",
-          "bias": "centre",
-          "perspective": "Trump's Warning and US Response",
-          "angle": "These sources focus on President Trump's warnings to Iran against retaliation, his specific offers or threats to the IRGC, and the potential US response to any Iranian action.",
-          "url": "https://thehill.com/policy/international/5761137-ayatollah-khamenei-death-reaction/",
-          "pub_date": "Sun, 01 Mar 2026 04:03:28 +0000"
-        },
-        {
-          "name": "The American Conservative",
-          "region": "USA",
-          "bias": "right",
-          "perspective": "Confirmation and Immediate Impact of Khamenei's Death",
-          "angle": "These sources primarily report the confirmation of Ayatollah Ali Khamenei's death due to US-Israeli attacks and the immediate aftermath, such as Iran's mourning period or the direct result of the strikes.",
-          "url": "https://www.theamericanconservative.com/iranian-state-media-confirm-khameneis-death/",
-          "pub_date": "Sun, 01 Mar 2026 01:55:36 +0000"
-        },
-        {
-          "name": "National Post",
-          "region": "Canada",
-          "bias": "centre-right",
-          "perspective": "Khamenei's Legacy and Power Vacuum",
-          "angle": "These sources delve into Ayatollah Ali Khamenei's long rule, his impact on Iran's political and military landscape, and the power vacuum created by his death.",
-          "url": "https://nationalpost.com/news/world/khamenei-killed-in-tehran-strike-according-to-israeli-official",
-          "pub_date": "Sat, 28 Feb 2026 20:33:45 +0000"
-        },
-        {
-          "name": "Al Monitor",
-          "region": "Middle East/Africa",
-          "bias": "centre",
-          "perspective": "Future Implications and Geopolitical Consequences",
-          "angle": "These sources look beyond the immediate event, speculating on what comes next for Iran and the broader region, including the potential for escalation or the strategic message sent by the attack.",
-          "url": "https://www.al-monitor.com/originals/2026/02/explainer-why-us-attacking-iran",
-          "pub_date": "2026-02-28T21:36:45-0500"
-        },
-        {
-          "name": "Iran International",
-          "region": "UK/Iran",
-          "bias": "centre",
-          "perspective": "Iranian Internal Reaction",
-          "angle": "This source focuses on the internal reaction within Iran to Khamenei's death, highlighting the public's response.",
-          "url": "https://www.iranintl.com/en/202602285934",
-          "pub_date": "Sat, 28 Feb 2026 10:05:21 GMT"
-        },
-        {
-          "name": "France 24",
+          "name": "Le Monde",
           "region": "France",
-          "bias": "centre",
-          "perspective": "Focus on US/Israeli Military Action and Retaliation Threats",
-          "angle": "Emphasizes the US-Israeli strikes that killed Khamenei, Iran's vows of revenge, and Trump's warnings against retaliation. Frames the event as a high-stakes military confrontation with immediate escalation risks.",
-          "url": "https://www.france24.com/en/iran-supreme-leader-khamenei-killed-at-86-in-us-israeli-strikes",
-          "pub_date": "Sun, 01 Mar 2026 09:44:51 GMT"
-        },
-        {
-          "name": "The Intercept",
-          "region": "USA",
-          "bias": "left",
-          "perspective": "Critical View of US Policy and Regional Consequences",
-          "angle": "Questions the wisdom and potential fallout of the US action, warning that such strikes may incentivize adversaries to pursue nuclear weapons and destabilize the region.",
-          "url": "https://theintercept.com/2026/02/28/trump-iran-ayatollah-ali-khamenei-dead/",
-          "pub_date": "Sun, 01 Mar 2026 04:43:20 +0000"
-        },
-        {
-          "name": "Washington Post",
-          "region": "USA",
           "bias": "centre-left",
-          "perspective": "Factual Reporting of Death and Attack",
-          "angle": "These sources primarily focus on reporting the factual event of Ayatollah Ali Khamenei's death due to a U.S.-Israeli attack and the immediate retaliatory actions by Tehran. They emphasize the 'who, what, where' of the event.",
-          "url": "https://www.washingtonpost.com/world/2026/02/28/israel-strikes-iran-live-updates/",
-          "pub_date": "Sun, 01 Mar 2026 10:59:34 +0000"
-        },
-        {
-          "name": "France 24",
-          "region": "France",
-          "bias": "centre",
-          "perspective": "Geopolitical Implications and Regime Change",
-          "angle": "This source goes beyond the immediate facts to explore the broader geopolitical implications of Khamenei's death, specifically questioning whether this event will lead to regime change in Iran and discussing the 'limits of American power'.",
-          "url": "https://www.france24.com/en/asia-pacific/20260301-limits-american-power-will-killing-khamenei-bring-regime-change-iran",
-          "pub_date": "Sun, 01 Mar 2026 10:35:20 GMT"
-        },
-        {
-          "name": "India Today",
-          "region": "India",
-          "bias": "centre",
-          "perspective": "Iran's Retaliatory Actions and Impact",
-          "angle": "These sources focus on Iran's direct retaliatory actions, including missile and drone attacks on specific locations like Doha, Dubai, and Gulf states, and the resulting damage or 'internationalization of the battlefield.' They emphasize Iran's vow of 'ferocious operations.'",
-          "url": "https://www.indiatoday.in/world/story/blasts-heard-over-dubai-doha-for-second-day-amid-irans-retaliatory-strikes-2876086-2026-03-01?utm_source=rss",
-          "pub_date": "Sun, 01 Mar 2026 10:40:30 +0530"
-        },
-        {
-          "name": "Bloomberg",
-          "region": "USA-Finance",
-          "bias": "centre",
-          "perspective": "Economic and Market Impact",
-          "angle": "These sources primarily focus on the economic ramifications of the conflict, particularly concerning oil and gas markets, potential supply shocks, and broader market impacts. They discuss the financial implications for investors and global energy prices.",
-          "url": "https://www.bloomberg.com/news/articles/2026-03-01/iran-crisis-threatens-worst-disruption-in-gas-markets-since-2022",
-          "pub_date": "Sun, 01 Mar 2026 04:09:52 GMT"
-        },
-        {
-          "name": "In These Times",
-          "region": "USA-Labor",
-          "bias": "left",
-          "perspective": "Critique of US/Israel Actions",
-          "angle": "This source offers a critical perspective on the US and Israeli actions, labeling them as 'illegal and reckless' and attributing the initiation of war to specific political figures.",
-          "url": "https://inthesetimes.com/article/trump-netanyahu-war-iran",
-          "pub_date": "Sat, 28 Feb 2026 07:45:00 -0600"
-        },
-        {
-          "name": "South China Morning Post",
-          "region": "Hong Kong",
-          "bias": "centre",
-          "perspective": "Escalation and Retaliation in the Middle East",
-          "angle": "Focuses on the cycle of attacks and counterattacks between Iran, Israel, and the US, highlighting new blasts, Iranian vows of retaliation, and the broadening of the conflict to new locations.",
-          "url": "https://www.scmp.com/news/world/middle-east/article/3345006/iran-internationalises-battlefield-retaliatory-missiles-put-gulf-firing-line?utm_source=rss_feed",
-          "pub_date": "Sun, 01 Mar 2026 05:15:09 +0000"
-        },
-        {
-          "name": "Al Jazeera",
-          "region": "Qatar/ME",
-          "bias": "centre",
-          "perspective": "Iranian Official Response & Condemnation",
-          "angle": "This perspective focuses on the official Iranian reaction to Khamenei's killing, including condemnation, vows of retaliation, and the framing of the attack as a 'crime' or 'declaration of war'. It highlights statements from Iranian leadership.",
-          "url": "https://www.aljazeera.com/news/2026/3/1/iran-begins-40-day-mourning-after-khamenei-killed-in-us-israeli-attack?traffic_source=rss",
-          "pub_date": "Sun, 01 Mar 2026 08:33:17 +0000"
-        },
-        {
-          "name": "NPR",
-          "region": "USA",
-          "bias": "centre-left",
-          "perspective": "Emphasis on explosions/attacks in Tehran and Israeli targeting",
-          "angle": "Highlights the occurrence of explosions or attacks in Tehran, with Israel claiming responsibility or stating it is targeting the city, but without explicit mention of Khamenei's death as the trigger.",
-          "url": "https://www.npr.org/2026/03/01/g-s1-112062/iran-fires-missiles",
-          "pub_date": "Sun, 01 Mar 2026 02:11:17 -0500"
-        },
-        {
-          "name": "Le Devoir",
-          "region": "Canada-QC",
-          "bias": "centre-left",
-          "perspective": "Focus on the Operation and its Confirmation",
-          "angle": "These sources primarily focus on the details of the Israeli-American operation that led to Khamenei's death, its confirmation by Iranian authorities, and the immediate aftermath in terms of official announcements.",
-          "url": "https://www.ledevoir.com/monde/moyen-orient/960057/washington-israel-attaquent-iran-trump-appelle-renversement-regime",
-          "pub_date": "Sat, 28 Feb 2026 03:44:00 -0500"
-        },
-        {
-          "name": "Radio-Canada",
-          "region": "Canada-QC",
-          "bias": "centre-left",
-          "perspective": "Iranian Reaction and International Threats",
-          "angle": "These sources highlight Iran's official response, particularly vows of revenge, and the international reactions, specifically threats from Donald Trump, while also touching on the internal political transition.",
-          "url": "https://ici.radio-canada.ca/info/en-direct/1013513/israel-frappe-iran-teheran",
-          "pub_date": "Sun, 01 Mar 2026 11:16:13 GMT"
-        },
-        {
-          "name": "Washington Post",
-          "region": "USA",
-          "bias": "centre-left",
-          "perspective": "Internal Iranian Public Sentiment",
-          "angle": "This source uniquely focuses on the diverse reactions of the Iranian populace to Khamenei's death, showcasing a mix of celebration and grief.",
-          "url": "https://www.washingtonpost.com",
-          "pub_date": "Sun, 01 Mar 2026 11:21:07 +0000"
-        },
-        {
-          "name": "New York Times",
-          "region": "USA",
-          "bias": "centre-left",
-          "perspective": "US-Israeli Intelligence and Operation Details",
-          "angle": "Highlights the operational and intelligence cooperation between the US and Israel leading to the strike, framing the event as a result of coordinated Western action.",
-          "url": "https://www.nytimes.com/2026/03/01/us/politics/cia-israel-ayatollah-compound.html",
-          "pub_date": "Sun, 01 Mar 2026 07:41:15 +0000"
-        },
-        {
-          "name": "Iran International",
-          "region": "UK/Iran",
-          "bias": "centre",
-          "perspective": "Joint US-Israel Action",
-          "angle": "These sources directly state or strongly imply a coordinated, joint effort between the United States and Israel in launching the strikes against Iran.",
-          "url": "https://www.iranintl.com/en/202602289915",
-          "pub_date": "Sat, 28 Feb 2026 08:33:59 GMT"
-        },
-        {
-          "name": "Vatican News",
-          "region": "Vatican",
-          "bias": "religious",
-          "perspective": "Focus on Escalation and Retaliation",
-          "angle": "This perspective highlights the strikes as a re-ignition of conflict and emphasizes the immediate or potential for Iranian retaliation, framing the event within a cycle of escalation.",
-          "url": "https://www.vaticannews.va/en/world/news/2026-02/israel-u-s-iran-strikes.html",
-          "pub_date": "Sat, 28 Feb 2026 14:36:00 +0100"
-        },
-        {
-          "name": "Merco Press",
-          "region": "Latin America",
-          "bias": "centre",
-          "perspective": "US Presidential Commentary",
-          "angle": "This angle specifically includes direct quotes or references to the US President's characterization of the strikes, indicating the significance of the US leadership's framing.",
-          "url": "https://en.mercopress.com/2026/02/28/us-and-israel-launch-strikes-on-iran-trump-calls-them-a-massive-operation-as-tehran-vows-retaliation?utm_source=feed&utm_medium=rss&utm_content=main&utm_campaign=rss",
-          "pub_date": "Sat, 28 Feb 2026 10:58:00 GMT"
-        },
-        {
-          "name": "Wired",
-          "region": "USA-Tech",
-          "bias": "centre",
-          "perspective": "Major Combat Operation and Political Response",
-          "angle": "Focuses on the scale of the operation, using terms like 'massive' and 'major combat operation,' and includes political reactions, particularly statements from US President Trump and Iran\u2019s vow of retaliation.",
-          "url": "https://www.wired.com/story/us-iran-strike-donald-trump/",
-          "pub_date": "Sat, 28 Feb 2026 09:42:54 +0000"
-        },
-        {
-          "name": "Taipei Times",
-          "region": "Taiwan",
-          "bias": "centre",
-          "perspective": "Straightforward Reporting of Strikes",
-          "angle": "Presents a factual, unembellished account of the US and Israel launching waves of strikes on Iran, without additional context or emphasis on retaliation, escalation, or political statements.",
-          "url": "https://www.taipeitimes.com/News/front/archives/2026/03/01/2003853055",
-          "pub_date": "2026-03-01T08:00:00+08:00"
-        },
-        {
-          "name": "Global News Canada",
-          "region": "Canada",
-          "bias": "centre",
-          "perspective": "Primary report",
-          "angle": "Lead coverage",
-          "url": "https://globalnews.ca/news/11711377/un-security-council-us-israel-iran/",
-          "pub_date": "Sat, 28 Feb 2026 17:36:17 +0000"
-        },
-        {
-          "name": "Al Jazeera",
-          "region": "Qatar/ME",
-          "bias": "centre",
-          "perspective": "Mourning and Retaliation",
-          "angle": "Focuses on the public mourning in Iran for Khamenei and the Iranian Revolutionary Guard Corps' (IRGC) pledge of fierce retaliation.",
-          "url": "https://www.aljazeera.com/gallery/2026/3/1/thousands-in-iran-mourn-khameneis-killing?traffic_source=rss",
-          "pub_date": "Sun, 01 Mar 2026 07:07:34 +0000"
-        },
-        {
-          "name": "Times of Israel",
-          "region": "Israel",
-          "bias": "centre",
-          "perspective": "International Diplomatic Response and Escalation",
-          "angle": "Highlights the international diplomatic fallout, specifically the UN Security Council meeting requested by Russia, and the broader implications for regional conflict.",
-          "url": "https://www.timesofisrael.com/un-security-council-to-hold-emergency-meeting-on-us-israeli-strikes-against-iran/",
-          "pub_date": "Sat, 28 Feb 2026 20:35:59 +0000"
-        },
-        {
-          "name": "El Pais English",
-          "region": "Spain",
-          "bias": "centre-left",
-          "perspective": "US-Israel Attack Justification and Legality",
-          "angle": "Examines the legality and constitutionality of the US-Israeli strikes, often questioning the justification and the role of the US President and Congress.",
-          "url": "https://english.elpais.com/opinion/2026-03-01/another-reckless-attack-by-trump.html",
-          "pub_date": "Sun, 01 Mar 2026 04:45:00 GMT"
-        },
-        {
-          "name": "NHK World",
-          "region": "Japan",
-          "bias": "centre",
-          "perspective": "Operational Details of the Strike",
-          "angle": "Focuses on the intelligence gathering and execution of the military operation that led to Khamenei's death, including the tracking of his location.",
-          "url": "http://www3.nhk.or.jp/news/html/20260301/k10015063701000.html",
-          "pub_date": "Sun, 01 Mar 2026 19:28:26 +0900"
-        },
-        {
-          "name": "Iran International",
-          "region": "UK/Iran",
-          "bias": "centre",
-          "perspective": "Iranian Casualties and Internal Reactions",
-          "angle": "Reports on the confirmed deaths of other senior military officials and the mixed reactions (fear, joy, hope) among the Iranian populace.",
-          "url": "https://www.iranintl.com/en/202602287056",
-          "pub_date": "Sat, 28 Feb 2026 19:00:00 GMT"
-        },
-        {
-          "name": "NOS Nieuws",
-          "region": "Netherlands",
-          "bias": "centre",
-          "perspective": "Regional Civilian Impact",
-          "angle": "Focuses on the broader impact of the conflict on civilians in the Middle East, including travel disruptions and fear among non-combatants.",
-          "url": "https://nos.nl/l/2604423",
-          "pub_date": "Sat, 28 Feb 2026 19:40:40 +0100"
-        },
-        {
-          "name": "The New Arab",
-          "region": "UK/ME",
-          "bias": "centre-left",
-          "perspective": "Human Impact & Immediate Casualties",
-          "angle": "This perspective focuses on the direct human cost and immediate physical damage caused by the strikes, highlighting deaths and injuries.",
-          "url": "https://www.newarab.com/news/two-dead-iran-launches-waves-strikes-wealthy-gulf",
-          "pub_date": "Sun, 01 Mar 2026 01:13:38 +0000"
-        },
-        {
-          "name": "Financial Times",
-          "region": "UK",
-          "bias": "centre",
-          "perspective": "Economic & Insurance Impact",
-          "angle": "This perspective emphasizes the financial repercussions of the conflict, specifically the impact on the shipping industry through increased insurance costs and policy cancellations.",
-          "url": "https://www.ft.com/content/2dc114d0-5bb3-4fae-b538-9a050954549a",
-          "pub_date": "Sat, 28 Feb 2026 16:07:08 GMT"
-        },
-        {
-          "name": "Al Jazeera",
-          "region": "Qatar/ME",
-          "bias": "centre",
-          "perspective": "Geopolitical Escalation & US Targeting",
-          "angle": "This perspective frames the strikes as part of a broader geopolitical conflict, focusing on Iran's targeting of US assets and the potential for wider regional escalation.",
-          "url": "https://www.aljazeera.com/news/2026/3/1/more-blasts-rock-dubai-doha-and-manama-as-iran-targets-us-assets-in-gulf?traffic_source=rss",
-          "pub_date": "Sun, 01 Mar 2026 08:44:52 +0000"
-        },
-        {
-          "name": "Politico EU",
-          "region": "Europe",
-          "bias": "centre",
-          "perspective": "Khamenei\u2019s Death and Power Vacuum",
-          "angle": "Focuses on the immediate aftermath of Khamenei\u2019s death, the resulting uncertainty, and the potential for a power vacuum or regime instability.",
-          "url": "https://www.politico.com/news/2026/02/28/iranian-supreme-leader-killed-in-airstrike-leaving-power-vacuum-atop-regime-00806018?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "pub_date": "Sat, 28 Feb 2026 22:05:29 +0000"
-        },
-        {
-          "name": "Al Jazeera",
-          "region": "Qatar/ME",
-          "bias": "centre",
-          "perspective": "Transition and Succession in Iran",
-          "angle": "Highlights the formation of an interim council and the process of political transition following Khamenei\u2019s death.",
-          "url": "https://www.aljazeera.com/news/2026/3/1/us-israel-attacks-on-iran-day-2-khamenei-is-killed-iran-retaliates?traffic_source=rss",
-          "pub_date": "Sun, 01 Mar 2026 09:10:06 +0000"
+          "perspective": "Direct Impact of Conflict",
+          "angle": "Focuses on the immediate human cost and casualties of the ongoing conflict in Ukraine due to Russian attacks.",
+          "url": "https://www.lemonde.fr/international/live/2026/03/02/en-direct-guerre-en-ukraine-cinq-personnes-ont-ete-tuees-dans-l-oblast-de-donetsk-apres-des-attaques-russes_6668763_3210.html",
+          "pub_date": "Mon, 02 Mar 2026 11:32:30 +0100"
         },
         {
           "name": "DW News",
           "region": "Germany",
           "bias": "centre",
-          "perspective": "US/Israeli Strategic Objectives and Leadership Decisions",
-          "angle": "Explores the motives, goals, and decision-making of US and Israeli leaders, particularly Trump and Netanyahu, in launching the strikes and seeking regime change.",
-          "url": "https://www.dw.com/en/donald-trump-s-iran-objectives-what-can-be-achieved/a-76166558?maca=en-rss-en-all-1573-rdf",
-          "pub_date": "2026-02-28T14:25:00Z"
-        },
-        {
-          "name": "Bloomberg",
-          "region": "USA-Finance",
-          "bias": "centre",
-          "perspective": "Primary report",
-          "angle": "Lead coverage",
-          "url": "https://www.bloomberg.com/news/articles/2026-03-01/iran-strikes-disrupt-thousands-of-flights-dubai-airport-damaged",
-          "pub_date": "Sun, 01 Mar 2026 02:56:37 GMT"
-        },
-        {
-          "name": "Al Jazeera",
-          "region": "Qatar/ME",
-          "bias": "centre",
-          "perspective": "Direct Impact on Dubai Port",
-          "angle": "This perspective focuses on the immediate, visible impact of the attack on a specific, significant location \u2013 Dubai's Jebel Ali Port, highlighting the physical manifestation of the conflict.",
-          "url": "https://www.aljazeera.com/video/newsfeed/2026/3/1/video-smoke-seen-rising-from-dubais-main-shipping-port-after-iran-attack?traffic_source=rss",
-          "pub_date": "Sun, 01 Mar 2026 09:33:39 +0000"
-        },
-        {
-          "name": "The Straits Times",
-          "region": "Singapore",
-          "bias": "centre",
-          "perspective": "Regional Air Travel Disruption",
-          "angle": "This perspective highlights the broader logistical and economic consequences of the conflict, specifically focusing on the widespread disruption to air travel across the Middle East and its impact on international flights, including those to Japan.",
-          "url": "https://www.straitstimes.com/world/middle-east/us-iran-conflict-disrupts-thousands-of-flights-as-travel-chaos-deepens",
-          "pub_date": "Sun, 01 Mar 2026 15:56:17 +0800"
-        },
-        {
-          "name": "Middle East Eye",
-          "region": "UK/ME",
-          "bias": "centre",
-          "perspective": "Wider Regional Impact (Saudi Arabia)",
-          "angle": "This angle broadens the scope of the conflict's impact beyond the UAE, indicating that other countries in the region, such as Saudi Arabia, are also experiencing direct effects like explosions.",
-          "url": "https://www.middleeasteye.net/live-blog/live-blog-update/explosions-heard-east-saudi-capital-riyadh-afp",
-          "pub_date": "Sun, 01 Mar 2026 09:20:59 +0000"
-        },
-        {
-          "name": "Times of Israel",
-          "region": "Israel",
-          "bias": "centre",
-          "perspective": "Primary report",
-          "angle": "Lead coverage",
-          "url": "https://www.timesofisrael.com/liveblog-march-01-2026/",
-          "pub_date": "Sun, 01 Mar 2026 02:35:48 +0000"
-        },
-        {
-          "name": "In These Times",
-          "region": "USA-Labor",
-          "bias": "left",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://inthesetimes.com/article/trump-iran-attacks-war-israel-nuclear-weapons",
-          "pub_date": "Wed, 25 Feb 2026 13:00:00 -0600"
-        },
-        {
-          "name": "Le Devoir",
-          "region": "Canada-QC",
-          "bias": "centre-left",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://www.ledevoir.com/monde/etats-unis/960075/congres-americain-reactions-partagees-frappes-iran",
-          "pub_date": "Sat, 28 Feb 2026 10:48:10 -0500"
-        },
-        {
-          "name": "Toronto Star",
-          "region": "Canada",
-          "bias": "centre-left",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://www.thestar.com/news/canada/anand-backs-qatar-united-arab-emirates-against-iran-attacks/article_2c86ef2c-f963-5ec1-872b-f43ea844df8c.html",
-          "pub_date": "Sun, 01 Mar 2026 00:23:09 -0500"
-        },
-        {
-          "name": "Al Monitor",
-          "region": "Middle East/Africa",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://www.al-monitor.com/originals/2026/03/pro-iran-protesters-try-storm-us-missions-pakistan-iraq",
-          "pub_date": "2026-03-01T04:00:19-0500"
-        },
-        {
-          "name": "Toronto Star",
-          "region": "Canada",
-          "bias": "centre-left",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://www.thestar.com/news/world/middle-east/at-least-9-killed-as-shiites-storm-us-consulate-in-pakistan-over-killing-of-irans/article_dc451cde-79ce-5ceb-b644-0322d3098b85.html",
-          "pub_date": "Sun, 01 Mar 2026 03:02:48 -0500"
+          "perspective": "External Support/Sanctions Evasion",
+          "angle": "Highlights the issue of foreign components (specifically German parts) being found in Russian military equipment, raising questions about sanctions effectiveness and international supply chains.",
+          "url": "https://www.dw.com/en/ukraine-war-german-parts-make-their-way-into-russian-drones/a-76178605?maca=en-rss-en-all-1573-rdf",
+          "pub_date": "2026-03-02T10:12:00Z"
         },
         {
           "name": "S\u00fcddeutsche Zeitung",
           "region": "Germany",
           "bias": "centre-left",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://www.sueddeutsche.de/politik/iran-liveblog-news-israel-usa-botschaft-pakistan-irak-proteste-li.3395676",
-          "pub_date": "Sun, 01 Mar 2026 10:04:00 GMT"
-        },
-        {
-          "name": "DW News",
-          "region": "Germany",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://www.dw.com/en/iran-strikes-us-says-no-reports-of-american-casualties/a-76169908?maca=en-rss-en-all-1573-rdf",
-          "pub_date": "2026-02-28T23:18:00Z"
-        },
-        {
-          "name": "EuroNews",
-          "region": "Europe",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "http://www.euronews.com/2026/02/28/qatar-says-situation-secure-after-iranian-attacks-foiled-urges-vigilance-on-rumours",
-          "pub_date": "Sat, 28 Feb 2026 23:30:10 +0100"
-        },
-        {
-          "name": "Financial Times",
-          "region": "UK",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://www.ft.com/content/136d9ad6-f427-4bea-bbb2-5df8fb5decec",
-          "pub_date": "Sat, 28 Feb 2026 22:34:26 GMT"
+          "perspective": "Ukrainian Resilience/Leadership Perspective",
+          "angle": "Emphasizes the Ukrainian perspective on enduring the conflict, particularly through difficult periods like winter, as articulated by its leadership.",
+          "url": "https://www.sueddeutsche.de/politik/ukraine-krieg-newsblog-selenskij-winter-li.3388192",
+          "pub_date": "Mon, 02 Mar 2026 08:16:00 GMT"
         }
       ],
       "missing_perspectives": [
-        "Oil Market Volatility and Prices",
-        "Disruption to Air Travel",
-        "Preparedness for Global Market Volatility"
+        "Human Impact and Immediate Casualties",
+        "Sanctions Evasion and Western Technology in Russian Weapons",
+        "Ukrainian Resilience and Leadership Messaging"
       ],
       "comparisons": {
-        "Gemini Pro": "AGREED FACTS:\nMultiple sources report that the US and Israel launched strikes on Iran. (South China Morning Post, Al Monitor)\n\nMultiple sources report that the strikes are expected to or have already impacted oil prices. (Global News Canada, South China Morning Post, Al Monitor)\n\nDISAGREEMENTS:\nNo substantive contradictions identified.\n\nFRAMING DIFFERENCES:\nThe sources frame the event through different lenses based on their perspective.\n\nGlobal News Canada frames the story in terms of immediate, observed market reactions, using factual language like \"Oil prices have already risen on war fears\" and noting Brent crude \"closed at a seven-month high.\"\n\nAl Monitor frames the event around the anticipated policy response from oil producers. Its editorial framing uses phrases like \"in shadow of war\" to connect the OPEC+ meeting directly to the military strikes and highlights the risk of prices \"sending... sharply higher.\"\n\nSouth China Morning Post frames the story from a perspective of national economic planning and preparedness. It quotes Hong Kong's finance chief who describes the situation as creating \"significant global uncertainty\" and focuses on the government's readiness for \"greater global market volatility and risks.\"\n\nBBC News frames the event narrowly around its impact on the travel industry, focusing factually on specific airlines like \"BA and Virgin Atlantic\" that have grounded services.\n\nKEY UNKNOWNS:\nThe extractions do not specify the date of the US-Israel strikes. The exact price of Brent crude at the close on Friday is disputed, with one source citing US$72.87 and another US$90.75. The specific targets and extent of damage from the strikes are not detailed. The outcome of the OPEC+ meeting, including whether an output increase was announced, is not mentioned. The claim of Ayatollah Ali Khamenei's death is attributed to Iranian state media but is not corroborated by other sources.",
-        "ChatGPT": "AGREED FACTS:\nMultiple sources confirm that there have been US and Israeli strikes on Iran (South China Morning Post, Al Monitor, BBC News). There is agreement that these attacks have led to immediate impacts on global markets and sectors: oil prices have risen or are at risk of rising (Global News Canada, Al Monitor), and major airlines (BA and Virgin Atlantic) have grounded services to the Middle East (BBC News). There is also consensus that the conflict has created significant global uncertainty and market volatility (South China Morning Post, Al Monitor).\n\nDISAGREEMENTS:\nNo substantive contradictions identified. All sources report on different aspects of the aftermath of the US-Israel strikes on Iran, with no incompatible claims about the same facts or events.\n\nFRAMING DIFFERENCES:\nGlobal News Canada uses straightforward economic language, directly linking oil price increases to \"war fears\" and reporting on Brent crude reaching a \"seven-month high.\" Al Monitor frames the situation as a \"fresh Middle East conflict\" that \"risks sending oil prices sharply higher,\" and connects the conflict directly to anticipated OPEC+ policy decisions, using the phrase \"in shadow of war.\" South China Morning Post emphasizes official preparedness and uncertainty, quoting Hong Kong\u2019s finance chief describing \"significant global uncertainty\" and highlighting readiness for \"greater global market volatility and risks, higher trade costs, and fluctuating commodity prices.\" BBC News frames the event through its impact on travel, stating that BA and Virgin Atlantic \"are among major airlines to ground services to the Middle East in light of the attacks,\" with a focus on immediate logistical consequences.\n\nEditorial framing differs in focus: Global News Canada and Al Monitor stress economic and oil market impacts; South China Morning Post highlights official government response and preparedness; BBC News centers on travel disruptions.\n\nKEY UNKNOWNS:\nThe actual scale and duration of oil price swings in the coming week remain unclear. The specific details and confirmation of the reported death of Iran\u2019s Supreme Leader (claimed by South China Morning Post, attributed to Iranian state media) are not corroborated by other sources in these extractions. The outcome and details of the anticipated OPEC+ output decision are not yet known. The broader geopolitical consequences and potential for escalation following the strikes are not addressed. The full extent of travel and logistics disruptions beyond the named airlines is not detailed."
+        "Gemini Pro": "AGREED FACTS:\nNo agreed facts are present across multiple sources. The provided extractions cover entirely different aspects of the war in Ukraine: Le Monde reports on recent casualties, DW News reports on components in Russian drones, and S\u00fcddeutsche Zeitung reports on a statement by the Ukrainian president about surviving the winter.\n\nDISAGREEMENTS:\nNo substantive contradictions identified.\n\nFRAMING DIFFERENCES:\nThe sources frame the war in Ukraine through entirely different lenses, focusing on distinct, non-overlapping events.\n\nLe Monde frames the war through the lens of immediate human cost, using a \"LIVE\" headline to create a sense of urgency: \"LIVE, war in Ukraine: Five people killed in Donetsk Oblast after Russian attacks\". This focuses the reader on the direct, real-time impact of combat operations on civilians.\n\nDW News frames its coverage around the theme of sanctions evasion and the complexities of international supply chains. Its headline, \"Ukraine war: German parts make their way into Russian drones\", highlights a specific problem in the international effort to isolate Russia, focusing on the technological and logistical aspects of the conflict.\n\nS\u00fcddeutsche Zeitung frames the situation from a high-level political and national perspective, focusing on Ukrainian resilience. It quotes President Zelenskyy's statements about survival, such as \"We survived the winter\" and that Ukraine \"did not give in\", to build a narrative of national defiance and endurance against Russian aggression.\n\nKEY UNKNOWNS:\nThe Le Monde report does not specify the exact locations or circumstances of the attacks in Donetsk Oblast that resulted in the five deaths and thirteen injuries. The timeframe for these casualties is also not specified beyond being recent. The DW News report does not explain the specific mechanisms or routes by which hundreds of thousands of German parts are circumventing sanctions to end up in Russian drones. The S\u00fcddeutsche Zeitung report does not provide the context or date for President Zelenskyy's statement about surviving the \"most difficult\" winter.",
+        "ChatGPT": "AGREED FACTS:\nOnly Le Monde provides direct claims about \"Five people killed in Donetsk Oblast after Russian attacks.\" Neither DW News nor S\u00fcddeutsche Zeitung address this incident or provide overlapping factual claims about casualties in Donetsk Oblast. Therefore, no facts are confirmed by multiple sources regarding the deaths or injuries in Donetsk Oblast after Russian attacks.\n\nDISAGREEMENTS:\nNo substantive contradictions identified. The sources cover different aspects of the war in Ukraine (casualties in Donetsk, German parts in Russian drones, Ukrainian resilience through winter) and do not make incompatible claims about the same event or fact.\n\nFRAMING DIFFERENCES:\nLe Monde frames the situation with urgency and direct human impact, using phrases like \"LIVE, war in Ukraine: Five people killed in Donetsk Oblast after Russian attacks\" and emphasizing the immediate cost in lives and injuries. The focus is on the direct consequences of Russian military action on civilians in Donetsk Oblast.\n\nDW News frames its coverage around the issue of sanctions evasion and external support, with the headline \"Ukraine war: German parts make their way into Russian drones.\" The article emphasizes the challenge of stopping the flow of Western components into Russian weaponry, using phrases like \"despite sanctions\" and \"The Russian military apparently values German components highly.\" This is a broader, systemic perspective rather than a focus on immediate battlefield events.\n\nS\u00fcddeutsche Zeitung frames the conflict from a Ukrainian leadership and resilience perspective, quoting the Ukrainian president: \"The fourth winter since the Russian invasion was the most difficult,\" \"Ukraine did not give in,\" and \"Ukraine survived the winter.\" The editorial emphasis is on Ukrainian endurance and defiance in the face of Russian aggression, rather than specific military or civilian incidents.\n\nKEY UNKNOWNS:\nNo source independently corroborates the reported five deaths and thirteen injuries in Donetsk Oblast, leaving the precise details and verification of this incident unclear.\nThere is no information on the broader context or aftermath of the Donetsk attacks beyond casualty figures.\nThe sources do not address the Russian perspective or provide independent verification of the claims made by Ukrainian officials.\nNo details are given about the specific locations, identities of the victims, or the nature of the attacks in Donetsk Oblast.\nThere is no discussion of international or humanitarian responses to the reported incident in Donetsk."
       },
       "investigation_raw": "",
       "written_by": "ChatGPT",
-      "qa_warnings": [
-        "KEY FACTS section reports contradictory Brent crude prices at Friday's close: 'sources citing either US$72.87 or US$90.75' - a discrepancy of nearly $18 per barrel cannot both be correct for the same closing price."
-      ],
-      "political_balance": "balanced",
-      "geo_diversity": 6,
-      "coverage_depth": "thin",
-      "heat_score": 291,
-      "_original_index": 0
-    },
-    {
-      "title": "Kimwolf Botnet Lurking in Corporate, Govt. Networks",
-      "why_matters": "The presence of Kimwolf in sensitive networks poses immediate risks to organizational data, operations, and privacy. Its activity on I2P complicates detection and mitigation, increasing the threat to both public and private sectors.",
-      "why_today": "Recent security disclosures have revealed Kimwolf's current activity and infiltration, prompting urgent attention.",
-      "whats_happening": "The Kimwolf botnet has been detected actively operating within corporate and government networks. Reports indicate that Kimwolf is also heavily utilizing the anonymity network I2P. Security researchers have identified a figure known as 'Dort' as the possible botmaster behind Kimwolf.",
-      "spin_positions": [],
-      "spin_predictions": [],
-      "key_facts": [],
-      "context": [],
-      "history": [],
-      "unknowns": [],
-      "bigger_picture": "",
-      "actions": [],
-      "editorial": "",
-      "editorial_writer": "",
-      "editorial_editor": "",
-      "editorial_rounds": 0,
-      "what_happened": "The Kimwolf botnet has been detected actively operating within corporate and government networks. Reports indicate that Kimwolf is also heavily utilizing the anonymity network I2P. Security researchers have identified a figure known as 'Dort' as the possible botmaster behind Kimwolf.",
-      "so_what": "The presence of Kimwolf in sensitive networks poses immediate risks to organizational data, operations, and privacy. Its activity on I2P complicates detection and mitigation, increasing the threat to both public and private sectors.",
-      "agreed_facts": [],
-      "disputes": [],
-      "framing": [],
-      "coverage_note": "",
-      "investigation_impact": "",
-      "key_unknowns": [],
-      "predictions": [],
-      "notable_details": [],
-      "card_mode": "brief",
-      "contested_reason": "",
-      "depth_tier": "brief",
-      "importance": 4,
-      "importance_reason": "Major cybersecurity threat affecting corporate and government networks; high relevance for tech and governance.",
-      "topics": [
-        "data_privacy_governance",
-        "tech_ai"
-      ],
-      "source_count": 6,
-      "independent_count": 3,
-      "region_count": 1,
-      "sources": [
-        {
-          "name": "Krebs on Security",
-          "region": "USA-Security",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://krebsonsecurity.com/2026/01/kimwolf-botnet-lurking-in-corporate-govt-networks/",
-          "pub_date": "Tue, 20 Jan 2026 18:19:13 +0000"
-        },
-        {
-          "name": "Krebs on Security",
-          "region": "USA-Security",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://krebsonsecurity.com/2026/01/the-kimwolf-botnet-is-stalking-your-local-network/",
-          "pub_date": "Fri, 02 Jan 2026 14:20:10 +0000"
-        },
-        {
-          "name": "Krebs on Security",
-          "region": "USA-Security",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://krebsonsecurity.com/2026/02/kimwolf-botnet-swamps-anonymity-network-i2p/",
-          "pub_date": "Wed, 11 Feb 2026 16:08:11 +0000"
-        }
-      ],
-      "missing_perspectives": [],
-      "comparisons": {},
-      "investigation_raw": "",
-      "written_by": "ChatGPT",
       "qa_warnings": [],
-      "political_balance": "balanced",
+      "political_balance": "leans_left",
       "geo_diversity": 1,
       "coverage_depth": "thin",
-      "heat_score": 37,
-      "_original_index": 1
-    },
-    {
-      "title": "OpenAI\u2019s Sam Altman announces Pentagon deal with \u2018technical safeguards\u2019",
-      "why_matters": "This deal could shape how AI is used in US defense operations, potentially affecting national security and military decision-making. The inclusion of technical safeguards may influence public trust and future government partnerships with AI companies.",
-      "why_today": "The deal was publicly announced today, following recent federal actions against another major AI company, Anthropic.",
-      "whats_happening": "Sam Altman of OpenAI has announced a deal with the US Pentagon to provide artificial intelligence technology with 'technical safeguards.' The agreement includes layered protections and allows for classified AI networks. This announcement comes shortly after Anthropic was banned from federal agencies.",
-      "spin_positions": [],
-      "spin_predictions": [],
-      "key_facts": [],
-      "context": [],
-      "history": [],
-      "unknowns": [],
-      "bigger_picture": "",
-      "actions": [],
-      "editorial": "",
-      "editorial_writer": "",
-      "editorial_editor": "",
-      "editorial_rounds": 0,
-      "what_happened": "Sam Altman of OpenAI has announced a deal with the US Pentagon to provide artificial intelligence technology with 'technical safeguards.' The agreement includes layered protections and allows for classified AI networks. This announcement comes shortly after Anthropic was banned from federal agencies.",
-      "so_what": "This deal could shape how AI is used in US defense operations, potentially affecting national security and military decision-making. The inclusion of technical safeguards may influence public trust and future government partnerships with AI companies.",
-      "agreed_facts": [],
-      "disputes": [],
-      "framing": [],
-      "coverage_note": "",
-      "investigation_impact": "",
-      "key_unknowns": [],
-      "predictions": [],
-      "notable_details": [],
-      "card_mode": "brief",
-      "contested_reason": "",
-      "depth_tier": "brief",
-      "importance": 4,
-      "importance_reason": "OpenAI-Pentagon deal with safeguards; significant for AI governance and tech policy.",
-      "topics": [
-        "tech_ai",
-        "data_privacy_governance",
-        "us_politics"
-      ],
-      "source_count": 4,
-      "independent_count": 3,
-      "region_count": 2,
-      "sources": [
-        {
-          "name": "TechCrunch",
-          "region": "USA-Tech",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://techcrunch.com/2026/02/28/openais-sam-altman-announces-pentagon-deal-with-technical-safeguards/",
-          "pub_date": "Sat, 28 Feb 2026 16:17:36 +0000"
-        },
-        {
-          "name": "The Decoder",
-          "region": "Global-AI",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://the-decoder.com/the-pentagon-openai-anthropic-fallout-comes-down-to-three-words-all-lawful-use/",
-          "pub_date": "Sun, 01 Mar 2026 09:43:45 +0000"
-        },
-        {
-          "name": "The Decoder",
-          "region": "Global-AI",
-          "bias": "centre",
-          "perspective": "General coverage",
-          "angle": "",
-          "url": "https://the-decoder.com/openai-signs-pentagon-deal-for-classified-ai-networks-hours-after-anthropic-gets-banned-from-federal-agencies/",
-          "pub_date": "Sat, 28 Feb 2026 09:31:17 +0000"
-        }
-      ],
-      "missing_perspectives": [],
-      "comparisons": {},
-      "investigation_raw": "",
-      "written_by": "ChatGPT",
-      "qa_warnings": [],
-      "political_balance": "balanced",
-      "geo_diversity": 2,
-      "coverage_depth": "thin",
-      "heat_score": 35,
-      "_original_index": 2
+      "heat_score": 31,
+      "_original_index": 3
     }
   ]
 }
